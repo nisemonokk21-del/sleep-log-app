@@ -11,137 +11,144 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f8f8f6; --surface: #ffffff; --border: #e8e8e4;
-    --text: #1a1a18; --muted: #9a9a96;
-    --accent: #2d6a4f; --accent-light: #e8f4ee; --accent-mid: #52b788;
-    --warn: #e07a5f; --warn-light: #fdf0ec;
-    --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
-    --radius: 16px;
+    --bg:#f8f8f6; --surface:#ffffff; --border:#e8e8e4;
+    --text:#1a1a18; --muted:#9a9a96;
+    --accent:#2d6a4f; --accent-light:#e8f4ee; --accent-mid:#52b788;
+    --warn:#e07a5f; --warn-light:#fdf0ec;
+    --mono:'DM Mono',monospace; --sans:'DM Sans',sans-serif;
+    --radius:16px;
   }
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { font-family:var(--sans); background:var(--bg); color:var(--text); min-height:100vh; max-width:430px; margin:0 auto; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;}
 
-  .header { padding:56px 24px 20px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
-  .header-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-  .app-name { font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; }
+  .header{padding:56px 24px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+  .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .app-name{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;}
+  .date-picker-wrap{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:4px 12px;}
+  .date-picker-wrap input[type=date]{font-family:var(--mono);font-size:12px;color:var(--text);border:none;background:transparent;outline:none;cursor:pointer;width:110px;}
+  .date-picker-wrap input[type=date]::-webkit-calendar-picker-indicator{opacity:0.4;cursor:pointer;width:14px;}
 
-  .date-picker-wrap { display:flex; align-items:center; gap:6px; background:var(--bg); border:1px solid var(--border); border-radius:99px; padding:4px 12px; }
-  .date-picker-wrap input[type=date] { font-family:var(--mono); font-size:12px; color:var(--text); border:none; background:transparent; outline:none; cursor:pointer; width:110px; }
-  .date-picker-wrap input[type=date]::-webkit-calendar-picker-indicator { opacity:0.4; cursor:pointer; width:14px; }
+  .score-display{display:flex;align-items:flex-end;gap:8px;margin-top:4px;}
+  .score-number{font-family:var(--mono);font-size:60px;font-weight:300;line-height:1;color:var(--text);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);}
+  .score-label{font-size:13px;color:var(--muted);margin-bottom:8px;}
+  .score-bar-wrap{margin-top:10px;height:4px;background:var(--border);border-radius:99px;overflow:hidden;}
+  .score-bar{height:100%;border-radius:99px;transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);background:linear-gradient(90deg,var(--accent-mid),var(--accent));}
+  .score-bar.warn{background:linear-gradient(90deg,#f4a261,var(--warn));}
+  .score-bar.bad{background:linear-gradient(90deg,#e07a5f,#c1440e);}
 
-  .score-display { display:flex; align-items:flex-end; gap:8px; margin-top:4px; }
-  .score-number { font-family:var(--mono); font-size:60px; font-weight:300; line-height:1; color:var(--text); transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-  .score-label { font-size:13px; color:var(--muted); margin-bottom:8px; }
-  .score-bar-wrap { margin-top:10px; height:4px; background:var(--border); border-radius:99px; overflow:hidden; }
-  .score-bar { height:100%; border-radius:99px; transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1); background:linear-gradient(90deg,var(--accent-mid),var(--accent)); }
-  .score-bar.warn { background:linear-gradient(90deg,#f4a261,var(--warn)); }
-  .score-bar.bad { background:linear-gradient(90deg,#e07a5f,#c1440e); }
+  .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);}
+  .tab{flex:1;padding:12px 0;font-size:12px;font-weight:500;letter-spacing:0.05em;text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;user-select:none;}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 
-  .tabs { display:flex; background:var(--surface); border-bottom:1px solid var(--border); }
-  .tab { flex:1; padding:12px 0; font-size:12px; font-weight:500; letter-spacing:0.05em; text-align:center; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; user-select:none; }
-  .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .content{padding:20px 16px 100px;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
 
-  .content { padding:20px 16px 100px; }
-  .tab-panel { display:none; }
-  .tab-panel.active { display:block; }
+  /* SECTION TABS (夜/翌日) */
+  .section-tabs{display:flex;background:var(--bg);border-radius:99px;padding:3px;margin-bottom:16px;gap:3px;}
+  .section-tab{flex:1;text-align:center;padding:8px;font-size:12px;font-weight:500;color:var(--muted);border-radius:99px;cursor:pointer;transition:all 0.2s;user-select:none;}
+  .section-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
 
-  .section { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); margin-bottom:12px; overflow:hidden; }
-  .section-header { padding:14px 20px 12px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-  .section-header-left { display:flex; align-items:center; gap:8px; }
-  .section-icon { font-size:16px; line-height:1; }
-  .section-title { font-size:12px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
-  .section-body { padding:16px 20px; }
+  .log-panel{display:none;}
+  .log-panel.active{display:block;}
 
-  .time-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
-  .time-row:last-child { border-bottom:none; }
-  .time-label { font-size:14px; font-weight:400; color:var(--text); flex:1; }
-  .time-sub { font-size:11px; color:var(--muted); margin-top:2px; }
-  .time-input { font-family:var(--mono); font-size:18px; color:var(--text); border:none; background:transparent; text-align:right; width:100px; outline:none; cursor:pointer; }
-  .time-input::-webkit-calendar-picker-indicator { display:none; }
-  .time-input:focus { color:var(--accent); }
+  .section{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+  .section-header{padding:14px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .section-header-left{display:flex;align-items:center;gap:8px;}
+  .section-icon{font-size:16px;line-height:1;}
+  .section-title{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
+  .section-body{padding:16px 20px;}
 
-  .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border); }
-  .toggle-row:last-child { border-bottom:none; }
-  .toggle-label { font-size:14px; }
-  .toggle-sub { font-size:11px; color:var(--muted); margin-top:2px; }
-  .toggle { width:44px; height:26px; background:var(--border); border-radius:99px; position:relative; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
-  .toggle.on { background:var(--accent); }
-  .toggle::after { content:''; position:absolute; width:20px; height:20px; background:white; border-radius:50%; top:3px; left:3px; transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 1px 4px rgba(0,0,0,0.15); }
-  .toggle.on::after { transform:translateX(18px); }
+  .time-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+  .time-row:last-child{border-bottom:none;}
+  .time-label{font-size:14px;font-weight:400;color:var(--text);flex:1;}
+  .time-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  .time-input{font-family:var(--mono);font-size:18px;color:var(--text);border:none;background:transparent;text-align:right;width:100px;outline:none;cursor:pointer;}
+  .time-input::-webkit-calendar-picker-indicator{display:none;}
+  .time-input:focus{color:var(--accent);}
 
-  /* COFFEE CUPS */
-  .coffee-row { padding:12px 0; border-bottom:1px solid var(--border); }
-  .coffee-row:last-child { border-bottom:none; }
-  .coffee-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-  .coffee-label { font-size:14px; }
-  .coffee-count { font-family:var(--mono); font-size:18px; color:var(--accent); min-width:40px; text-align:right; }
-  .cup-selector { display:flex; gap:6px; flex-wrap:wrap; }
-  .cup-btn { font-size:22px; cursor:pointer; opacity:0.25; transition:all 0.15s; user-select:none; }
-  .cup-btn.active { opacity:1; transform:scale(1.15); }
-  .half-cup-btn { font-size:13px; padding:5px 12px; border-radius:99px; border:1.5px solid var(--border); color:var(--muted); cursor:pointer; user-select:none; transition:all 0.15s; }
-  .half-cup-btn.active { border-color:var(--accent); background:var(--accent-light); color:var(--accent); font-weight:500; }
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+  .toggle-row:last-child{border-bottom:none;}
+  .toggle-label{font-size:14px;}
+  .toggle-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  .toggle{width:44px;height:26px;background:var(--border);border-radius:99px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+  .toggle.on{background:var(--accent);}
+  .toggle::after{content:'';position:absolute;width:20px;height:20px;background:white;border-radius:50%;top:3px;left:3px;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 1px 4px rgba(0,0,0,0.15);}
+  .toggle.on::after{transform:translateX(18px);}
 
-  .select-grid { display:flex; flex-wrap:wrap; gap:8px; padding:4px 0; }
-  .select-chip { padding:6px 14px; border-radius:99px; border:1.5px solid var(--border); font-size:13px; color:var(--muted); cursor:pointer; transition:all 0.15s; user-select:none; display:flex; align-items:center; gap:4px; }
-  .select-chip.selected { border-color:var(--accent); background:var(--accent-light); color:var(--accent); font-weight:500; }
-  .select-chip.warn-chip.selected { border-color:var(--warn); background:var(--warn-light); color:var(--warn); }
+  .coffee-row{padding:12px 0;border-bottom:1px solid var(--border);}
+  .coffee-row:last-child{border-bottom:none;}
+  .coffee-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .coffee-label{font-size:14px;}
+  .coffee-count{font-family:var(--mono);font-size:18px;color:var(--accent);min-width:40px;text-align:right;}
+  .cup-selector{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .cup-btn{font-size:22px;cursor:pointer;opacity:0.25;transition:all 0.15s;user-select:none;}
+  .cup-btn.active{opacity:1;transform:scale(1.15);}
+  .half-cup-btn{font-size:13px;padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;user-select:none;transition:all 0.15s;}
+  .half-cup-btn.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500;}
 
-  .add-activity-row { display:flex; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); align-items:center; }
-  .add-activity-input { flex:1; font-family:var(--sans); font-size:13px; color:var(--text); border:1.5px solid var(--border); background:var(--bg); border-radius:99px; padding:6px 14px; outline:none; }
-  .add-activity-input:focus { border-color:var(--accent); }
-  .add-activity-input::placeholder { color:var(--muted); }
-  .add-activity-type { font-size:11px; padding:6px 10px; border-radius:99px; border:1.5px solid var(--border); background:var(--bg); color:var(--muted); cursor:pointer; user-select:none; white-space:nowrap; }
-  .add-activity-type.bad-type { border-color:var(--warn); background:var(--warn-light); color:var(--warn); }
-  .add-activity-btn { width:32px; height:32px; border-radius:50%; background:var(--accent); color:white; border:none; font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
-  .chip-delete { font-size:10px; color:var(--muted); margin-left:2px; opacity:0.6; }
+  .select-grid{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
+  .select-chip{padding:6px 14px;border-radius:99px;border:1.5px solid var(--border);font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.15s;user-select:none;display:flex;align-items:center;gap:4px;}
+  .select-chip.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500;}
+  .select-chip.warn-chip.selected{border-color:var(--warn);background:var(--warn-light);color:var(--warn);}
+  .add-activity-row{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);align-items:center;}
+  .add-activity-input{flex:1;font-family:var(--sans);font-size:13px;color:var(--text);border:1.5px solid var(--border);background:var(--bg);border-radius:99px;padding:6px 14px;outline:none;}
+  .add-activity-input:focus{border-color:var(--accent);}
+  .add-activity-input::placeholder{color:var(--muted);}
+  .add-activity-type{font-size:11px;padding:6px 10px;border-radius:99px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;}
+  .add-activity-type.bad-type{border-color:var(--warn);background:var(--warn-light);color:var(--warn);}
+  .add-activity-btn{width:32px;height:32px;border-radius:50%;background:var(--accent);color:white;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .chip-delete{font-size:10px;color:var(--muted);margin-left:2px;opacity:0.6;}
 
-  .slider-row { padding:8px 0; border-bottom:1px solid var(--border); }
-  .slider-row:last-child { border-bottom:none; }
-  .slider-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-  .slider-label { font-size:14px; }
-  .slider-value { font-family:var(--mono); font-size:18px; color:var(--accent); min-width:24px; text-align:right; }
-  input[type=range] { -webkit-appearance:none; width:100%; height:4px; background:var(--border); border-radius:99px; outline:none; }
-  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; background:var(--accent); border-radius:50%; cursor:pointer; box-shadow:0 2px 6px rgba(45,106,79,0.3); }
+  .slider-row{padding:8px 0;border-bottom:1px solid var(--border);}
+  .slider-row:last-child{border-bottom:none;}
+  .slider-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .slider-label{font-size:14px;}
+  .slider-value{font-family:var(--mono);font-size:18px;color:var(--accent);min-width:24px;text-align:right;}
+  input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:99px;outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(45,106,79,0.3);}
 
-  .emoji-scale { display:flex; justify-content:space-between; padding:4px 0 0; }
-  .emoji-btn { font-size:24px; cursor:pointer; opacity:0.3; transition:all 0.15s; user-select:none; }
-  .emoji-btn.selected { opacity:1; transform:scale(1.3); }
+  .emoji-scale{display:flex;justify-content:space-between;padding:4px 0 0;}
+  .emoji-btn{font-size:24px;cursor:pointer;opacity:0.3;transition:all 0.15s;user-select:none;}
+  .emoji-btn.selected{opacity:1;transform:scale(1.3);}
 
-  .note-input { width:100%; border:none; background:transparent; font-family:var(--sans); font-size:14px; color:var(--text); resize:none; outline:none; min-height:60px; line-height:1.6; }
-  .note-input::placeholder { color:var(--muted); }
+  /* NEXT DAY DATE BADGE */
+  .next-day-badge{display:inline-block;font-family:var(--mono);font-size:11px;background:var(--accent-light);color:var(--accent);padding:3px 10px;border-radius:99px;margin-bottom:12px;}
 
-  .save-btn { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); width:calc(100% - 32px); max-width:398px; padding:18px; background:var(--text); color:white; border:none; border-radius:var(--radius); font-family:var(--mono); font-size:13px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 24px rgba(0,0,0,0.15); }
-  .save-btn:active { transform:translateX(-50%) scale(0.98); }
-  .save-btn.saved { background:var(--accent); }
+  .note-input{width:100%;border:none;background:transparent;font-family:var(--sans);font-size:14px;color:var(--text);resize:none;outline:none;min-height:60px;line-height:1.6;}
+  .note-input::placeholder{color:var(--muted);}
 
-  .history-empty { text-align:center; padding:60px 20px; color:var(--muted); font-size:14px; line-height:1.8; }
-  .history-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 20px; margin-bottom:10px; }
-  .history-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
-  .history-date { font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.05em; }
-  .history-score { font-family:var(--mono); font-size:28px; font-weight:300; line-height:1; }
-  .history-score.good { color:var(--accent); }
-  .history-score.ok { color:#f4a261; }
-  .history-score.bad { color:var(--warn); }
-  .history-pills { display:flex; flex-wrap:wrap; gap:6px; }
-  .history-pill { font-size:11px; padding:3px 10px; border-radius:99px; background:var(--bg); color:var(--muted); font-family:var(--mono); }
-  .history-pill.red { background:var(--warn-light); color:var(--warn); }
-  .history-pill.green { background:var(--accent-light); color:var(--accent); }
+  .save-btn{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:398px;padding:18px;background:var(--text);color:white;border:none;border-radius:var(--radius);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 24px rgba(0,0,0,0.15);}
+  .save-btn:active{transform:translateX(-50%) scale(0.98);}
+  .save-btn.saved{background:var(--accent);}
 
-  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
-  .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; }
-  .stat-value { font-family:var(--mono); font-size:32px; font-weight:300; line-height:1; margin-bottom:4px; }
-  .stat-label { font-size:11px; color:var(--muted); font-weight:500; letter-spacing:0.05em; text-transform:uppercase; }
+  .history-empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;line-height:1.8;}
+  .history-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:10px;cursor:pointer;}
+  .history-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .history-date{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.05em;}
+  .history-score{font-family:var(--mono);font-size:28px;font-weight:300;line-height:1;}
+  .history-score.good{color:var(--accent);}
+  .history-score.ok{color:#f4a261;}
+  .history-score.bad{color:var(--warn);}
+  .history-pills{display:flex;flex-wrap:wrap;gap:6px;}
+  .history-pill{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--bg);color:var(--muted);font-family:var(--mono);}
+  .history-pill.red{background:var(--warn-light);color:var(--warn);}
+  .history-pill.green{background:var(--accent-light);color:var(--accent);}
+  .history-perf{display:flex;gap:6px;margin-top:8px;font-size:18px;}
 
-  .deduction-item { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
-  .deduction-item:last-child { border-bottom:none; }
-  .deduction-pts { font-family:var(--mono); font-size:12px; color:var(--warn); font-weight:500; }
-  .deduction-ok { font-family:var(--mono); font-size:12px; color:var(--accent); }
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+  .stat-value{font-family:var(--mono);font-size:32px;font-weight:300;line-height:1;margin-bottom:4px;}
+  .stat-label{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.05em;text-transform:uppercase;}
+  .deduction-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .deduction-item:last-child{border-bottom:none;}
+  .deduction-pts{font-family:var(--mono);font-size:12px;color:var(--warn);font-weight:500;}
+  .deduction-ok{font-family:var(--mono);font-size:12px;color:var(--accent);}
 
-  @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
-  .pulse { animation:pulse 0.4s ease; }
-
-  .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--text); color:white; padding:12px 24px; border-radius:99px; font-size:13px; font-family:var(--mono); opacity:0; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); pointer-events:none; white-space:nowrap; z-index:200; }
-  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+  .pulse{animation:pulse 0.4s ease;}
+  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:white;padding:12px 24px;border-radius:99px;font-size:13px;font-family:var(--mono);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:nowrap;z-index:200;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -172,175 +179,209 @@
 <div class="content">
   <div class="tab-panel active" id="tab-log">
 
-    <!-- SLEEP -->
-    <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">🌙</span><span class="section-title">SLEEP</span></div></div>
-      <div class="section-body">
-        <div class="time-row">
-          <div><div class="time-label">就寝</div><div class="time-sub">ベッドに入った時間</div></div>
-          <input type="time" class="time-input" id="bedtime" onchange="recalc()">
-        </div>
-        <div class="time-row">
-          <div><div class="time-label">起床</div><div class="time-sub">目が覚めた時間</div></div>
-          <input type="time" class="time-input" id="waketime" onchange="recalc()">
-        </div>
-        <div class="time-row">
-          <div><div class="time-label">目覚め</div><div class="time-sub">起きた瞬間の感覚</div></div>
-          <div class="emoji-scale">
-            <span class="emoji-btn" data-group="wakeup" data-val="1" onclick="selectEmoji(this)">😴</span>
-            <span class="emoji-btn" data-group="wakeup" data-val="2" onclick="selectEmoji(this)">😪</span>
-            <span class="emoji-btn" data-group="wakeup" data-val="3" onclick="selectEmoji(this)">😐</span>
-            <span class="emoji-btn" data-group="wakeup" data-val="4" onclick="selectEmoji(this)">🙂</span>
-            <span class="emoji-btn" data-group="wakeup" data-val="5" onclick="selectEmoji(this)">😁</span>
+    <!-- 夜 / 翌日 切り替え -->
+    <div class="section-tabs">
+      <div class="section-tab active" onclick="switchLogPanel('night')">🌙 夜の記録</div>
+      <div class="section-tab" onclick="switchLogPanel('nextday')">☀️ 翌日の状態</div>
+    </div>
+
+    <!-- 夜の記録パネル -->
+    <div class="log-panel active" id="panel-night">
+
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">🌙</span><span class="section-title">SLEEP</span></div></div>
+        <div class="section-body">
+          <div class="time-row">
+            <div><div class="time-label">就寝</div><div class="time-sub">ベッドに入った時間</div></div>
+            <input type="time" class="time-input" id="bedtime" onchange="recalc()">
+          </div>
+          <div class="time-row">
+            <div><div class="time-label">起床</div><div class="time-sub">目が覚めた時間</div></div>
+            <input type="time" class="time-input" id="waketime" onchange="recalc()">
+          </div>
+          <div class="time-row">
+            <div><div class="time-label">目覚め感</div><div class="time-sub">起きた瞬間の感覚</div></div>
+            <div class="emoji-scale">
+              <span class="emoji-btn" data-group="wakeup" data-val="1" onclick="selectEmoji(this)">😴</span>
+              <span class="emoji-btn" data-group="wakeup" data-val="2" onclick="selectEmoji(this)">😪</span>
+              <span class="emoji-btn" data-group="wakeup" data-val="3" onclick="selectEmoji(this)">😐</span>
+              <span class="emoji-btn" data-group="wakeup" data-val="4" onclick="selectEmoji(this)">🙂</span>
+              <span class="emoji-btn" data-group="wakeup" data-val="5" onclick="selectEmoji(this)">😁</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- FOOD -->
-    <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">🍽</span><span class="section-title">FOOD</span></div></div>
-      <div class="section-body">
-        <div class="time-row">
-          <div><div class="time-label">最後の食事</div><div class="time-sub">就寝3時間前までが理想</div></div>
-          <input type="time" class="time-input" id="mealtime" onchange="recalc()">
-        </div>
-        <div class="toggle-row">
-          <div><div class="toggle-label">アルコール</div><div class="toggle-sub">REM睡眠を妨げる</div></div>
-          <div class="toggle" id="alcohol" onclick="toggleSwitch(this); recalc()"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- BATH -->
-    <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">🛁</span><span class="section-title">BATH</span></div></div>
-      <div class="section-body">
-        <div class="time-row">
-          <div><div class="time-label">入浴時間</div><div class="time-sub">就寝90分前が理想</div></div>
-          <input type="time" class="time-input" id="bathtime" onchange="recalc()">
-        </div>
-        <div class="toggle-row">
-          <div><div class="toggle-label">シャワーのみ</div></div>
-          <div class="toggle" id="showerOnly" onclick="toggleSwitch(this)"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- COFFEE -->
-    <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">☕️</span><span class="section-title">COFFEE</span></div></div>
-      <div class="section-body">
-        <div class="coffee-row">
-          <div class="coffee-top">
-            <div class="coffee-label">本日の杯数</div>
-            <div class="coffee-count" id="coffeeCountLabel">—</div>
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">🍽</span><span class="section-title">FOOD</span></div></div>
+        <div class="section-body">
+          <div class="time-row">
+            <div><div class="time-label">最後の食事</div><div class="time-sub">就寝3時間前までが理想</div></div>
+            <input type="time" class="time-input" id="mealtime" onchange="recalc()">
           </div>
-          <div class="cup-selector" id="cupSelector">
-            <span class="half-cup-btn" id="halfCupBtn" onclick="toggleHalfCup()">½</span>
-            <span class="cup-btn" data-cup="1" onclick="setCups(1)">☕</span>
-            <span class="cup-btn" data-cup="2" onclick="setCups(2)">☕</span>
-            <span class="cup-btn" data-cup="3" onclick="setCups(3)">☕</span>
+          <div class="toggle-row">
+            <div><div class="toggle-label">アルコール</div><div class="toggle-sub">REM睡眠を妨げる</div></div>
+            <div class="toggle" id="alcohol" onclick="toggleSwitch(this); recalc()"></div>
           </div>
         </div>
-        <div class="time-row">
-          <div><div class="time-label">最後に飲んだ時間</div><div class="time-sub">14時前が理想</div></div>
-          <input type="time" class="time-input" id="coffeeTime" onchange="recalc()">
-        </div>
       </div>
-    </div>
 
-    <!-- PRE-SLEEP -->
-    <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">💻</span><span class="section-title">PRE-SLEEP</span></div></div>
-      <div class="section-body">
-        <div style="margin-bottom:4px">
-          <div class="time-label" style="margin-bottom:10px">就寝前の行動（複数選択可）</div>
-          <div class="select-grid" id="activityGrid"></div>
-          <div class="add-activity-row">
-            <input type="text" class="add-activity-input" id="newActivityInput" placeholder="項目を追加" maxlength="12">
-            <div class="add-activity-type" id="newActivityType" onclick="toggleNewActivityType()">良い</div>
-            <button class="add-activity-btn" onclick="addCustomActivity()">+</button>
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">🛁</span><span class="section-title">BATH</span></div></div>
+        <div class="section-body">
+          <div class="time-row">
+            <div><div class="time-label">入浴時間</div><div class="time-sub">就寝90分前が理想</div></div>
+            <input type="time" class="time-input" id="bathtime" onchange="recalc()">
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">シャワーのみ</div></div>
+            <div class="toggle" id="showerOnly" onclick="toggleSwitch(this)"></div>
           </div>
         </div>
-        <div class="time-row" style="margin-top:12px">
-          <div><div class="time-label">作業終了</div><div class="time-sub">就寝1時間前が理想</div></div>
-          <input type="time" class="time-input" id="workend" onchange="recalc()">
-        </div>
       </div>
-    </div>
 
-    <!-- DAYTIME (当日) -->
-    <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">☀️</span><span class="section-title">DAYTIME</span></div></div>
-      <div class="section-body">
-        <div class="slider-row">
-          <div class="slider-top"><div class="slider-label">ストレスレベル</div><div class="slider-value" id="stressVal">—</div></div>
-          <input type="range" min="0" max="5" value="0" id="stress" oninput="document.getElementById('stressVal').textContent=this.value==0?'—':this.value; recalc()">
-        </div>
-        <div class="toggle-row">
-          <div><div class="toggle-label">運動した</div><div class="toggle-sub">就寝2時間前までOK</div></div>
-          <div class="toggle" id="exercise" onclick="toggleSwitch(this); recalc()"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- NEXT DAY PERFORMANCE -->
-    <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">📈</span><span class="section-title">NEXT DAY</span></div></div>
-      <div class="section-body">
-        <div class="time-row">
-          <div><div class="time-label">昼間の眠気</div><div class="time-sub">午後の集中が保てたか</div></div>
-          <div class="emoji-scale">
-            <span class="emoji-btn" data-group="drowsy" data-val="1" onclick="selectEmoji(this)">😵</span>
-            <span class="emoji-btn" data-group="drowsy" data-val="2" onclick="selectEmoji(this)">😪</span>
-            <span class="emoji-btn" data-group="drowsy" data-val="3" onclick="selectEmoji(this)">😐</span>
-            <span class="emoji-btn" data-group="drowsy" data-val="4" onclick="selectEmoji(this)">🙂</span>
-            <span class="emoji-btn" data-group="drowsy" data-val="5" onclick="selectEmoji(this)">😎</span>
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">☕️</span><span class="section-title">COFFEE</span></div></div>
+        <div class="section-body">
+          <div class="coffee-row">
+            <div class="coffee-top">
+              <div class="coffee-label">本日の杯数</div>
+              <div class="coffee-count" id="coffeeCountLabel">—</div>
+            </div>
+            <div class="cup-selector">
+              <span class="half-cup-btn" id="halfCupBtn" onclick="toggleHalfCup()">½</span>
+              <span class="cup-btn" data-cup="1" onclick="setCups(1)">☕</span>
+              <span class="cup-btn" data-cup="2" onclick="setCups(2)">☕</span>
+              <span class="cup-btn" data-cup="3" onclick="setCups(3)">☕</span>
+            </div>
+          </div>
+          <div class="time-row">
+            <div><div class="time-label">最後に飲んだ時間</div><div class="time-sub">14時前が理想</div></div>
+            <input type="time" class="time-input" id="coffeeTime" onchange="recalc()">
           </div>
         </div>
-        <div class="time-row">
-          <div><div class="time-label">集中力</div><div class="time-sub">作業・仕事のパフォーマンス</div></div>
-          <div class="emoji-scale">
-            <span class="emoji-btn" data-group="focus" data-val="1" onclick="selectEmoji(this)">🧠💀</span>
-            <span class="emoji-btn" data-group="focus" data-val="2" onclick="selectEmoji(this)">😵‍💫</span>
-            <span class="emoji-btn" data-group="focus" data-val="3" onclick="selectEmoji(this)">😐</span>
-            <span class="emoji-btn" data-group="focus" data-val="4" onclick="selectEmoji(this)">🎯</span>
-            <span class="emoji-btn" data-group="focus" data-val="5" onclick="selectEmoji(this)">⚡</span>
+      </div>
+
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">💻</span><span class="section-title">PRE-SLEEP</span></div></div>
+        <div class="section-body">
+          <div style="margin-bottom:4px">
+            <div class="time-label" style="margin-bottom:10px">就寝前の行動（複数選択可）</div>
+            <div class="select-grid" id="activityGrid"></div>
+            <div class="add-activity-row">
+              <input type="text" class="add-activity-input" id="newActivityInput" placeholder="項目を追加" maxlength="12">
+              <div class="add-activity-type" id="newActivityType" onclick="toggleNewActivityType()">良い</div>
+              <button class="add-activity-btn" onclick="addCustomActivity()">+</button>
+            </div>
+          </div>
+          <div class="time-row" style="margin-top:12px">
+            <div><div class="time-label">作業終了</div><div class="time-sub">就寝1時間前が理想</div></div>
+            <input type="time" class="time-input" id="workend" onchange="recalc()">
           </div>
         </div>
-        <div class="time-row">
-          <div><div class="time-label">気分・情緒</div><div class="time-sub">一日を通じての感情状態</div></div>
-          <div class="emoji-scale">
-            <span class="emoji-btn" data-group="mood" data-val="1" onclick="selectEmoji(this)">😤</span>
-            <span class="emoji-btn" data-group="mood" data-val="2" onclick="selectEmoji(this)">😞</span>
-            <span class="emoji-btn" data-group="mood" data-val="3" onclick="selectEmoji(this)">😐</span>
-            <span class="emoji-btn" data-group="mood" data-val="4" onclick="selectEmoji(this)">😊</span>
-            <span class="emoji-btn" data-group="mood" data-val="5" onclick="selectEmoji(this)">🌟</span>
+      </div>
+
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">😤</span><span class="section-title">STRESS</span></div></div>
+        <div class="section-body">
+          <div class="slider-row">
+            <div class="slider-top"><div class="slider-label">ストレスレベル</div><div class="slider-value" id="stressVal">—</div></div>
+            <input type="range" min="0" max="5" value="0" id="stress" oninput="document.getElementById('stressVal').textContent=this.value==0?'—':this.value; recalc()">
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">運動した</div><div class="toggle-sub">就寝2時間前までOK</div></div>
+            <div class="toggle" id="exercise" onclick="toggleSwitch(this); recalc()"></div>
           </div>
         </div>
-        <div class="slider-row">
-          <div class="slider-top"><div class="slider-label">身体的エネルギー</div><div class="slider-value" id="energyVal">—</div></div>
-          <input type="range" min="0" max="5" value="0" id="energy" oninput="document.getElementById('energyVal').textContent=this.value==0?'—':this.value">
+      </div>
+
+      <div class="section" id="breakdownSection" style="display:none">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">📊</span><span class="section-title">BREAKDOWN</span></div></div>
+        <div class="section-body"><div class="deduction-list" id="deductionList"></div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">✏️</span><span class="section-title">NOTE</span></div></div>
+        <div class="section-body">
+          <textarea class="note-input" id="noteInput" placeholder="メモ（夢、気になったことなど）"></textarea>
         </div>
       </div>
-    </div>
 
-    <!-- BREAKDOWN -->
-    <div class="section" id="breakdownSection" style="display:none">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">📊</span><span class="section-title">BREAKDOWN</span></div></div>
-      <div class="section-body"><div class="deduction-list" id="deductionList"></div></div>
-    </div>
+    </div><!-- /panel-night -->
 
-    <!-- NOTE -->
-    <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">✏️</span><span class="section-title">NOTE</span></div></div>
-      <div class="section-body">
-        <textarea class="note-input" id="noteInput" placeholder="メモ（気になったこと、夢、など）"></textarea>
+    <!-- 翌日の状態パネル -->
+    <div class="log-panel" id="panel-nextday">
+
+      <div class="next-day-badge" id="nextDayBadge">— の翌日</div>
+
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">😪</span><span class="section-title">眠気</span></div></div>
+        <div class="section-body">
+          <div class="time-row">
+            <div><div class="time-label">昼間の眠気</div><div class="time-sub">午後の集中が保てたか</div></div>
+            <div class="emoji-scale">
+              <span class="emoji-btn" data-group="drowsy" data-val="1" onclick="selectEmoji(this)">😵</span>
+              <span class="emoji-btn" data-group="drowsy" data-val="2" onclick="selectEmoji(this)">😪</span>
+              <span class="emoji-btn" data-group="drowsy" data-val="3" onclick="selectEmoji(this)">😐</span>
+              <span class="emoji-btn" data-group="drowsy" data-val="4" onclick="selectEmoji(this)">🙂</span>
+              <span class="emoji-btn" data-group="drowsy" data-val="5" onclick="selectEmoji(this)">😎</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-  </div>
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">🎯</span><span class="section-title">集中力</span></div></div>
+        <div class="section-body">
+          <div class="time-row">
+            <div><div class="time-label">作業パフォーマンス</div><div class="time-sub">EA・仕事・創作など</div></div>
+            <div class="emoji-scale">
+              <span class="emoji-btn" data-group="focus" data-val="1" onclick="selectEmoji(this)">💀</span>
+              <span class="emoji-btn" data-group="focus" data-val="2" onclick="selectEmoji(this)">😵‍💫</span>
+              <span class="emoji-btn" data-group="focus" data-val="3" onclick="selectEmoji(this)">😐</span>
+              <span class="emoji-btn" data-group="focus" data-val="4" onclick="selectEmoji(this)">🎯</span>
+              <span class="emoji-btn" data-group="focus" data-val="5" onclick="selectEmoji(this)">⚡</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">🌈</span><span class="section-title">気分</span></div></div>
+        <div class="section-body">
+          <div class="time-row">
+            <div><div class="time-label">一日の感情状態</div><div class="time-sub">イライラ・落ち込み・安定感</div></div>
+            <div class="emoji-scale">
+              <span class="emoji-btn" data-group="mood" data-val="1" onclick="selectEmoji(this)">😤</span>
+              <span class="emoji-btn" data-group="mood" data-val="2" onclick="selectEmoji(this)">😞</span>
+              <span class="emoji-btn" data-group="mood" data-val="3" onclick="selectEmoji(this)">😐</span>
+              <span class="emoji-btn" data-group="mood" data-val="4" onclick="selectEmoji(this)">😊</span>
+              <span class="emoji-btn" data-group="mood" data-val="5" onclick="selectEmoji(this)">🌟</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">⚡</span><span class="section-title">エネルギー</span></div></div>
+        <div class="section-body">
+          <div class="slider-row">
+            <div class="slider-top"><div class="slider-label">身体的エネルギー</div><div class="slider-value" id="energyVal">—</div></div>
+            <input type="range" min="0" max="5" value="0" id="energy" oninput="document.getElementById('energyVal').textContent=this.value==0?'—':this.value">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">✏️</span><span class="section-title">翌日メモ</span></div></div>
+        <div class="section-body">
+          <textarea class="note-input" id="nextDayNote" placeholder="翌日に気づいたこと"></textarea>
+        </div>
+      </div>
+
+    </div><!-- /panel-nextday -->
+
+  </div><!-- /tab-log -->
 
   <div class="tab-panel" id="tab-history"><div id="historyList"></div></div>
   <div class="tab-panel" id="tab-stats"><div id="statsContent"></div></div>
@@ -350,216 +391,191 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ==================== ACTIVITIES ====================
-const DEFAULT_ACTIVITIES = [
-  { val:'ea', label:'EA作業', bad:true },
-  { val:'screen', label:'スマホ', bad:true },
-  { val:'work', label:'PC作業', bad:true },
-  { val:'game', label:'ゲーム', bad:true },
-  { val:'read', label:'読書', bad:false },
-  { val:'stretch', label:'ストレッチ', bad:false },
-  { val:'meditate', label:'瞑想', bad:false },
-  { val:'nothing', label:'なにもしない', bad:false },
+const DEFAULT_ACTIVITIES=[
+  {val:'ea',label:'EA作業',bad:true},
+  {val:'screen',label:'スマホ',bad:true},
+  {val:'work',label:'PC作業',bad:true},
+  {val:'game',label:'ゲーム',bad:true},
+  {val:'read',label:'読書',bad:false},
+  {val:'stretch',label:'ストレッチ',bad:false},
+  {val:'meditate',label:'瞑想',bad:false},
+  {val:'nothing',label:'なにもしない',bad:false},
 ];
 
-const state = { wakeupRating:0, drowsyRating:0, focusRating:0, moodRating:0, newActivityIsBad:false, coffeeHalf:false, coffeeCups:0 };
+const state={wakeupRating:0,drowsyRating:0,focusRating:0,moodRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0};
 
-function getCustomActivities() { try { return JSON.parse(localStorage.getItem('custom_activities')||'[]'); } catch { return []; } }
-function saveCustomActivities(arr) { localStorage.setItem('custom_activities', JSON.stringify(arr)); }
-function getAllActivities() { return [...DEFAULT_ACTIVITIES, ...getCustomActivities()]; }
+function getCustomActivities(){try{return JSON.parse(localStorage.getItem('custom_activities')||'[]');}catch{return[];}}
+function saveCustomActivities(arr){localStorage.setItem('custom_activities',JSON.stringify(arr));}
+function getAllActivities(){return[...DEFAULT_ACTIVITIES,...getCustomActivities()];}
 
-function renderActivityGrid(selectedVals=[]) {
-  const grid = document.getElementById('activityGrid');
-  const all = getAllActivities();
-  grid.innerHTML = all.map(a => {
-    const isSelected = selectedVals.includes(a.val);
-    const isDefault = DEFAULT_ACTIVITIES.some(d => d.val === a.val);
-    const deleteBtn = !isDefault ? `<span class="chip-delete" onclick="deleteActivity(event,'${a.val}')">✕</span>` : '';
-    return `<div class="select-chip ${a.bad?'warn-chip':''} ${isSelected?'selected':''}" data-val="${a.val}" data-bad="${a.bad}" onclick="toggleChip(this); recalc()">${a.label}${deleteBtn}</div>`;
+function renderActivityGrid(selectedVals=[]){
+  const grid=document.getElementById('activityGrid');
+  grid.innerHTML=getAllActivities().map(a=>{
+    const isDefault=DEFAULT_ACTIVITIES.some(d=>d.val===a.val);
+    const del=!isDefault?`<span class="chip-delete" onclick="deleteActivity(event,'${a.val}')">✕</span>`:'';
+    return `<div class="select-chip ${a.bad?'warn-chip':''} ${selectedVals.includes(a.val)?'selected':''}" data-val="${a.val}" data-bad="${a.bad}" onclick="toggleChip(this);recalc()">${a.label}${del}</div>`;
   }).join('');
 }
 
-function deleteActivity(e, val) {
+function deleteActivity(e,val){
   e.stopPropagation();
-  saveCustomActivities(getCustomActivities().filter(a => a.val !== val));
-  const sel = [...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c => c.dataset.val).filter(v => v !== val);
-  renderActivityGrid(sel);
-  recalc();
+  saveCustomActivities(getCustomActivities().filter(a=>a.val!==val));
+  const sel=[...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val).filter(v=>v!==val);
+  renderActivityGrid(sel);recalc();
 }
 
-function toggleNewActivityType() {
-  state.newActivityIsBad = !state.newActivityIsBad;
-  const btn = document.getElementById('newActivityType');
-  btn.textContent = state.newActivityIsBad ? '悪い' : '良い';
-  btn.classList.toggle('bad-type', state.newActivityIsBad);
+function toggleNewActivityType(){
+  state.newActivityIsBad=!state.newActivityIsBad;
+  const btn=document.getElementById('newActivityType');
+  btn.textContent=state.newActivityIsBad?'悪い':'良い';
+  btn.classList.toggle('bad-type',state.newActivityIsBad);
 }
 
-function addCustomActivity() {
-  const input = document.getElementById('newActivityInput');
-  const label = input.value.trim();
-  if (!label) return;
-  const customs = getCustomActivities();
-  customs.push({ val:'custom_'+Date.now(), label, bad:state.newActivityIsBad });
+function addCustomActivity(){
+  const input=document.getElementById('newActivityInput');
+  const label=input.value.trim();if(!label)return;
+  const customs=getCustomActivities();
+  customs.push({val:'custom_'+Date.now(),label,bad:state.newActivityIsBad});
   saveCustomActivities(customs);
-  const sel = [...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c => c.dataset.val);
-  renderActivityGrid(sel);
-  input.value = '';
-  recalc();
+  const sel=[...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val);
+  renderActivityGrid(sel);input.value='';recalc();
 }
 
-// ==================== COFFEE ====================
-function setCups(n) {
-  if (state.coffeeCups === n && !state.coffeeHalf) {
-    state.coffeeCups = 0;
-  } else {
-    state.coffeeCups = n;
-    state.coffeeHalf = false;
-    document.getElementById('halfCupBtn').classList.remove('active');
+// COFFEE
+function setCups(n){
+  state.coffeeCups=state.coffeeCups===n&&!state.coffeeHalf?0:n;
+  state.coffeeHalf=false;
+  document.getElementById('halfCupBtn').classList.remove('active');
+  updateCupUI();recalc();
+}
+function toggleHalfCup(){
+  state.coffeeHalf=!state.coffeeHalf;
+  if(state.coffeeHalf)state.coffeeCups=0;
+  document.getElementById('halfCupBtn').classList.toggle('active',state.coffeeHalf);
+  updateCupUI();recalc();
+}
+function updateCupUI(){
+  document.querySelectorAll('.cup-btn').forEach(btn=>btn.classList.toggle('active',parseInt(btn.dataset.cup)<=state.coffeeCups));
+  const total=state.coffeeCups+(state.coffeeHalf?0.5:0);
+  document.getElementById('coffeeCountLabel').textContent=total===0?'—':total+'杯';
+}
+
+// UTILS
+function toMinutes(t){if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+m;}
+function minDiff(t1,t2){let d=t2-t1;if(d<0)d+=1440;return d;}
+function formatMins(m){const h=Math.floor(m/60),mm=m%60;return mm===0?`${h}h`:`${h}h${mm}m`;}
+function getTodayISO(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function getSelectedDate(){return document.getElementById('logDate').value||getTodayISO();}
+
+function getNextDateLabel(dateKey){
+  const[y,m,d]=dateKey.split('-');
+  const date=new Date(+y,+m-1,+d);
+  date.setDate(date.getDate()+1);
+  return`${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')}`;
+}
+
+function getSelectedDateLabel(){
+  const val=getSelectedDate();
+  const[y,m,d]=val.split('-');
+  const date=new Date(+y,+m-1,+d);
+  const today=new Date();today.setHours(0,0,0,0);
+  const yesterday=new Date(today);yesterday.setDate(today.getDate()-1);
+  if(date.toDateString()===today.toDateString())return'今日';
+  if(date.toDateString()===yesterday.toDateString())return'昨日';
+  return`${m}/${d}`;
+}
+
+function onDateChange(){loadLogForDate(getSelectedDate());updateSaveBtnLabel();updateNextDayBadge();}
+function updateSaveBtnLabel(){document.getElementById('saveBtn').textContent=`SAVE — ${getSelectedDateLabel()}`;}
+function updateNextDayBadge(){
+  const dateKey=getSelectedDate();
+  document.getElementById('nextDayBadge').textContent=`${getSelectedDate().replace(/-/g,'/')} の翌日（${getNextDateLabel(dateKey)}）`;
+}
+
+// LOG PANEL SWITCH
+function switchLogPanel(panel){
+  document.querySelectorAll('.section-tab').forEach((t,i)=>t.classList.toggle('active',['night','nextday'][i]===panel));
+  document.querySelectorAll('.log-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+panel).classList.add('active');
+}
+
+// RECALC
+function recalc(){
+  let score=100;const deductions=[];
+  const bed=toMinutes(document.getElementById('bedtime').value);
+  const wake=toMinutes(document.getElementById('waketime').value);
+  const meal=toMinutes(document.getElementById('mealtime').value);
+  const bath=toMinutes(document.getElementById('bathtime').value);
+  const coffeeTime=toMinutes(document.getElementById('coffeeTime').value);
+  const workend=toMinutes(document.getElementById('workend').value);
+  const alcohol=document.getElementById('alcohol').classList.contains('on');
+  const hasBadActivity=[...document.querySelectorAll('#activityGrid .select-chip.selected')].some(c=>c.dataset.bad==='true');
+
+  if(bed!==null&&wake!==null){
+    const s=minDiff(bed,wake);
+    if(s<420){const pts=Math.min(25,Math.round((420-s)/12));score-=pts;deductions.push({name:`睡眠時間 ${formatMins(s)}`,pts,bad:true});}
+    else deductions.push({name:`睡眠時間 ${formatMins(s)}`,pts:0,bad:false});
   }
-  updateCupUI();
-  recalc();
-}
-
-function toggleHalfCup() {
-  state.coffeeHalf = !state.coffeeHalf;
-  if (state.coffeeHalf) state.coffeeCups = 0;
-  document.getElementById('halfCupBtn').classList.toggle('active', state.coffeeHalf);
-  updateCupUI();
-  recalc();
-}
-
-function updateCupUI() {
-  document.querySelectorAll('.cup-btn').forEach(btn => {
-    const n = parseInt(btn.dataset.cup);
-    btn.classList.toggle('active', n <= state.coffeeCups);
-  });
-  const total = state.coffeeCups + (state.coffeeHalf ? 0.5 : 0);
-  document.getElementById('coffeeCountLabel').textContent = total === 0 ? '—' : total + '杯';
-}
-
-// ==================== UTILS ====================
-function toMinutes(t) { if (!t) return null; const [h,m]=t.split(':').map(Number); return h*60+m; }
-function minDiff(t1,t2) { let d=t2-t1; if(d<0) d+=1440; return d; }
-function formatMins(m) { const h=Math.floor(m/60),mm=m%60; return mm===0?`${h}h`:`${h}h${mm}m`; }
-
-function getTodayISO() {
-  const d=new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-
-function getSelectedDate() { return document.getElementById('logDate').value || getTodayISO(); }
-
-function getSelectedDateLabel() {
-  const val = getSelectedDate();
-  const [y,m,d] = val.split('-');
-  const date = new Date(+y,+m-1,+d);
-  const today = new Date(); today.setHours(0,0,0,0);
-  const yesterday = new Date(today); yesterday.setDate(today.getDate()-1);
-  if (date.toDateString()===today.toDateString()) return '今日';
-  if (date.toDateString()===yesterday.toDateString()) return '昨日';
-  return `${m}/${d}`;
-}
-
-function onDateChange() { loadLogForDate(getSelectedDate()); updateSaveBtnLabel(); }
-function updateSaveBtnLabel() { document.getElementById('saveBtn').textContent = `SAVE — ${getSelectedDateLabel()}`; }
-
-// ==================== RECALC ====================
-function recalc() {
-  let score = 100;
-  const deductions = [];
-
-  const bed = toMinutes(document.getElementById('bedtime').value);
-  const wake = toMinutes(document.getElementById('waketime').value);
-  const meal = toMinutes(document.getElementById('mealtime').value);
-  const bath = toMinutes(document.getElementById('bathtime').value);
-  const coffeeTime = toMinutes(document.getElementById('coffeeTime').value);
-  const workend = toMinutes(document.getElementById('workend').value);
-  const alcohol = document.getElementById('alcohol').classList.contains('on');
-  const hasBadActivity = [...document.querySelectorAll('#activityGrid .select-chip.selected')].some(c => c.dataset.bad==='true');
-
-  if (bed!==null && wake!==null) {
-    const sleepMins = minDiff(bed,wake);
-    if (sleepMins < 420) { const pts=Math.min(25,Math.round((420-sleepMins)/12)); score-=pts; deductions.push({name:`睡眠時間 ${formatMins(sleepMins)}`,pts,bad:true}); }
-    else { deductions.push({name:`睡眠時間 ${formatMins(sleepMins)}`,pts:0,bad:false}); }
-  }
-
-  if (meal!==null && bed!==null) {
+  if(meal!==null&&bed!==null){
     const gap=minDiff(meal,bed);
-    if (gap<120) { score-=15; deductions.push({name:`食事→就寝 ${formatMins(gap)}`,pts:15,bad:true}); }
-    else if (gap<180) { score-=8; deductions.push({name:`食事→就寝 ${formatMins(gap)}`,pts:8,bad:true}); }
-    else { deductions.push({name:`食事→就寝 ${formatMins(gap)}`,pts:0,bad:false}); }
+    if(gap<120){score-=15;deductions.push({name:`食事→就寝 ${formatMins(gap)}`,pts:15,bad:true});}
+    else if(gap<180){score-=8;deductions.push({name:`食事→就寝 ${formatMins(gap)}`,pts:8,bad:true});}
+    else deductions.push({name:`食事→就寝 ${formatMins(gap)}`,pts:0,bad:false});
   }
-
-  if (alcohol) { score-=15; deductions.push({name:'アルコールあり',pts:15,bad:true}); }
-
-  if (bath!==null && bed!==null) {
+  if(alcohol){score-=15;deductions.push({name:'アルコールあり',pts:15,bad:true});}
+  if(bath!==null&&bed!==null){
     const gap=minDiff(bath,bed);
-    if (gap<30) { score-=10; deductions.push({name:`入浴→就寝 ${formatMins(gap)} (近すぎ)`,pts:10,bad:true}); }
-    else if (gap>=60&&gap<=120) { deductions.push({name:`入浴タイミング 最適`,pts:0,bad:false}); }
-    else { deductions.push({name:`入浴→就寝 ${formatMins(gap)}`,pts:0,bad:false}); }
+    if(gap<30){score-=10;deductions.push({name:`入浴→就寝 ${formatMins(gap)} (近すぎ)`,pts:10,bad:true});}
+    else if(gap>=60&&gap<=120)deductions.push({name:'入浴タイミング 最適',pts:0,bad:false});
+    else deductions.push({name:`入浴→就寝 ${formatMins(gap)}`,pts:0,bad:false});
   }
-
-  if (coffeeTime!==null) {
+  if(coffeeTime!==null){
     const h=Math.floor(coffeeTime/60);
-    const str=`${Math.floor(coffeeTime/60)}:${String(coffeeTime%60).padStart(2,'0')}`;
-    if (h>=16) { score-=15; deductions.push({name:`コーヒー最終 ${str}`,pts:15,bad:true}); }
-    else if (h>=14) { score-=8; deductions.push({name:`コーヒー最終 ${str}`,pts:8,bad:true}); }
-    else { deductions.push({name:`コーヒー最終 ${str}`,pts:0,bad:false}); }
+    const str=`${h}:${String(coffeeTime%60).padStart(2,'0')}`;
+    if(h>=16){score-=15;deductions.push({name:`コーヒー最終 ${str}`,pts:15,bad:true});}
+    else if(h>=14){score-=8;deductions.push({name:`コーヒー最終 ${str}`,pts:8,bad:true});}
+    else deductions.push({name:`コーヒー最終 ${str}`,pts:0,bad:false});
   }
-
-  if (hasBadActivity && workend!==null && bed!==null) {
+  if(hasBadActivity&&workend!==null&&bed!==null){
     const gap=minDiff(workend,bed);
-    if (gap<60) { score-=20; deductions.push({name:`作業→就寝 ${formatMins(gap)} (近すぎ)`,pts:20,bad:true}); }
-    else if (gap<90) { score-=10; deductions.push({name:`作業→就寝 ${formatMins(gap)}`,pts:10,bad:true}); }
-    else { deductions.push({name:`作業→就寝 ${formatMins(gap)}`,pts:0,bad:false}); }
-  } else if (hasBadActivity && workend===null) {
-    score-=15; deductions.push({name:'作業終了時間 未入力',pts:15,bad:true});
-  }
+    if(gap<60){score-=20;deductions.push({name:`作業→就寝 ${formatMins(gap)} (近すぎ)`,pts:20,bad:true});}
+    else if(gap<90){score-=10;deductions.push({name:`作業→就寝 ${formatMins(gap)}`,pts:10,bad:true});}
+    else deductions.push({name:`作業→就寝 ${formatMins(gap)}`,pts:0,bad:false});
+  }else if(hasBadActivity&&workend===null){score-=15;deductions.push({name:'作業終了時間 未入力',pts:15,bad:true});}
 
-  score = Math.max(0, score);
-
-  const scoreEl = document.getElementById('scoreNum');
-  const barEl = document.getElementById('scoreBar');
-  scoreEl.textContent = score;
-  scoreEl.classList.add('pulse');
+  score=Math.max(0,score);
+  const scoreEl=document.getElementById('scoreNum');
+  scoreEl.textContent=score;scoreEl.classList.add('pulse');
   setTimeout(()=>scoreEl.classList.remove('pulse'),400);
-  barEl.style.width = score+'%';
-  barEl.className = 'score-bar';
-  if (score<50) barEl.classList.add('bad');
-  else if (score<75) barEl.classList.add('warn');
+  const barEl=document.getElementById('scoreBar');
+  barEl.style.width=score+'%';barEl.className='score-bar';
+  if(score<50)barEl.classList.add('bad');else if(score<75)barEl.classList.add('warn');
 
-  const breakdownEl = document.getElementById('breakdownSection');
-  const listEl = document.getElementById('deductionList');
-  if (deductions.length>0) {
-    breakdownEl.style.display='block';
-    listEl.innerHTML = deductions.map(d=>`
-      <div class="deduction-item">
-        <span>${d.name}</span>
-        ${d.bad?`<span class="deduction-pts">-${d.pts}pt</span>`:`<span class="deduction-ok">✓</span>`}
-      </div>`).join('');
-  } else { breakdownEl.style.display='none'; }
-
+  const breakEl=document.getElementById('breakdownSection');
+  const listEl=document.getElementById('deductionList');
+  if(deductions.length>0){
+    breakEl.style.display='block';
+    listEl.innerHTML=deductions.map(d=>`<div class="deduction-item"><span>${d.name}</span>${d.bad?`<span class="deduction-pts">-${d.pts}pt</span>`:`<span class="deduction-ok">✓</span>`}</div>`).join('');
+  }else breakEl.style.display='none';
   return score;
 }
 
-// ==================== INTERACTIONS ====================
-function toggleSwitch(el) { el.classList.toggle('on'); }
-function toggleChip(el) { if(el.closest && el.target && el.target.classList.contains('chip-delete')) return; el.classList.toggle('selected'); }
-function selectEmoji(el) {
+function toggleSwitch(el){el.classList.toggle('on');}
+function toggleChip(el){el.classList.toggle('selected');}
+function selectEmoji(el){
   const group=el.dataset.group;
   document.querySelectorAll(`.emoji-btn[data-group="${group}"]`).forEach(e=>e.classList.remove('selected'));
   el.classList.add('selected');
   state[group+'Rating']=parseInt(el.dataset.val);
 }
 
-// ==================== SAVE / LOAD ====================
-function getLogs() { try { return JSON.parse(localStorage.getItem('sleep_logs')||'[]'); } catch { return []; } }
+function getLogs(){try{return JSON.parse(localStorage.getItem('sleep_logs')||'[]');}catch{return[];}}
 
-function saveLog() {
-  const score = recalc();
-  const dateKey = getSelectedDate();
-  const log = {
-    date:dateKey, score,
+function saveLog(){
+  const score=recalc();
+  const dateKey=getSelectedDate();
+  const log={
+    date:dateKey,score,
     bedtime:document.getElementById('bedtime').value,
     waketime:document.getElementById('waketime').value,
     meal:document.getElementById('mealtime').value,
@@ -577,42 +593,39 @@ function saveLog() {
     energy:document.getElementById('energy').value,
     stress:document.getElementById('stress').value,
     note:document.getElementById('noteInput').value,
+    nextDayNote:document.getElementById('nextDayNote').value,
     ts:Date.now(),
   };
-
-  let logs = getLogs();
-  logs = logs.filter(l=>l.date!==dateKey);
+  let logs=getLogs();
+  logs=logs.filter(l=>l.date!==dateKey);
   logs.unshift(log);
   logs.sort((a,b)=>b.date.localeCompare(a.date));
-  localStorage.setItem('sleep_logs', JSON.stringify(logs));
-
+  localStorage.setItem('sleep_logs',JSON.stringify(logs));
   const btn=document.getElementById('saveBtn');
   const orig=btn.textContent;
-  btn.textContent='SAVED ✓'; btn.classList.add('saved');
-  setTimeout(()=>{ btn.textContent=orig; btn.classList.remove('saved'); },2000);
+  btn.textContent='SAVED ✓';btn.classList.add('saved');
+  setTimeout(()=>{btn.textContent=orig;btn.classList.remove('saved');},2000);
   showToast('保存しました');
 }
 
-function loadLogForDate(dateKey) {
-  const log = getLogs().find(l=>l.date===dateKey);
-
-  ['bedtime','waketime','mealtime','bathtime','coffeeTime','workend','noteInput'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.value='';
+function loadLogForDate(dateKey){
+  const log=getLogs().find(l=>l.date===dateKey);
+  ['bedtime','waketime','mealtime','bathtime','coffeeTime','workend','noteInput','nextDayNote'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
   });
   ['alcohol','showerOnly','exercise'].forEach(id=>document.getElementById(id).classList.remove('on'));
-  ['stress','energy'].forEach(id=>{ document.getElementById(id).value=0; });
-  document.getElementById('stressVal').textContent='—';
-  document.getElementById('energyVal').textContent='—';
+  document.getElementById('stress').value=0;document.getElementById('stressVal').textContent='—';
+  document.getElementById('energy').value=0;document.getElementById('energyVal').textContent='—';
   document.querySelectorAll('.emoji-btn').forEach(e=>e.classList.remove('selected'));
   document.getElementById('scoreNum').textContent='—';
   document.getElementById('scoreBar').style.width='0%';
   document.getElementById('breakdownSection').style.display='none';
-  state.coffeeCups=0; state.coffeeHalf=false;
+  state.coffeeCups=0;state.coffeeHalf=false;
   document.getElementById('halfCupBtn').classList.remove('active');
   updateCupUI();
+  ['wakeupRating','drowsyRating','focusRating','moodRating'].forEach(k=>state[k]=0);
 
-  if (!log) { renderActivityGrid([]); return; }
+  if(!log){renderActivityGrid([]);return;}
 
   document.getElementById('bedtime').value=log.bedtime||'';
   document.getElementById('waketime').value=log.waketime||'';
@@ -621,97 +634,92 @@ function loadLogForDate(dateKey) {
   document.getElementById('coffeeTime').value=log.coffeeTime||'';
   document.getElementById('workend').value=log.workend||'';
   document.getElementById('noteInput').value=log.note||'';
-  if(log.alcohol) document.getElementById('alcohol').classList.add('on');
-  if(log.exercise) document.getElementById('exercise').classList.add('on');
-  if(log.stress) { document.getElementById('stress').value=log.stress; document.getElementById('stressVal').textContent=log.stress; }
-  if(log.energy) { document.getElementById('energy').value=log.energy; document.getElementById('energyVal').textContent=log.energy; }
-
-  // Coffee
-  if(log.coffeeCups) {
-    const half = log.coffeeCups % 1 !== 0;
-    state.coffeeCups = Math.floor(log.coffeeCups);
-    state.coffeeHalf = half;
-    if(half) document.getElementById('halfCupBtn').classList.add('active');
+  document.getElementById('nextDayNote').value=log.nextDayNote||'';
+  if(log.alcohol)document.getElementById('alcohol').classList.add('on');
+  if(log.exercise)document.getElementById('exercise').classList.add('on');
+  if(log.stress){document.getElementById('stress').value=log.stress;document.getElementById('stressVal').textContent=log.stress;}
+  if(log.energy){document.getElementById('energy').value=log.energy;document.getElementById('energyVal').textContent=log.energy;}
+  if(log.coffeeCups){
+    state.coffeeHalf=log.coffeeCups%1!==0;
+    state.coffeeCups=Math.floor(log.coffeeCups);
+    if(state.coffeeHalf)document.getElementById('halfCupBtn').classList.add('active');
     updateCupUI();
   }
-
   ['wakeup','drowsy','focus','mood'].forEach(group=>{
-    const val = log[group+'Rating'];
-    if(val) {
+    const val=log[group+'Rating'];
+    if(val){
       const btn=document.querySelector(`.emoji-btn[data-group="${group}"][data-val="${val}"]`);
-      if(btn) btn.classList.add('selected');
+      if(btn)btn.classList.add('selected');
       state[group+'Rating']=val;
     }
   });
-
   renderActivityGrid(log.activities||[]);
   recalc();
 }
 
-// ==================== TOAST ====================
-function showToast(msg) {
+function showToast(msg){
   const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
+  t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-// ==================== TABS ====================
-function switchTab(tab) {
+function switchTab(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['log','history','stats'][i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('saveBtn').style.display=tab==='log'?'block':'none';
-  if(tab==='history') renderHistory();
-  if(tab==='stats') renderStats();
+  if(tab==='history')renderHistory();
+  if(tab==='stats')renderStats();
 }
 
-// ==================== HISTORY ====================
-function renderHistory() {
+function renderHistory(){
   const logs=getLogs();
   const el=document.getElementById('historyList');
-  if(logs.length===0) { el.innerHTML=`<div class="history-empty">まだ記録がありません</div>`; return; }
-
+  if(logs.length===0){el.innerHTML=`<div class="history-empty">まだ記録がありません</div>`;return;}
+  const allActs=getAllActivities();
   el.innerHTML=logs.map(log=>{
     const scoreClass=log.score>=75?'good':log.score>=50?'ok':'bad';
-    const allActs=getAllActivities();
     let pills=[];
-    if(log.bedtime&&log.waketime) pills.push(`<span class="history-pill">${formatMins(minDiff(toMinutes(log.bedtime),toMinutes(log.waketime)))}</span>`);
-    if(log.coffeeCups) pills.push(`<span class="history-pill">☕️${log.coffeeCups}杯</span>`);
-    if(log.alcohol) pills.push(`<span class="history-pill red">アルコール</span>`);
-    if(log.activities) log.activities.forEach(v=>{
-      const act=allActs.find(a=>a.val===v);
-      if(!act) return;
+    if(log.bedtime&&log.waketime)pills.push(`<span class="history-pill">${formatMins(minDiff(toMinutes(log.bedtime),toMinutes(log.waketime)))}</span>`);
+    if(log.coffeeCups)pills.push(`<span class="history-pill">☕️${log.coffeeCups}杯</span>`);
+    if(log.alcohol)pills.push(`<span class="history-pill red">アルコール</span>`);
+    if(log.activities)log.activities.forEach(v=>{
+      const act=allActs.find(a=>a.val===v);if(!act)return;
       pills.push(`<span class="history-pill ${act.bad?'red':'green'}">${act.label}</span>`);
     });
 
-    const [y,m,d]=log.date.split('-');
-    return `
-      <div class="history-card" onclick="jumpToDate('${log.date}')">
-        <div class="history-top">
-          <div>
-            <div class="history-date">${y}/${m}/${d}</div>
-            ${log.note?`<div style="font-size:12px;color:var(--muted);margin-top:4px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${log.note}</div>`:''}
-          </div>
-          <div class="history-score ${scoreClass}">${log.score}</div>
+    // 翌日パフォーマンス絵文字
+    let perfEmojis='';
+    const emojiMap={wakeup:['','😴','😪','😐','🙂','😁'],drowsy:['','😵','😪','😐','🙂','😎'],focus:['','💀','😵‍💫','😐','🎯','⚡'],mood:['','😤','😞','😐','😊','🌟']};
+    ['wakeup','drowsy','focus','mood'].forEach(g=>{
+      if(log[g+'Rating'])perfEmojis+=emojiMap[g][log[g+'Rating']]||'';
+    });
+
+    const[y,m,d]=log.date.split('-');
+    return`<div class="history-card" onclick="jumpToDate('${log.date}')">
+      <div class="history-top">
+        <div>
+          <div class="history-date">${y}/${m}/${d}</div>
+          ${log.note?`<div style="font-size:12px;color:var(--muted);margin-top:4px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${log.note}</div>`:''}
         </div>
-        <div class="history-pills">${pills.join('')}</div>
-      </div>`;
+        <div class="history-score ${scoreClass}">${log.score}</div>
+      </div>
+      <div class="history-pills">${pills.join('')}</div>
+      ${perfEmojis?`<div class="history-perf" style="margin-top:8px;font-size:18px">${perfEmojis}</div>`:''}
+    </div>`;
   }).join('');
 }
 
-function jumpToDate(dateKey) {
+function jumpToDate(dateKey){
   document.getElementById('logDate').value=dateKey;
-  loadLogForDate(dateKey);
-  updateSaveBtnLabel();
+  loadLogForDate(dateKey);updateSaveBtnLabel();updateNextDayBadge();
   switchTab('log');
 }
 
-// ==================== STATS ====================
-function renderStats() {
+function renderStats(){
   const logs=getLogs();
   const el=document.getElementById('statsContent');
-  if(logs.length===0) { el.innerHTML=`<div class="history-empty">記録が増えると<br>統計が表示されます</div>`; return; }
-
+  if(logs.length===0){el.innerHTML=`<div class="history-empty">記録が増えると<br>統計が表示されます</div>`;return;}
   const avgScore=Math.round(logs.reduce((s,l)=>s+l.score,0)/logs.length);
   const maxScore=Math.max(...logs.map(l=>l.score));
   const sleepDurs=logs.filter(l=>l.bedtime&&l.waketime).map(l=>minDiff(toMinutes(l.bedtime),toMinutes(l.waketime)));
@@ -730,9 +738,7 @@ function renderStats() {
     </div>
     <div class="section">
       <div class="section-header"><div class="section-header-left"><span class="section-icon">☕️</span><span class="section-title">COFFEE</span></div></div>
-      <div class="section-body">
-        <div class="deduction-item"><span>平均杯数</span><span style="font-family:var(--mono);font-size:14px">${avgCoffee?avgCoffee+'杯':'—'}</span></div>
-      </div>
+      <div class="section-body"><div class="deduction-item"><span>平均杯数</span><span style="font-family:var(--mono);font-size:14px">${avgCoffee?avgCoffee+'杯':'—'}</span></div></div>
     </div>
     <div class="section">
       <div class="section-header"><div class="section-header-left"><span class="section-icon">⚠️</span><span class="section-title">HABITS</span></div></div>
@@ -743,11 +749,11 @@ function renderStats() {
     </div>`;
 }
 
-// ==================== INIT ====================
+// INIT
 document.getElementById('logDate').value=getTodayISO();
-updateSaveBtnLabel();
+updateSaveBtnLabel();updateNextDayBadge();
 renderActivityGrid([]);
-document.getElementById('newActivityInput').addEventListener('keydown',e=>{ if(e.key==='Enter') addCustomActivity(); });
+document.getElementById('newActivityInput').addEventListener('keydown',e=>{if(e.key==='Enter')addCustomActivity();});
 </script>
 </body>
 </html>
