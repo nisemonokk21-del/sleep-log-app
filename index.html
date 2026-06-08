@@ -36,6 +36,13 @@
   .score-bar.warn{background:linear-gradient(90deg,#f4a261,var(--warn));}
   .score-bar.bad{background:linear-gradient(90deg,#e07a5f,#c1440e);}
 
+  .sync-status{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px;}
+  .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
+  .sync-dot.ok{background:var(--accent-mid);}
+  .sync-dot.err{background:var(--warn);}
+  .sync-dot.loading{background:#f4a261;animation:blink 1s infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
   .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);}
   .tab{flex:1;padding:12px 0;font-size:12px;font-weight:500;letter-spacing:0.05em;text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;user-select:none;}
   .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
@@ -44,7 +51,6 @@
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
 
-  /* SECTION TABS (夜/翌日) */
   .section-tabs{display:flex;background:var(--bg);border-radius:99px;padding:3px;margin-bottom:16px;gap:3px;}
   .section-tab{flex:1;text-align:center;padding:8px;font-size:12px;font-weight:500;color:var(--muted);border-radius:99px;cursor:pointer;transition:all 0.2s;user-select:none;}
   .section-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
@@ -112,7 +118,6 @@
   .emoji-btn{font-size:24px;cursor:pointer;opacity:0.3;transition:all 0.15s;user-select:none;}
   .emoji-btn.selected{opacity:1;transform:scale(1.3);}
 
-  /* NEXT DAY DATE BADGE */
   .next-day-badge{display:inline-block;font-family:var(--mono);font-size:11px;background:var(--accent-light);color:var(--accent);padding:3px 10px;border-radius:99px;margin-bottom:12px;}
 
   .note-input{width:100%;border:none;background:transparent;font-family:var(--sans);font-size:14px;color:var(--text);resize:none;outline:none;min-height:60px;line-height:1.6;}
@@ -134,7 +139,6 @@
   .history-pill{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--bg);color:var(--muted);font-family:var(--mono);}
   .history-pill.red{background:var(--warn-light);color:var(--warn);}
   .history-pill.green{background:var(--accent-light);color:var(--accent);}
-  .history-perf{display:flex;gap:6px;margin-top:8px;font-size:18px;}
 
   .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
   .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
@@ -149,9 +153,22 @@
   .pulse{animation:pulse 0.4s ease;}
   .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:white;padding:12px 24px;border-radius:99px;font-size:13px;font-family:var(--mono);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:nowrap;z-index:200;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* LOGIN */
+  .login-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px;}
+  .login-title{font-family:var(--mono);font-size:13px;letter-spacing:0.2em;color:var(--muted);}
+  .login-btn{padding:16px 32px;background:var(--text);color:white;border:none;border-radius:var(--radius);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.1em;cursor:pointer;}
+  .login-sub{font-size:12px;color:var(--muted);}
 </style>
 </head>
 <body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-title">SLEEP LOG</div>
+  <button class="login-btn" onclick="signIn()">Googleでログイン</button>
+  <div class="login-sub">データはクラウドに保存されます</div>
+</div>
 
 <div class="header">
   <div class="header-top">
@@ -168,6 +185,10 @@
   <div class="score-bar-wrap">
     <div class="score-bar" id="scoreBar" style="width:0%"></div>
   </div>
+  <div class="sync-status">
+    <div class="sync-dot" id="syncDot"></div>
+    <span id="syncLabel">—</span>
+  </div>
 </div>
 
 <div class="tabs">
@@ -179,13 +200,11 @@
 <div class="content">
   <div class="tab-panel active" id="tab-log">
 
-    <!-- 夜 / 翌日 切り替え -->
     <div class="section-tabs">
       <div class="section-tab active" onclick="switchLogPanel('night')">🌙 夜の記録</div>
       <div class="section-tab" onclick="switchLogPanel('nextday')">☀️ 翌日の状態</div>
     </div>
 
-    <!-- 夜の記録パネル -->
     <div class="log-panel active" id="panel-night">
 
       <div class="section">
@@ -286,18 +305,18 @@
         <div class="section-body">
           <div class="slider-row">
             <div class="slider-top"><div class="slider-label">ストレスレベル</div><div class="slider-value" id="stressVal">—</div></div>
-            <input type="range" min="0" max="5" value="0" id="stress" oninput="document.getElementById('stressVal').textContent=this.value==0?'—':this.value; recalc()">
+            <input type="range" min="0" max="5" value="0" id="stress" oninput="document.getElementById('stressVal').textContent=this.value==0?'—':this.value;recalc()">
           </div>
           <div class="toggle-row">
             <div><div class="toggle-label">運動した</div><div class="toggle-sub">就寝2時間前までOK</div></div>
-            <div class="toggle" id="exercise" onclick="toggleSwitch(this); recalc()"></div>
+            <div class="toggle" id="exercise" onclick="toggleSwitch(this);recalc()"></div>
           </div>
         </div>
       </div>
 
       <div class="section" id="breakdownSection" style="display:none">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">📊</span><span class="section-title">BREAKDOWN</span></div></div>
-        <div class="section-body"><div class="deduction-list" id="deductionList"></div></div>
+        <div class="section-body"><div id="deductionList"></div></div>
       </div>
 
       <div class="section">
@@ -307,11 +326,9 @@
         </div>
       </div>
 
-    </div><!-- /panel-night -->
+    </div>
 
-    <!-- 翌日の状態パネル -->
     <div class="log-panel" id="panel-nextday">
-
       <div class="next-day-badge" id="nextDayBadge">— の翌日</div>
 
       <div class="section">
@@ -378,10 +395,9 @@
           <textarea class="note-input" id="nextDayNote" placeholder="翌日に気づいたこと"></textarea>
         </div>
       </div>
+    </div>
 
-    </div><!-- /panel-nextday -->
-
-  </div><!-- /tab-log -->
+  </div>
 
   <div class="tab-panel" id="tab-history"><div id="historyList"></div></div>
   <div class="tab-panel" id="tab-stats"><div id="statsContent"></div></div>
@@ -390,7 +406,90 @@
 <button class="save-btn" id="saveBtn" onclick="saveLog()">SAVE</button>
 <div class="toast" id="toast"></div>
 
-<script>
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyClH0QgBhAyTjn4FeCAQpX7nkiJr_BpY3E",
+  authDomain: "sleep-log-dc539.firebaseapp.com",
+  projectId: "sleep-log-dc539",
+  storageBucket: "sleep-log-dc539.firebasestorage.app",
+  messagingSenderId: "438358636408",
+  appId: "1:438358636408:web:fc05861406cba39de3ba8d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+let currentUser = null;
+let logsCache = [];
+
+// ==================== AUTH ====================
+window.signIn = async () => {
+  try {
+    await signInWithPopup(auth, provider);
+  } catch(e) {
+    showToast('ログイン失敗');
+  }
+};
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('loginScreen').style.display = 'none';
+    setSyncStatus('loading', '読み込み中...');
+    await loadAllLogs();
+    setSyncStatus('ok', user.displayName || 'ログイン済み');
+    loadLogForDate(getSelectedDate());
+    updateSaveBtnLabel();
+    updateNextDayBadge();
+  } else {
+    currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
+});
+
+// ==================== FIRESTORE ====================
+async function saveLogToCloud(log) {
+  if (!currentUser) return;
+  setSyncStatus('loading', '保存中...');
+  try {
+    await setDoc(doc(db, 'users', currentUser.uid, 'logs', log.date), log);
+    const idx = logsCache.findIndex(l => l.date === log.date);
+    if (idx >= 0) logsCache[idx] = log; else logsCache.unshift(log);
+    logsCache.sort((a,b) => b.date.localeCompare(a.date));
+    setSyncStatus('ok', '保存済み');
+  } catch(e) {
+    setSyncStatus('err', '保存失敗');
+    showToast('保存に失敗しました');
+  }
+}
+
+async function loadAllLogs() {
+  if (!currentUser) return;
+  try {
+    const q = query(collection(db, 'users', currentUser.uid, 'logs'), orderBy('date', 'desc'));
+    const snap = await getDocs(q);
+    logsCache = snap.docs.map(d => d.data());
+  } catch(e) {
+    logsCache = [];
+  }
+}
+
+function getLogs() { return logsCache; }
+
+function setSyncStatus(state, label) {
+  const dot = document.getElementById('syncDot');
+  dot.className = 'sync-dot ' + state;
+  document.getElementById('syncLabel').textContent = label;
+}
+
+// ==================== ACTIVITIES ====================
 const DEFAULT_ACTIVITIES=[
   {val:'ea',label:'EA作業',bad:true},
   {val:'screen',label:'スマホ',bad:true},
@@ -408,30 +507,30 @@ function getCustomActivities(){try{return JSON.parse(localStorage.getItem('custo
 function saveCustomActivities(arr){localStorage.setItem('custom_activities',JSON.stringify(arr));}
 function getAllActivities(){return[...DEFAULT_ACTIVITIES,...getCustomActivities()];}
 
-function renderActivityGrid(selectedVals=[]){
+window.renderActivityGrid = function(selectedVals=[]){
   const grid=document.getElementById('activityGrid');
   grid.innerHTML=getAllActivities().map(a=>{
     const isDefault=DEFAULT_ACTIVITIES.some(d=>d.val===a.val);
     const del=!isDefault?`<span class="chip-delete" onclick="deleteActivity(event,'${a.val}')">✕</span>`:'';
-    return `<div class="select-chip ${a.bad?'warn-chip':''} ${selectedVals.includes(a.val)?'selected':''}" data-val="${a.val}" data-bad="${a.bad}" onclick="toggleChip(this);recalc()">${a.label}${del}</div>`;
+    return`<div class="select-chip ${a.bad?'warn-chip':''} ${selectedVals.includes(a.val)?'selected':''}" data-val="${a.val}" data-bad="${a.bad}" onclick="toggleChip(this);recalc()">${a.label}${del}</div>`;
   }).join('');
-}
+};
 
-function deleteActivity(e,val){
+window.deleteActivity = function(e,val){
   e.stopPropagation();
   saveCustomActivities(getCustomActivities().filter(a=>a.val!==val));
   const sel=[...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val).filter(v=>v!==val);
   renderActivityGrid(sel);recalc();
-}
+};
 
-function toggleNewActivityType(){
+window.toggleNewActivityType = function(){
   state.newActivityIsBad=!state.newActivityIsBad;
   const btn=document.getElementById('newActivityType');
   btn.textContent=state.newActivityIsBad?'悪い':'良い';
   btn.classList.toggle('bad-type',state.newActivityIsBad);
-}
+};
 
-function addCustomActivity(){
+window.addCustomActivity = function(){
   const input=document.getElementById('newActivityInput');
   const label=input.value.trim();if(!label)return;
   const customs=getCustomActivities();
@@ -439,21 +538,21 @@ function addCustomActivity(){
   saveCustomActivities(customs);
   const sel=[...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val);
   renderActivityGrid(sel);input.value='';recalc();
-}
+};
 
 // COFFEE
-function setCups(n){
+window.setCups = function(n){
   state.coffeeCups=state.coffeeCups===n&&!state.coffeeHalf?0:n;
   state.coffeeHalf=false;
   document.getElementById('halfCupBtn').classList.remove('active');
   updateCupUI();recalc();
-}
-function toggleHalfCup(){
+};
+window.toggleHalfCup = function(){
   state.coffeeHalf=!state.coffeeHalf;
   if(state.coffeeHalf)state.coffeeCups=0;
   document.getElementById('halfCupBtn').classList.toggle('active',state.coffeeHalf);
   updateCupUI();recalc();
-}
+};
 function updateCupUI(){
   document.querySelectorAll('.cup-btn').forEach(btn=>btn.classList.toggle('active',parseInt(btn.dataset.cup)<=state.coffeeCups));
   const total=state.coffeeCups+(state.coffeeHalf?0.5:0);
@@ -485,22 +584,21 @@ function getSelectedDateLabel(){
   return`${m}/${d}`;
 }
 
-function onDateChange(){loadLogForDate(getSelectedDate());updateSaveBtnLabel();updateNextDayBadge();}
+window.onDateChange = function(){loadLogForDate(getSelectedDate());updateSaveBtnLabel();updateNextDayBadge();};
 function updateSaveBtnLabel(){document.getElementById('saveBtn').textContent=`SAVE — ${getSelectedDateLabel()}`;}
 function updateNextDayBadge(){
   const dateKey=getSelectedDate();
-  document.getElementById('nextDayBadge').textContent=`${getSelectedDate().replace(/-/g,'/')} の翌日（${getNextDateLabel(dateKey)}）`;
+  document.getElementById('nextDayBadge').textContent=`${dateKey.replace(/-/g,'/')} の翌日（${getNextDateLabel(dateKey)}）`;
 }
 
-// LOG PANEL SWITCH
-function switchLogPanel(panel){
+window.switchLogPanel = function(panel){
   document.querySelectorAll('.section-tab').forEach((t,i)=>t.classList.toggle('active',['night','nextday'][i]===panel));
   document.querySelectorAll('.log-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+panel).classList.add('active');
-}
+};
 
 // RECALC
-function recalc(){
+window.recalc = function(){
   let score=100;const deductions=[];
   const bed=toMinutes(document.getElementById('bedtime').value);
   const wake=toMinutes(document.getElementById('waketime').value);
@@ -525,7 +623,7 @@ function recalc(){
   if(alcohol){score-=15;deductions.push({name:'アルコールあり',pts:15,bad:true});}
   if(bath!==null&&bed!==null){
     const gap=minDiff(bath,bed);
-    if(gap<30){score-=10;deductions.push({name:`入浴→就寝 ${formatMins(gap)} (近すぎ)`,pts:10,bad:true});}
+    if(gap<30){score-=10;deductions.push({name:`入浴→就寝 ${formatMins(gap)}(近すぎ)`,pts:10,bad:true});}
     else if(gap>=60&&gap<=120)deductions.push({name:'入浴タイミング 最適',pts:0,bad:false});
     else deductions.push({name:`入浴→就寝 ${formatMins(gap)}`,pts:0,bad:false});
   }
@@ -538,7 +636,7 @@ function recalc(){
   }
   if(hasBadActivity&&workend!==null&&bed!==null){
     const gap=minDiff(workend,bed);
-    if(gap<60){score-=20;deductions.push({name:`作業→就寝 ${formatMins(gap)} (近すぎ)`,pts:20,bad:true});}
+    if(gap<60){score-=20;deductions.push({name:`作業→就寝 ${formatMins(gap)}(近すぎ)`,pts:20,bad:true});}
     else if(gap<90){score-=10;deductions.push({name:`作業→就寝 ${formatMins(gap)}`,pts:10,bad:true});}
     else deductions.push({name:`作業→就寝 ${formatMins(gap)}`,pts:0,bad:false});
   }else if(hasBadActivity&&workend===null){score-=15;deductions.push({name:'作業終了時間 未入力',pts:15,bad:true});}
@@ -558,20 +656,20 @@ function recalc(){
     listEl.innerHTML=deductions.map(d=>`<div class="deduction-item"><span>${d.name}</span>${d.bad?`<span class="deduction-pts">-${d.pts}pt</span>`:`<span class="deduction-ok">✓</span>`}</div>`).join('');
   }else breakEl.style.display='none';
   return score;
-}
+};
 
-function toggleSwitch(el){el.classList.toggle('on');}
-function toggleChip(el){el.classList.toggle('selected');}
-function selectEmoji(el){
+window.toggleSwitch = function(el){el.classList.toggle('on');};
+window.toggleChip = function(el){el.classList.toggle('selected');};
+window.selectEmoji = function(el){
   const group=el.dataset.group;
   document.querySelectorAll(`.emoji-btn[data-group="${group}"]`).forEach(e=>e.classList.remove('selected'));
   el.classList.add('selected');
   state[group+'Rating']=parseInt(el.dataset.val);
-}
+};
 
-function getLogs(){try{return JSON.parse(localStorage.getItem('sleep_logs')||'[]');}catch{return[];}}
-
-function saveLog(){
+// SAVE
+window.saveLog = async function(){
+  if(!currentUser){showToast('ログインが必要です');return;}
   const score=recalc();
   const dateKey=getSelectedDate();
   const log={
@@ -596,17 +694,13 @@ function saveLog(){
     nextDayNote:document.getElementById('nextDayNote').value,
     ts:Date.now(),
   };
-  let logs=getLogs();
-  logs=logs.filter(l=>l.date!==dateKey);
-  logs.unshift(log);
-  logs.sort((a,b)=>b.date.localeCompare(a.date));
-  localStorage.setItem('sleep_logs',JSON.stringify(logs));
+  await saveLogToCloud(log);
   const btn=document.getElementById('saveBtn');
   const orig=btn.textContent;
   btn.textContent='SAVED ✓';btn.classList.add('saved');
   setTimeout(()=>{btn.textContent=orig;btn.classList.remove('saved');},2000);
   showToast('保存しました');
-}
+};
 
 function loadLogForDate(dateKey){
   const log=getLogs().find(l=>l.date===dateKey);
@@ -663,14 +757,14 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-function switchTab(tab){
+window.switchTab = function(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['log','history','stats'][i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('saveBtn').style.display=tab==='log'?'block':'none';
   if(tab==='history')renderHistory();
   if(tab==='stats')renderStats();
-}
+};
 
 function renderHistory(){
   const logs=getLogs();
@@ -687,14 +781,9 @@ function renderHistory(){
       const act=allActs.find(a=>a.val===v);if(!act)return;
       pills.push(`<span class="history-pill ${act.bad?'red':'green'}">${act.label}</span>`);
     });
-
-    // 翌日パフォーマンス絵文字
-    let perfEmojis='';
     const emojiMap={wakeup:['','😴','😪','😐','🙂','😁'],drowsy:['','😵','😪','😐','🙂','😎'],focus:['','💀','😵‍💫','😐','🎯','⚡'],mood:['','😤','😞','😐','😊','🌟']};
-    ['wakeup','drowsy','focus','mood'].forEach(g=>{
-      if(log[g+'Rating'])perfEmojis+=emojiMap[g][log[g+'Rating']]||'';
-    });
-
+    let perfEmojis='';
+    ['wakeup','drowsy','focus','mood'].forEach(g=>{if(log[g+'Rating'])perfEmojis+=emojiMap[g][log[g+'Rating']]||'';});
     const[y,m,d]=log.date.split('-');
     return`<div class="history-card" onclick="jumpToDate('${log.date}')">
       <div class="history-top">
@@ -705,16 +794,16 @@ function renderHistory(){
         <div class="history-score ${scoreClass}">${log.score}</div>
       </div>
       <div class="history-pills">${pills.join('')}</div>
-      ${perfEmojis?`<div class="history-perf" style="margin-top:8px;font-size:18px">${perfEmojis}</div>`:''}
+      ${perfEmojis?`<div style="margin-top:8px;font-size:18px">${perfEmojis}</div>`:''}
     </div>`;
   }).join('');
 }
 
-function jumpToDate(dateKey){
+window.jumpToDate = function(dateKey){
   document.getElementById('logDate').value=dateKey;
   loadLogForDate(dateKey);updateSaveBtnLabel();updateNextDayBadge();
   switchTab('log');
-}
+};
 
 function renderStats(){
   const logs=getLogs();
@@ -728,7 +817,6 @@ function renderStats(){
   const eaDays=logs.filter(l=>l.activities&&l.activities.includes('ea')).length;
   const coffeeLogs=logs.filter(l=>l.coffeeCups);
   const avgCoffee=coffeeLogs.length?(coffeeLogs.reduce((s,l)=>s+l.coffeeCups,0)/coffeeLogs.length).toFixed(1):null;
-
   el.innerHTML=`
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-value" style="color:var(--accent)">${avgScore}</div><div class="stat-label">平均スコア</div></div>
@@ -751,9 +839,9 @@ function renderStats(){
 
 // INIT
 document.getElementById('logDate').value=getTodayISO();
-updateSaveBtnLabel();updateNextDayBadge();
-renderActivityGrid([]);
 document.getElementById('newActivityInput').addEventListener('keydown',e=>{if(e.key==='Enter')addCustomActivity();});
+renderActivityGrid([]);
+
 </script>
 </body>
 </html>
