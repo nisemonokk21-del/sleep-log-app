@@ -17,9 +17,10 @@
     --warn:#e07a5f; --warn-light:#fdf0ec;
     --mono:'DM Mono',monospace; --sans:'DM Sans',sans-serif;
     --radius:16px;
+    --bottom-nav-h:60px;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;padding-bottom:calc(var(--bottom-nav-h) + 16px);}
 
   .header{padding:56px 24px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
   .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
@@ -43,11 +44,15 @@
   .sync-dot.loading{background:#f4a261;animation:blink 1s infinite;}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-  .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);}
-  .tab{flex:1;padding:12px 0;font-size:12px;font-weight:500;letter-spacing:0.05em;text-align:center;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;user-select:none;}
-  .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+  /* BOTTOM NAV */
+  .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:var(--bottom-nav-h);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:200;}
+  .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--muted);transition:color 0.2s;user-select:none;}
+  .nav-tab.active{color:var(--accent);}
+  .nav-tab-icon{font-size:18px;line-height:1;}
+  .nav-tab-label{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;}
+  .nav-tab-bar{position:absolute;top:0;height:2px;width:33.33%;background:var(--accent);transition:left 0.25s cubic-bezier(0.4,0,0.2,1);border-radius:0 0 2px 2px;}
 
-  .content{padding:20px 16px 100px;}
+  .content{padding:20px 16px 8px;}
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
 
@@ -93,6 +98,17 @@
   .half-cup-btn{font-size:13px;padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;user-select:none;transition:all 0.15s;}
   .half-cup-btn.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500;}
 
+  /* NUMBER SCALE */
+  .num-scale{display:flex;gap:4px;flex-wrap:nowrap;padding:4px 0 0;}
+  .num-btn{flex:1;min-width:0;padding:7px 2px;border-radius:8px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;background:var(--bg);}
+  .num-btn.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:600;}
+  .num-scale-row{padding:10px 0;border-bottom:1px solid var(--border);}
+  .num-scale-row:last-child{border-bottom:none;}
+  .num-scale-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .num-scale-label{font-size:14px;}
+  .num-scale-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+  .num-scale-val{font-family:var(--mono);font-size:18px;color:var(--accent);min-width:24px;text-align:right;}
+
   .select-grid{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
   .select-chip{padding:6px 14px;border-radius:99px;border:1.5px solid var(--border);font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.15s;user-select:none;display:flex;align-items:center;gap:4px;}
   .select-chip.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500;}
@@ -114,32 +130,39 @@
   input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:99px;outline:none;}
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(45,106,79,0.3);}
 
-  .emoji-scale{display:flex;justify-content:space-between;padding:4px 0 0;}
-  .emoji-btn{font-size:24px;cursor:pointer;opacity:0.3;transition:all 0.15s;user-select:none;}
-  .emoji-btn.selected{opacity:1;transform:scale(1.3);}
-
   .next-day-badge{display:inline-block;font-family:var(--mono);font-size:11px;background:var(--accent-light);color:var(--accent);padding:3px 10px;border-radius:99px;margin-bottom:12px;}
 
   .note-input{width:100%;border:none;background:transparent;font-family:var(--sans);font-size:14px;color:var(--text);resize:none;outline:none;min-height:60px;line-height:1.6;}
   .note-input::placeholder{color:var(--muted);}
 
-  .save-btn{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:398px;padding:18px;background:var(--text);color:white;border:none;border-radius:var(--radius);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 24px rgba(0,0,0,0.15);}
+  /* SAVE BTN — above bottom nav */
+  .save-btn{position:fixed;bottom:calc(var(--bottom-nav-h) + 8px);left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:398px;padding:16px;background:var(--text);color:white;border:none;border-radius:var(--radius);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 24px rgba(0,0,0,0.15);z-index:190;}
   .save-btn:active{transform:translateX(-50%) scale(0.98);}
   .save-btn.saved{background:var(--accent);}
 
+  /* HISTORY */
   .history-empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;line-height:1.8;}
   .history-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:10px;cursor:pointer;}
-  .history-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-  .history-date{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.05em;}
-  .history-score{font-family:var(--mono);font-size:28px;font-weight:300;line-height:1;}
+  .history-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+  .history-date{font-family:var(--mono);font-size:13px;color:var(--text);font-weight:500;letter-spacing:0.05em;}
+  .history-score{font-family:var(--mono);font-size:36px;font-weight:300;line-height:1;}
   .history-score.good{color:var(--accent);}
   .history-score.ok{color:#f4a261;}
   .history-score.bad{color:var(--warn);}
-  .history-pills{display:flex;flex-wrap:wrap;gap:6px;}
-  .history-pill{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--bg);color:var(--muted);font-family:var(--mono);}
-  .history-pill.red{background:var(--warn-light);color:var(--warn);}
-  .history-pill.green{background:var(--accent-light);color:var(--accent);}
+  .history-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+  .history-meta-item{display:flex;flex-direction:column;gap:2px;}
+  .history-meta-key{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
+  .history-meta-val{font-family:var(--mono);font-size:13px;color:var(--text);}
+  .history-tags{display:flex;flex-wrap:wrap;gap:5px;}
+  .history-tag{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--bg);color:var(--muted);font-family:var(--mono);}
+  .history-tag.red{background:var(--warn-light);color:var(--warn);}
+  .history-tag.green{background:var(--accent-light);color:var(--accent);}
+  .history-ratings{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+  .history-rating-item{flex:1;text-align:center;}
+  .history-rating-key{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;}
+  .history-rating-val{font-family:var(--mono);font-size:16px;color:var(--accent);display:block;margin-top:2px;}
 
+  /* STATS */
   .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
   .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
   .stat-value{font-family:var(--mono);font-size:32px;font-weight:300;line-height:1;margin-bottom:4px;}
@@ -149,21 +172,29 @@
   .deduction-pts{font-family:var(--mono);font-size:12px;color:var(--warn);font-weight:500;}
   .deduction-ok{font-family:var(--mono);font-size:12px;color:var(--accent);}
 
+  /* CHART */
+  .chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+  .chart-title{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+  canvas.stat-chart{width:100%;display:block;}
+
   @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
   .pulse{animation:pulse 0.4s ease;}
-  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:white;padding:12px 24px;border-radius:99px;font-size:13px;font-family:var(--mono);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:nowrap;z-index:200;}
+  .toast{position:fixed;bottom:calc(var(--bottom-nav-h) + 80px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:white;padding:12px 24px;border-radius:99px;font-size:13px;font-family:var(--mono);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:nowrap;z-index:300;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  /* LOGIN */
   .login-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px;}
   .login-title{font-family:var(--mono);font-size:13px;letter-spacing:0.2em;color:var(--muted);}
   .login-btn{padding:16px 32px;background:var(--text);color:white;border:none;border-radius:var(--radius);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.1em;cursor:pointer;}
   .login-sub{font-size:12px;color:var(--muted);}
+
+  /* nap duration input */
+  .nap-dur-input{font-family:var(--mono);font-size:18px;color:var(--text);border:none;background:transparent;text-align:right;width:70px;outline:none;}
+  .nap-dur-input:focus{color:var(--accent);}
+  .nap-dur-unit{font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:2px;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-title">SLEEP LOG</div>
   <button class="login-btn" onclick="signIn()">Googleでログイン</button>
@@ -191,15 +222,26 @@
   </div>
 </div>
 
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('log')">LOG</div>
-  <div class="tab" onclick="switchTab('history')">HISTORY</div>
-  <div class="tab" onclick="switchTab('stats')">STATS</div>
-</div>
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="nav-tab-bar" id="navBar" style="left:0%"></div>
+  <div class="nav-tab active" id="navTab-log" onclick="switchTab('log')">
+    <div class="nav-tab-icon">🌙</div>
+    <div class="nav-tab-label">LOG</div>
+  </div>
+  <div class="nav-tab" id="navTab-history" onclick="switchTab('history')">
+    <div class="nav-tab-icon">📋</div>
+    <div class="nav-tab-label">HISTORY</div>
+  </div>
+  <div class="nav-tab" id="navTab-stats" onclick="switchTab('stats')">
+    <div class="nav-tab-icon">📊</div>
+    <div class="nav-tab-label">STATS</div>
+  </div>
+</nav>
 
 <div class="content">
+  <!-- LOG TAB -->
   <div class="tab-panel active" id="tab-log">
-
     <div class="section-tabs">
       <div class="section-tab active" onclick="switchLogPanel('night')">🌙 夜の記録</div>
       <div class="section-tab" onclick="switchLogPanel('nextday')">☀️ 翌日の状態</div>
@@ -207,6 +249,7 @@
 
     <div class="log-panel active" id="panel-night">
 
+      <!-- SLEEP -->
       <div class="section">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">🌙</span><span class="section-title">SLEEP</span></div></div>
         <div class="section-body">
@@ -218,19 +261,17 @@
             <div><div class="time-label">起床</div><div class="time-sub">目が覚めた時間</div></div>
             <input type="time" class="time-input" id="waketime" onchange="recalc()">
           </div>
-          <div class="time-row">
-            <div><div class="time-label">目覚め感</div><div class="time-sub">起きた瞬間の感覚</div></div>
-            <div class="emoji-scale">
-              <span class="emoji-btn" data-group="wakeup" data-val="1" onclick="selectEmoji(this)">😴</span>
-              <span class="emoji-btn" data-group="wakeup" data-val="2" onclick="selectEmoji(this)">😪</span>
-              <span class="emoji-btn" data-group="wakeup" data-val="3" onclick="selectEmoji(this)">😐</span>
-              <span class="emoji-btn" data-group="wakeup" data-val="4" onclick="selectEmoji(this)">🙂</span>
-              <span class="emoji-btn" data-group="wakeup" data-val="5" onclick="selectEmoji(this)">😁</span>
+          <div class="num-scale-row">
+            <div class="num-scale-top">
+              <div><div class="num-scale-label">目覚め感</div><div class="time-sub">起きた瞬間の感覚</div></div>
+              <div class="num-scale-val" id="wakeupVal">—</div>
             </div>
+            <div class="num-scale" id="scale-wakeup"></div>
           </div>
         </div>
       </div>
 
+      <!-- FOOD -->
       <div class="section">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">🍽</span><span class="section-title">FOOD</span></div></div>
         <div class="section-body">
@@ -245,6 +286,7 @@
         </div>
       </div>
 
+      <!-- BATH -->
       <div class="section">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">🛁</span><span class="section-title">BATH</span></div></div>
         <div class="section-body">
@@ -259,6 +301,7 @@
         </div>
       </div>
 
+      <!-- COFFEE -->
       <div class="section">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">☕️</span><span class="section-title">COFFEE</span></div></div>
         <div class="section-body">
@@ -281,6 +324,7 @@
         </div>
       </div>
 
+      <!-- PRE-SLEEP -->
       <div class="section">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">💻</span><span class="section-title">PRE-SLEEP</span></div></div>
         <div class="section-body">
@@ -300,8 +344,9 @@
         </div>
       </div>
 
+      <!-- STRESS / EXERCISE -->
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">😤</span><span class="section-title">STRESS</span></div></div>
+        <div class="section-header"><div class="section-header-left"><span class="section-icon">😤</span><span class="section-title">STRESS & EXERCISE</span></div></div>
         <div class="section-body">
           <div class="slider-row">
             <div class="slider-top"><div class="slider-label">ストレスレベル</div><div class="slider-value" id="stressVal">—</div></div>
@@ -311,14 +356,37 @@
             <div><div class="toggle-label">運動した</div><div class="toggle-sub">就寝2時間前までOK</div></div>
             <div class="toggle" id="exercise" onclick="toggleSwitch(this);recalc()"></div>
           </div>
+          <div class="time-row" id="exerciseTimeRow">
+            <div><div class="time-label">運動した時間</div><div class="time-sub">終了時刻</div></div>
+            <input type="time" class="time-input" id="exerciseTime" onchange="recalc()">
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">昼寝した</div></div>
+            <div class="toggle" id="napped" onclick="toggleSwitch(this);toggleNapFields()"></div>
+          </div>
+          <div id="napFields" style="display:none">
+            <div class="time-row">
+              <div><div class="time-label">昼寝開始</div></div>
+              <input type="time" class="time-input" id="napStart">
+            </div>
+            <div class="time-row">
+              <div><div class="time-label">昼寝の長さ</div></div>
+              <div style="display:flex;align-items:center;justify-content:flex-end">
+                <input type="number" class="nap-dur-input" id="napDuration" min="1" max="240" placeholder="—">
+                <span class="nap-dur-unit">分</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- BREAKDOWN -->
       <div class="section" id="breakdownSection" style="display:none">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">📊</span><span class="section-title">BREAKDOWN</span></div></div>
         <div class="section-body"><div id="deductionList"></div></div>
       </div>
 
+      <!-- NOTE -->
       <div class="section">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">✏️</span><span class="section-title">NOTE</span></div></div>
         <div class="section-body">
@@ -326,23 +394,21 @@
         </div>
       </div>
 
-    </div>
+    </div><!-- /panel-night -->
 
+    <!-- NEXT DAY PANEL -->
     <div class="log-panel" id="panel-nextday">
       <div class="next-day-badge" id="nextDayBadge">— の翌日</div>
 
       <div class="section">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">😪</span><span class="section-title">眠気</span></div></div>
         <div class="section-body">
-          <div class="time-row">
-            <div><div class="time-label">昼間の眠気</div><div class="time-sub">午後の集中が保てたか</div></div>
-            <div class="emoji-scale">
-              <span class="emoji-btn" data-group="drowsy" data-val="1" onclick="selectEmoji(this)">😵</span>
-              <span class="emoji-btn" data-group="drowsy" data-val="2" onclick="selectEmoji(this)">😪</span>
-              <span class="emoji-btn" data-group="drowsy" data-val="3" onclick="selectEmoji(this)">😐</span>
-              <span class="emoji-btn" data-group="drowsy" data-val="4" onclick="selectEmoji(this)">🙂</span>
-              <span class="emoji-btn" data-group="drowsy" data-val="5" onclick="selectEmoji(this)">😎</span>
+          <div class="num-scale-row">
+            <div class="num-scale-top">
+              <div><div class="num-scale-label">昼間の眠気</div><div class="time-sub">1=最悪 / 10=全く眠くない</div></div>
+              <div class="num-scale-val" id="drowsyVal">—</div>
             </div>
+            <div class="num-scale" id="scale-drowsy"></div>
           </div>
         </div>
       </div>
@@ -350,15 +416,12 @@
       <div class="section">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">🎯</span><span class="section-title">集中力</span></div></div>
         <div class="section-body">
-          <div class="time-row">
-            <div><div class="time-label">作業パフォーマンス</div><div class="time-sub">EA・仕事・創作など</div></div>
-            <div class="emoji-scale">
-              <span class="emoji-btn" data-group="focus" data-val="1" onclick="selectEmoji(this)">💀</span>
-              <span class="emoji-btn" data-group="focus" data-val="2" onclick="selectEmoji(this)">😵‍💫</span>
-              <span class="emoji-btn" data-group="focus" data-val="3" onclick="selectEmoji(this)">😐</span>
-              <span class="emoji-btn" data-group="focus" data-val="4" onclick="selectEmoji(this)">🎯</span>
-              <span class="emoji-btn" data-group="focus" data-val="5" onclick="selectEmoji(this)">⚡</span>
+          <div class="num-scale-row">
+            <div class="num-scale-top">
+              <div><div class="num-scale-label">作業パフォーマンス</div><div class="time-sub">1=最悪 / 10=絶好調</div></div>
+              <div class="num-scale-val" id="focusVal">—</div>
             </div>
+            <div class="num-scale" id="scale-focus"></div>
           </div>
         </div>
       </div>
@@ -366,15 +429,12 @@
       <div class="section">
         <div class="section-header"><div class="section-header-left"><span class="section-icon">🌈</span><span class="section-title">気分</span></div></div>
         <div class="section-body">
-          <div class="time-row">
-            <div><div class="time-label">一日の感情状態</div><div class="time-sub">イライラ・落ち込み・安定感</div></div>
-            <div class="emoji-scale">
-              <span class="emoji-btn" data-group="mood" data-val="1" onclick="selectEmoji(this)">😤</span>
-              <span class="emoji-btn" data-group="mood" data-val="2" onclick="selectEmoji(this)">😞</span>
-              <span class="emoji-btn" data-group="mood" data-val="3" onclick="selectEmoji(this)">😐</span>
-              <span class="emoji-btn" data-group="mood" data-val="4" onclick="selectEmoji(this)">😊</span>
-              <span class="emoji-btn" data-group="mood" data-val="5" onclick="selectEmoji(this)">🌟</span>
+          <div class="num-scale-row">
+            <div class="num-scale-top">
+              <div><div class="num-scale-label">一日の感情状態</div><div class="time-sub">1=最悪 / 10=最高</div></div>
+              <div class="num-scale-val" id="moodVal">—</div>
             </div>
+            <div class="num-scale" id="scale-mood"></div>
           </div>
         </div>
       </div>
@@ -395,9 +455,9 @@
           <textarea class="note-input" id="nextDayNote" placeholder="翌日に気づいたこと"></textarea>
         </div>
       </div>
-    </div>
+    </div><!-- /panel-nextday -->
 
-  </div>
+  </div><!-- /tab-log -->
 
   <div class="tab-panel" id="tab-history"><div id="historyList"></div></div>
   <div class="tab-panel" id="tab-stats"><div id="statsContent"></div></div>
@@ -406,11 +466,10 @@
 <button class="save-btn" id="saveBtn" onclick="saveLog()">SAVE</button>
 <div class="toast" id="toast"></div>
 
-<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClH0QgBhAyTjn4FeCAQpX7nkiJr_BpY3E",
@@ -429,13 +488,8 @@ const provider = new GoogleAuthProvider();
 let currentUser = null;
 let logsCache = [];
 
-// ==================== AUTH ====================
 window.signIn = async () => {
-  try {
-    await signInWithPopup(auth, provider);
-  } catch(e) {
-    showToast('ログイン失敗');
-  }
+  try { await signInWithPopup(auth, provider); } catch(e) { showToast('ログイン失敗'); }
 };
 
 onAuthStateChanged(auth, async (user) => {
@@ -454,7 +508,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// ==================== FIRESTORE ====================
 async function saveLogToCloud(log) {
   if (!currentUser) return;
   setSyncStatus('loading', '保存中...');
@@ -476,90 +529,142 @@ async function loadAllLogs() {
     const q = query(collection(db, 'users', currentUser.uid, 'logs'), orderBy('date', 'desc'));
     const snap = await getDocs(q);
     logsCache = snap.docs.map(d => d.data());
-  } catch(e) {
-    logsCache = [];
-  }
+  } catch(e) { logsCache = []; }
 }
 
 function getLogs() { return logsCache; }
-
 function setSyncStatus(state, label) {
-  const dot = document.getElementById('syncDot');
-  dot.className = 'sync-dot ' + state;
+  document.getElementById('syncDot').className = 'sync-dot ' + state;
   document.getElementById('syncLabel').textContent = label;
 }
 
 // ==================== ACTIVITIES ====================
-const DEFAULT_ACTIVITIES=[
-  {val:'ea',label:'EA作業',bad:true},
-  {val:'screen',label:'スマホ',bad:true},
-  {val:'work',label:'PC作業',bad:true},
-  {val:'game',label:'ゲーム',bad:true},
-  {val:'read',label:'読書',bad:false},
-  {val:'stretch',label:'ストレッチ',bad:false},
-  {val:'meditate',label:'瞑想',bad:false},
-  {val:'nothing',label:'なにもしない',bad:false},
+const DEFAULT_ACTIVITIES = [
+  {val:'ea',label:'EA作業',bad:true},{val:'screen',label:'スマホ',bad:true},
+  {val:'work',label:'PC作業',bad:true},{val:'game',label:'ゲーム',bad:true},
+  {val:'read',label:'読書',bad:false},{val:'stretch',label:'ストレッチ',bad:false},
+  {val:'meditate',label:'瞑想',bad:false},{val:'nothing',label:'なにもしない',bad:false},
 ];
 
-const state={wakeupRating:0,drowsyRating:0,focusRating:0,moodRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0};
+const state = {
+  wakeupRating:0, drowsyRating:0, focusRating:0, moodRating:0,
+  newActivityIsBad:false, coffeeHalf:false, coffeeCups:0
+};
 
 function getCustomActivities(){try{return JSON.parse(localStorage.getItem('custom_activities')||'[]');}catch{return[];}}
 function saveCustomActivities(arr){localStorage.setItem('custom_activities',JSON.stringify(arr));}
 function getAllActivities(){return[...DEFAULT_ACTIVITIES,...getCustomActivities()];}
 
-window.renderActivityGrid = function(selectedVals=[]){
-  const grid=document.getElementById('activityGrid');
-  grid.innerHTML=getAllActivities().map(a=>{
-    const isDefault=DEFAULT_ACTIVITIES.some(d=>d.val===a.val);
-    const del=!isDefault?`<span class="chip-delete" onclick="deleteActivity(event,'${a.val}')">✕</span>`:'';
-    return`<div class="select-chip ${a.bad?'warn-chip':''} ${selectedVals.includes(a.val)?'selected':''}" data-val="${a.val}" data-bad="${a.bad}" onclick="toggleChip(this);recalc()">${a.label}${del}</div>`;
+window.renderActivityGrid = function(selectedVals=[]) {
+  const grid = document.getElementById('activityGrid');
+  grid.innerHTML = getAllActivities().map(a => {
+    const isDefault = DEFAULT_ACTIVITIES.some(d => d.val === a.val);
+    const del = !isDefault ? `<span class="chip-delete" onclick="deleteActivity(event,'${a.val}')">✕</span>` : '';
+    return `<div class="select-chip ${a.bad?'warn-chip':''} ${selectedVals.includes(a.val)?'selected':''}" data-val="${a.val}" data-bad="${a.bad}" onclick="toggleChip(this);recalc()">${a.label}${del}</div>`;
   }).join('');
 };
 
-window.deleteActivity = function(e,val){
+window.deleteActivity = function(e, val) {
   e.stopPropagation();
-  saveCustomActivities(getCustomActivities().filter(a=>a.val!==val));
-  const sel=[...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val).filter(v=>v!==val);
-  renderActivityGrid(sel);recalc();
+  saveCustomActivities(getCustomActivities().filter(a => a.val !== val));
+  const sel = [...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val).filter(v=>v!==val);
+  renderActivityGrid(sel); recalc();
 };
 
-window.toggleNewActivityType = function(){
-  state.newActivityIsBad=!state.newActivityIsBad;
-  const btn=document.getElementById('newActivityType');
-  btn.textContent=state.newActivityIsBad?'悪い':'良い';
-  btn.classList.toggle('bad-type',state.newActivityIsBad);
+window.toggleNewActivityType = function() {
+  state.newActivityIsBad = !state.newActivityIsBad;
+  const btn = document.getElementById('newActivityType');
+  btn.textContent = state.newActivityIsBad ? '悪い' : '良い';
+  btn.classList.toggle('bad-type', state.newActivityIsBad);
 };
 
-window.addCustomActivity = function(){
-  const input=document.getElementById('newActivityInput');
-  const label=input.value.trim();if(!label)return;
-  const customs=getCustomActivities();
-  customs.push({val:'custom_'+Date.now(),label,bad:state.newActivityIsBad});
+window.addCustomActivity = function() {
+  const input = document.getElementById('newActivityInput');
+  const label = input.value.trim(); if(!label) return;
+  const customs = getCustomActivities();
+  customs.push({val:'custom_'+Date.now(), label, bad:state.newActivityIsBad});
   saveCustomActivities(customs);
-  const sel=[...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val);
-  renderActivityGrid(sel);input.value='';recalc();
+  const sel = [...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val);
+  renderActivityGrid(sel); input.value=''; recalc();
 };
 
-// COFFEE
-window.setCups = function(n){
-  state.coffeeCups=state.coffeeCups===n&&!state.coffeeHalf?0:n;
-  state.coffeeHalf=false;
-  document.getElementById('halfCupBtn').classList.remove('active');
-  updateCupUI();recalc();
-};
-window.toggleHalfCup = function(){
-  state.coffeeHalf=!state.coffeeHalf;
-  if(state.coffeeHalf)state.coffeeCups=0;
-  document.getElementById('halfCupBtn').classList.toggle('active',state.coffeeHalf);
-  updateCupUI();recalc();
-};
-function updateCupUI(){
-  document.querySelectorAll('.cup-btn').forEach(btn=>btn.classList.toggle('active',parseInt(btn.dataset.cup)<=state.coffeeCups));
-  const total=state.coffeeCups+(state.coffeeHalf?0.5:0);
-  document.getElementById('coffeeCountLabel').textContent=total===0?'—':total+'杯';
+// ==================== NUMBER SCALES ====================
+const SCALE_GROUPS = [
+  {id:'wakeup', containerId:'scale-wakeup', valId:'wakeupVal', stateKey:'wakeupRating'},
+  {id:'drowsy',  containerId:'scale-drowsy',  valId:'drowsyVal',  stateKey:'drowsyRating'},
+  {id:'focus',   containerId:'scale-focus',   valId:'focusVal',   stateKey:'focusRating'},
+  {id:'mood',    containerId:'scale-mood',    valId:'moodVal',    stateKey:'moodRating'},
+];
+
+function buildScales() {
+  SCALE_GROUPS.forEach(g => {
+    const wrap = document.getElementById(g.containerId);
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    for (let i = 1; i <= 10; i++) {
+      const btn = document.createElement('div');
+      btn.className = 'num-btn';
+      btn.textContent = i;
+      btn.dataset.group = g.id;
+      btn.dataset.val = i;
+      btn.onclick = () => selectNum(g, i);
+      wrap.appendChild(btn);
+    }
+  });
 }
 
-// UTILS
+function selectNum(g, val) {
+  const wrap = document.getElementById(g.containerId);
+  wrap.querySelectorAll('.num-btn').forEach(b => b.classList.toggle('selected', parseInt(b.dataset.val) === val));
+  document.getElementById(g.valId).textContent = val;
+  state[g.stateKey] = val;
+}
+
+function setScaleVal(groupId, val) {
+  const g = SCALE_GROUPS.find(x => x.id === groupId);
+  if (!g || !val) return;
+  const wrap = document.getElementById(g.containerId);
+  if (!wrap) return;
+  wrap.querySelectorAll('.num-btn').forEach(b => b.classList.toggle('selected', parseInt(b.dataset.val) === val));
+  document.getElementById(g.valId).textContent = val;
+  state[g.stateKey] = val;
+}
+
+function clearScaleVal(groupId) {
+  const g = SCALE_GROUPS.find(x => x.id === groupId);
+  if (!g) return;
+  const wrap = document.getElementById(g.containerId);
+  if (wrap) wrap.querySelectorAll('.num-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById(g.valId).textContent = '—';
+  state[g.stateKey] = 0;
+}
+
+// ==================== COFFEE ====================
+window.setCups = function(n) {
+  state.coffeeCups = state.coffeeCups === n && !state.coffeeHalf ? 0 : n;
+  state.coffeeHalf = false;
+  document.getElementById('halfCupBtn').classList.remove('active');
+  updateCupUI(); recalc();
+};
+window.toggleHalfCup = function() {
+  state.coffeeHalf = !state.coffeeHalf;
+  if (state.coffeeHalf) state.coffeeCups = 0;
+  document.getElementById('halfCupBtn').classList.toggle('active', state.coffeeHalf);
+  updateCupUI(); recalc();
+};
+function updateCupUI() {
+  document.querySelectorAll('.cup-btn').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.cup) <= state.coffeeCups));
+  const total = state.coffeeCups + (state.coffeeHalf ? 0.5 : 0);
+  document.getElementById('coffeeCountLabel').textContent = total === 0 ? '—' : total + '杯';
+}
+
+// ==================== NAP TOGGLE ====================
+window.toggleNapFields = function() {
+  const on = document.getElementById('napped').classList.contains('on');
+  document.getElementById('napFields').style.display = on ? 'block' : 'none';
+};
+
+// ==================== UTILS ====================
 function toMinutes(t){if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+m;}
 function minDiff(t1,t2){let d=t2-t1;if(d<0)d+=1440;return d;}
 function formatMins(m){const h=Math.floor(m/60),mm=m%60;return mm===0?`${h}h`:`${h}h${mm}m`;}
@@ -568,14 +673,11 @@ function getSelectedDate(){return document.getElementById('logDate').value||getT
 
 function getNextDateLabel(dateKey){
   const[y,m,d]=dateKey.split('-');
-  const date=new Date(+y,+m-1,+d);
-  date.setDate(date.getDate()+1);
+  const date=new Date(+y,+m-1,+d);date.setDate(date.getDate()+1);
   return`${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')}`;
 }
-
 function getSelectedDateLabel(){
-  const val=getSelectedDate();
-  const[y,m,d]=val.split('-');
+  const val=getSelectedDate();const[y,m,d]=val.split('-');
   const date=new Date(+y,+m-1,+d);
   const today=new Date();today.setHours(0,0,0,0);
   const yesterday=new Date(today);yesterday.setDate(today.getDate()-1);
@@ -597,7 +699,7 @@ window.switchLogPanel = function(panel){
   document.getElementById('panel-'+panel).classList.add('active');
 };
 
-// RECALC
+// ==================== RECALC ====================
 window.recalc = function(){
   let score=100;const deductions=[];
   const bed=toMinutes(document.getElementById('bedtime').value);
@@ -660,20 +762,14 @@ window.recalc = function(){
 
 window.toggleSwitch = function(el){el.classList.toggle('on');};
 window.toggleChip = function(el){el.classList.toggle('selected');};
-window.selectEmoji = function(el){
-  const group=el.dataset.group;
-  document.querySelectorAll(`.emoji-btn[data-group="${group}"]`).forEach(e=>e.classList.remove('selected'));
-  el.classList.add('selected');
-  state[group+'Rating']=parseInt(el.dataset.val);
-};
 
-// SAVE
+// ==================== SAVE ====================
 window.saveLog = async function(){
   if(!currentUser){showToast('ログインが必要です');return;}
   const score=recalc();
   const dateKey=getSelectedDate();
   const log={
-    date:dateKey,score,
+    date:dateKey, score,
     bedtime:document.getElementById('bedtime').value,
     waketime:document.getElementById('waketime').value,
     meal:document.getElementById('mealtime').value,
@@ -682,6 +778,10 @@ window.saveLog = async function(){
     coffeeCups:state.coffeeCups+(state.coffeeHalf?0.5:0),
     alcohol:document.getElementById('alcohol').classList.contains('on'),
     exercise:document.getElementById('exercise').classList.contains('on'),
+    exerciseTime:document.getElementById('exerciseTime').value,
+    napped:document.getElementById('napped').classList.contains('on'),
+    napStart:document.getElementById('napStart').value,
+    napDuration:document.getElementById('napDuration').value,
     activities:[...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val),
     workend:document.getElementById('workend').value,
     wakeupRating:state.wakeupRating,
@@ -702,22 +802,23 @@ window.saveLog = async function(){
   showToast('保存しました');
 };
 
+// ==================== LOAD ====================
 function loadLogForDate(dateKey){
   const log=getLogs().find(l=>l.date===dateKey);
-  ['bedtime','waketime','mealtime','bathtime','coffeeTime','workend','noteInput','nextDayNote'].forEach(id=>{
+  ['bedtime','waketime','mealtime','bathtime','coffeeTime','workend','noteInput','nextDayNote','exerciseTime','napStart','napDuration'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
-  ['alcohol','showerOnly','exercise'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  ['alcohol','showerOnly','exercise','napped'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  document.getElementById('napFields').style.display='none';
   document.getElementById('stress').value=0;document.getElementById('stressVal').textContent='—';
   document.getElementById('energy').value=0;document.getElementById('energyVal').textContent='—';
-  document.querySelectorAll('.emoji-btn').forEach(e=>e.classList.remove('selected'));
   document.getElementById('scoreNum').textContent='—';
   document.getElementById('scoreBar').style.width='0%';
   document.getElementById('breakdownSection').style.display='none';
   state.coffeeCups=0;state.coffeeHalf=false;
   document.getElementById('halfCupBtn').classList.remove('active');
   updateCupUI();
-  ['wakeupRating','drowsyRating','focusRating','moodRating'].forEach(k=>state[k]=0);
+  SCALE_GROUPS.forEach(g=>clearScaleVal(g.id));
 
   if(!log){renderActivityGrid([]);return;}
 
@@ -729,8 +830,15 @@ function loadLogForDate(dateKey){
   document.getElementById('workend').value=log.workend||'';
   document.getElementById('noteInput').value=log.note||'';
   document.getElementById('nextDayNote').value=log.nextDayNote||'';
+  document.getElementById('exerciseTime').value=log.exerciseTime||'';
+  document.getElementById('napStart').value=log.napStart||'';
+  document.getElementById('napDuration').value=log.napDuration||'';
   if(log.alcohol)document.getElementById('alcohol').classList.add('on');
   if(log.exercise)document.getElementById('exercise').classList.add('on');
+  if(log.napped){
+    document.getElementById('napped').classList.add('on');
+    document.getElementById('napFields').style.display='block';
+  }
   if(log.stress){document.getElementById('stress').value=log.stress;document.getElementById('stressVal').textContent=log.stress;}
   if(log.energy){document.getElementById('energy').value=log.energy;document.getElementById('energyVal').textContent=log.energy;}
   if(log.coffeeCups){
@@ -739,13 +847,9 @@ function loadLogForDate(dateKey){
     if(state.coffeeHalf)document.getElementById('halfCupBtn').classList.add('active');
     updateCupUI();
   }
-  ['wakeup','drowsy','focus','mood'].forEach(group=>{
-    const val=log[group+'Rating'];
-    if(val){
-      const btn=document.querySelector(`.emoji-btn[data-group="${group}"][data-val="${val}"]`);
-      if(btn)btn.classList.add('selected');
-      state[group+'Rating']=val;
-    }
+  SCALE_GROUPS.forEach(g=>{
+    const val=log[g.stateKey];
+    if(val)setScaleVal(g.id,val);
   });
   renderActivityGrid(log.activities||[]);
   recalc();
@@ -757,15 +861,19 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2000);
 }
 
+// ==================== TABS ====================
 window.switchTab = function(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['log','history','stats'][i]===tab));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('saveBtn').style.display=tab==='log'?'block':'none';
+  ['log','history','stats'].forEach((t,i)=>{
+    document.getElementById('navTab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  document.getElementById('navBar').style.left = tab==='log'?'0%':tab==='history'?'33.33%':'66.66%';
+  document.getElementById('saveBtn').style.display = tab==='log'?'block':'none';
   if(tab==='history')renderHistory();
   if(tab==='stats')renderStats();
 };
 
+// ==================== HISTORY ====================
 function renderHistory(){
   const logs=getLogs();
   const el=document.getElementById('historyList');
@@ -773,28 +881,44 @@ function renderHistory(){
   const allActs=getAllActivities();
   el.innerHTML=logs.map(log=>{
     const scoreClass=log.score>=75?'good':log.score>=50?'ok':'bad';
-    let pills=[];
-    if(log.bedtime&&log.waketime)pills.push(`<span class="history-pill">${formatMins(minDiff(toMinutes(log.bedtime),toMinutes(log.waketime)))}</span>`);
-    if(log.coffeeCups)pills.push(`<span class="history-pill">☕️${log.coffeeCups}杯</span>`);
-    if(log.alcohol)pills.push(`<span class="history-pill red">アルコール</span>`);
+    const[y,m,d]=log.date.split('-');
+    const sleepDur=log.bedtime&&log.waketime?formatMins(minDiff(toMinutes(log.bedtime),toMinutes(log.waketime))):'—';
+    const bedLabel=log.bedtime||'—';
+    const wakeLabel=log.waketime||'—';
+
+    let tags=[];
+    if(log.coffeeCups)tags.push(`<span class="history-tag">☕ ${log.coffeeCups}杯</span>`);
+    if(log.alcohol)tags.push(`<span class="history-tag red">アルコール</span>`);
+    if(log.napped)tags.push(`<span class="history-tag">昼寝 ${log.napDuration?log.napDuration+'分':''}</span>`);
     if(log.activities)log.activities.forEach(v=>{
       const act=allActs.find(a=>a.val===v);if(!act)return;
-      pills.push(`<span class="history-pill ${act.bad?'red':'green'}">${act.label}</span>`);
+      tags.push(`<span class="history-tag ${act.bad?'red':'green'}">${act.label}</span>`);
     });
-    const emojiMap={wakeup:['','😴','😪','😐','🙂','😁'],drowsy:['','😵','😪','😐','🙂','😎'],focus:['','💀','😵‍💫','😐','🎯','⚡'],mood:['','😤','😞','😐','😊','🌟']};
-    let perfEmojis='';
-    ['wakeup','drowsy','focus','mood'].forEach(g=>{if(log[g+'Rating'])perfEmojis+=emojiMap[g][log[g+'Rating']]||'';});
-    const[y,m,d]=log.date.split('-');
+
+    const ratingItems=[
+      {key:'wakeupRating',label:'目覚め'},
+      {key:'drowsyRating',label:'眠気'},
+      {key:'focusRating',label:'集中'},
+      {key:'moodRating',label:'気分'},
+    ];
+    const ratingsHtml=ratingItems.filter(r=>log[r.key]).map(r=>`<div class="history-rating-item"><div class="history-rating-key">${r.label}</div><span class="history-rating-val">${log[r.key]}</span></div>`).join('');
+
     return`<div class="history-card" onclick="jumpToDate('${log.date}')">
       <div class="history-top">
         <div>
           <div class="history-date">${y}/${m}/${d}</div>
-          ${log.note?`<div style="font-size:12px;color:var(--muted);margin-top:4px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${log.note}</div>`:''}
+          ${log.note?`<div style="font-size:12px;color:var(--muted);margin-top:4px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${log.note}</div>`:''}
         </div>
         <div class="history-score ${scoreClass}">${log.score}</div>
       </div>
-      <div class="history-pills">${pills.join('')}</div>
-      ${perfEmojis?`<div style="margin-top:8px;font-size:18px">${perfEmojis}</div>`:''}
+      <div class="history-meta">
+        <div class="history-meta-item"><div class="history-meta-key">就寝</div><div class="history-meta-val">${bedLabel}</div></div>
+        <div class="history-meta-item"><div class="history-meta-key">起床</div><div class="history-meta-val">${wakeLabel}</div></div>
+        <div class="history-meta-item"><div class="history-meta-key">睡眠時間</div><div class="history-meta-val">${sleepDur}</div></div>
+        <div class="history-meta-item"><div class="history-meta-key">ストレス</div><div class="history-meta-val">${log.stress||'—'}</div></div>
+      </div>
+      ${tags.length?`<div class="history-tags">${tags.join('')}</div>`:''}
+      ${ratingsHtml?`<div class="history-ratings">${ratingsHtml}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -805,25 +929,116 @@ window.jumpToDate = function(dateKey){
   switchTab('log');
 };
 
+// ==================== STATS ====================
+function drawLineChart(canvasId, labels, datasets, yMin, yMax) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = 160;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const pad = {top:16, right:16, bottom:28, left:36};
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+  const range = yMax - yMin || 1;
+
+  // grid
+  ctx.strokeStyle = '#e8e8e4';
+  ctx.lineWidth = 1;
+  const gridLines = 4;
+  for(let i=0;i<=gridLines;i++){
+    const y = pad.top + (ch/gridLines)*i;
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
+    const val = yMax - ((yMax-yMin)/gridLines)*i;
+    ctx.fillStyle='#9a9a96';ctx.font=`${10*dpr}px DM Mono,monospace`;ctx.textAlign='right';
+    ctx.fillText(Math.round(val), pad.left-6, y+4);
+  }
+
+  if (labels.length < 2) {
+    ctx.fillStyle='#9a9a96';ctx.font=`${11*dpr}px DM Sans,sans-serif`;ctx.textAlign='center';
+    ctx.fillText('データが2件以上で表示されます', W/2, H/2);
+    return;
+  }
+
+  // x labels
+  ctx.fillStyle='#9a9a96';ctx.font=`${9*dpr}px DM Mono,monospace`;ctx.textAlign='center';
+  const step = Math.max(1, Math.ceil(labels.length/5));
+  labels.forEach((l,i)=>{
+    if(i%step===0||i===labels.length-1){
+      const x=pad.left+(i/(labels.length-1))*cw;
+      ctx.fillText(l,x,H-6);
+    }
+  });
+
+  const colors=['#2d6a4f','#e07a5f','#52b788','#f4a261'];
+  datasets.forEach((ds,di)=>{
+    const color=colors[di%colors.length];
+    ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';
+    ctx.beginPath();
+    ds.data.forEach((v,i)=>{
+      const x=pad.left+(i/(labels.length-1))*cw;
+      const y=pad.top+ch-(((v-yMin)/range)*ch);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    // dots
+    ds.data.forEach((v,i)=>{
+      const x=pad.left+(i/(labels.length-1))*cw;
+      const y=pad.top+ch-(((v-yMin)/range)*ch);
+      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
+      ctx.fillStyle=color;ctx.fill();
+    });
+  });
+}
+
 function renderStats(){
-  const logs=getLogs();
+  const logs=[...getLogs()].reverse(); // oldest first for charts
   const el=document.getElementById('statsContent');
   if(logs.length===0){el.innerHTML=`<div class="history-empty">記録が増えると<br>統計が表示されます</div>`;return;}
-  const avgScore=Math.round(logs.reduce((s,l)=>s+l.score,0)/logs.length);
-  const maxScore=Math.max(...logs.map(l=>l.score));
-  const sleepDurs=logs.filter(l=>l.bedtime&&l.waketime).map(l=>minDiff(toMinutes(l.bedtime),toMinutes(l.waketime)));
+
+  const all=[...getLogs()]; // newest first for agg
+  const avgScore=Math.round(all.reduce((s,l)=>s+l.score,0)/all.length);
+  const maxScore=Math.max(...all.map(l=>l.score));
+  const sleepDurs=all.filter(l=>l.bedtime&&l.waketime).map(l=>minDiff(toMinutes(l.bedtime),toMinutes(l.waketime)));
   const avgSleep=sleepDurs.length?Math.round(sleepDurs.reduce((s,v)=>s+v,0)/sleepDurs.length):null;
-  const alcoholDays=logs.filter(l=>l.alcohol).length;
-  const eaDays=logs.filter(l=>l.activities&&l.activities.includes('ea')).length;
-  const coffeeLogs=logs.filter(l=>l.coffeeCups);
+  const alcoholDays=all.filter(l=>l.alcohol).length;
+  const eaDays=all.filter(l=>l.activities&&l.activities.includes('ea')).length;
+  const coffeeLogs=all.filter(l=>l.coffeeCups);
   const avgCoffee=coffeeLogs.length?(coffeeLogs.reduce((s,l)=>s+l.coffeeCups,0)/coffeeLogs.length).toFixed(1):null;
+
   el.innerHTML=`
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-value" style="color:var(--accent)">${avgScore}</div><div class="stat-label">平均スコア</div></div>
       <div class="stat-card"><div class="stat-value">${maxScore}</div><div class="stat-label">最高スコア</div></div>
       <div class="stat-card"><div class="stat-value">${avgSleep?formatMins(avgSleep):'—'}</div><div class="stat-label">平均睡眠</div></div>
-      <div class="stat-card"><div class="stat-value">${logs.length}</div><div class="stat-label">記録日数</div></div>
+      <div class="stat-card"><div class="stat-value">${all.length}</div><div class="stat-label">記録日数</div></div>
     </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">スコア推移</div>
+      <canvas id="chartScore" class="stat-chart"></canvas>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">睡眠時間推移</div>
+      <canvas id="chartSleep" class="stat-chart"></canvas>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">昼間の眠気（1〜10）</div>
+      <canvas id="chartDrowsy" class="stat-chart"></canvas>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">集中力（1〜10）</div>
+      <canvas id="chartFocus" class="stat-chart"></canvas>
+    </div>
+
     <div class="section">
       <div class="section-header"><div class="section-header-left"><span class="section-icon">☕️</span><span class="section-title">COFFEE</span></div></div>
       <div class="section-body"><div class="deduction-item"><span>平均杯数</span><span style="font-family:var(--mono);font-size:14px">${avgCoffee?avgCoffee+'杯':'—'}</span></div></div>
@@ -831,16 +1046,54 @@ function renderStats(){
     <div class="section">
       <div class="section-header"><div class="section-header-left"><span class="section-icon">⚠️</span><span class="section-title">HABITS</span></div></div>
       <div class="section-body">
-        <div class="deduction-item"><span>アルコールの日</span><span class="deduction-pts">${alcoholDays}日 / ${logs.length}日</span></div>
-        <div class="deduction-item"><span>就寝前EA作業</span><span class="deduction-pts">${eaDays}日 / ${logs.length}日</span></div>
+        <div class="deduction-item"><span>アルコールの日</span><span class="deduction-pts">${alcoholDays}日 / ${all.length}日</span></div>
+        <div class="deduction-item"><span>就寝前EA作業</span><span class="deduction-pts">${eaDays}日 / ${all.length}日</span></div>
       </div>
     </div>`;
+
+  // Draw charts after DOM renders
+  requestAnimationFrame(()=>{
+    const labels=logs.map(l=>{const[,m,d]=l.date.split('-');return`${m}/${d}`;});
+
+    // Score chart
+    drawLineChart('chartScore', labels,
+      [{data:logs.map(l=>l.score)}], 0, 100);
+
+    // Sleep duration chart
+    const sleepData=logs.map(l=>(l.bedtime&&l.waketime)?minDiff(toMinutes(l.bedtime),toMinutes(l.waketime))/60:null);
+    const validSleep=sleepData.filter(v=>v!==null);
+    if(validSleep.length>=1){
+      const sMin=Math.max(0,Math.floor(Math.min(...validSleep))-1);
+      const sMax=Math.ceil(Math.max(...validSleep))+1;
+      drawLineChart('chartSleep', labels,
+        [{data:sleepData.map(v=>v??0)}], sMin, sMax);
+    }
+
+    // Drowsy chart
+    const drowsyData=logs.map(l=>l.drowsyRating||null);
+    const validDrowsy=drowsyData.filter(v=>v!==null);
+    if(validDrowsy.length>=1){
+      drawLineChart('chartDrowsy', labels,
+        [{data:drowsyData.map(v=>v??0),color:'#e07a5f'}], 0, 10);
+    }
+
+    // Focus chart
+    const focusData=logs.map(l=>l.focusRating||null);
+    const validFocus=focusData.filter(v=>v!==null);
+    if(validFocus.length>=1){
+      drawLineChart('chartFocus', labels,
+        [{data:focusData.map(v=>v??0),color:'#52b788'}], 0, 10);
+    }
+  });
 }
 
-// INIT
+// ==================== INIT ====================
 document.getElementById('logDate').value=getTodayISO();
 document.getElementById('newActivityInput').addEventListener('keydown',e=>{if(e.key==='Enter')addCustomActivity();});
+buildScales();
 renderActivityGrid([]);
+updateSaveBtnLabel();
+updateNextDayBadge();
 
 </script>
 </body>
