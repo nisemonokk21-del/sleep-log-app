@@ -2,468 +2,666 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#11131f">
 <title>SLEEP LOG</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#f8f8f6; --surface:#ffffff; --border:#e8e8e4;
-    --text:#1a1a18; --muted:#9a9a96;
-    --accent:#2d6a4f; --accent-light:#e8f4ee; --accent-mid:#52b788;
-    --warn:#e07a5f; --warn-light:#fdf0ec;
-    --mono:'DM Mono',monospace; --sans:'DM Sans',sans-serif;
-    --radius:16px;
-    --bottom-nav-h:60px;
+  :root{
+    --bg:#11131f;
+    --surface:#191c2c;
+    --surface2:#20243a;
+    --border:#2a2e46;
+    --text:#e9e7de;
+    --muted:#8b8ea6;
+    --gold:#e3b96a;
+    --gold-dim:#a8893f;
+    --good:#7fc8a9;
+    --warn:#e0876f;
+    --warn-bg:#3a2a28;
+    --good-bg:#21342e;
+    --gold-bg:#332b1c;
+    --mincho:'Shippori Mincho',serif;
+    --gothic:'Zen Kaku Gothic New',sans-serif;
+    --mono:'DM Mono',monospace;
+    --radius:18px;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;padding-bottom:calc(var(--bottom-nav-h) + 16px);}
+  html{background:var(--bg);}
+  body{
+    font-family:var(--gothic);
+    background:
+      radial-gradient(ellipse 120% 50% at 50% -10%, #1c2038 0%, var(--bg) 60%),
+      var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    max-width:430px;
+    margin:0 auto;
+  }
 
-  .header{padding:56px 24px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-  .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-  .app-name{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;}
-  .date-picker-wrap{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:99px;padding:4px 12px;}
-  .date-picker-wrap input[type=date]{font-family:var(--mono);font-size:12px;color:var(--text);border:none;background:transparent;outline:none;cursor:pointer;width:110px;}
-  .date-picker-wrap input[type=date]::-webkit-calendar-picker-indicator{opacity:0.4;cursor:pointer;width:14px;}
+  /* ============ HEADER ============ */
+  .header{
+    padding:calc(env(safe-area-inset-top, 20px) + 36px) 22px 18px;
+    position:relative;
+  }
+  .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .app-name{
+    font-family:var(--mincho);
+    font-size:15px;font-weight:600;letter-spacing:0.42em;
+    color:var(--gold);
+  }
+  .date-chip{
+    display:flex;align-items:center;gap:6px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:99px;padding:5px 12px;
+  }
+  .date-chip input[type=date]{
+    font-family:var(--mono);font-size:12px;color:var(--text);
+    border:none;background:transparent;outline:none;width:108px;
+    color-scheme:dark;
+  }
 
-  .score-display{display:flex;align-items:flex-end;gap:8px;margin-top:4px;}
-  .score-number{font-family:var(--mono);font-size:60px;font-weight:300;line-height:1;color:var(--text);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);}
-  .score-label{font-size:13px;color:var(--muted);margin-bottom:8px;}
-  .score-bar-wrap{margin-top:10px;height:4px;background:var(--border);border-radius:99px;overflow:hidden;}
-  .score-bar{height:100%;border-radius:99px;transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);background:linear-gradient(90deg,var(--accent-mid),var(--accent));}
-  .score-bar.warn{background:linear-gradient(90deg,#f4a261,var(--warn));}
-  .score-bar.bad{background:linear-gradient(90deg,#e07a5f,#c1440e);}
+  /* moon ring */
+  .ring-wrap{display:flex;align-items:center;gap:20px;}
+  .ring-box{position:relative;width:118px;height:118px;flex-shrink:0;}
+  .ring-box svg{width:118px;height:118px;transform:rotate(-90deg);}
+  .ring-track{fill:none;stroke:var(--border);stroke-width:7;}
+  .ring-fill{
+    fill:none;stroke:var(--gold);stroke-width:7;stroke-linecap:round;
+    transition:stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1), stroke 0.5s;
+  }
+  .ring-center{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:0;
+  }
+  .ring-score{
+    font-family:var(--mincho);font-size:38px;font-weight:600;line-height:1;
+    color:var(--text);
+  }
+  .ring-unit{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.15em;margin-top:3px;}
 
-  .sync-status{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px;}
-  .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
-  .sync-dot.ok{background:var(--accent-mid);}
+  .header-meta{flex:1;display:flex;flex-direction:column;gap:9px;}
+  .meta-row{display:flex;align-items:baseline;gap:8px;}
+  .meta-label{font-size:10px;color:var(--muted);letter-spacing:0.12em;width:52px;flex-shrink:0;}
+  .meta-value{font-family:var(--mono);font-size:15px;color:var(--text);}
+  .meta-value .dim{color:var(--muted);font-size:11px;margin-left:2px;}
+  .streak-moons{font-size:13px;letter-spacing:2px;}
+  .sync-row{display:flex;align-items:center;gap:5px;margin-top:2px;}
+  .sync-dot{width:5px;height:5px;border-radius:50%;background:var(--muted);}
+  .sync-dot.ok{background:var(--good);}
   .sync-dot.err{background:var(--warn);}
-  .sync-dot.loading{background:#f4a261;animation:blink 1s infinite;}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+  .sync-dot.loading{background:var(--gold);animation:blink 1s infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+  .sync-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.08em;}
 
-  /* BOTTOM NAV */
-  .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:var(--bottom-nav-h);background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:200;}
-  .nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--muted);transition:color 0.2s;user-select:none;}
-  .nav-tab.active{color:var(--accent);}
-  .nav-tab-icon{font-size:18px;line-height:1;}
-  .nav-tab-label{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;}
-  .nav-tab-bar{position:absolute;top:0;height:2px;width:33.33%;background:var(--accent);transition:left 0.25s cubic-bezier(0.4,0,0.2,1);border-radius:0 0 2px 2px;}
+  /* ============ TABS ============ */
+  .tabs{
+    display:flex;margin:14px 16px 0;gap:4px;
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:99px;padding:4px;
+  }
+  .tab{
+    flex:1;padding:9px 0;font-size:12px;font-weight:500;letter-spacing:0.06em;
+    text-align:center;color:var(--muted);border-radius:99px;cursor:pointer;
+    transition:all 0.25s;user-select:none;
+  }
+  .tab.active{background:var(--gold);color:#1a1505;font-weight:700;}
 
-  .content{padding:20px 16px 8px;}
+  .content{padding:18px 16px calc(env(safe-area-inset-bottom, 0px) + 110px);}
   .tab-panel{display:none;}
-  .tab-panel.active{display:block;}
+  .tab-panel.active{display:block;animation:fadeUp 0.35s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-  .section-tabs{display:flex;background:var(--bg);border-radius:99px;padding:3px;margin-bottom:16px;gap:3px;}
-  .section-tab{flex:1;text-align:center;padding:8px;font-size:12px;font-weight:500;color:var(--muted);border-radius:99px;cursor:pointer;transition:all 0.2s;user-select:none;}
-  .section-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
-
+  /* ============ NIGHT/NEXTDAY SUBTABS ============ */
+  .subtabs{display:flex;gap:8px;margin-bottom:16px;}
+  .subtab{
+    flex:1;text-align:center;padding:11px;font-size:13px;font-weight:500;
+    color:var(--muted);background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);cursor:pointer;transition:all 0.2s;user-select:none;
+  }
+  .subtab.active{
+    border-color:var(--gold-dim);color:var(--gold);
+    background:linear-gradient(180deg, var(--gold-bg), var(--surface));
+  }
   .log-panel{display:none;}
   .log-panel.active{display:block;}
 
-  .section{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
-  .section-header{padding:14px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-  .section-header-left{display:flex;align-items:center;gap:8px;}
-  .section-icon{font-size:16px;line-height:1;}
-  .section-title{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
-  .section-body{padding:16px 20px;}
+  /* ============ SECTIONS ============ */
+  .section{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);margin-bottom:12px;overflow:hidden;
+  }
+  .section-header{
+    padding:13px 18px 11px;display:flex;align-items:center;gap:9px;
+    border-bottom:1px solid var(--border);
+  }
+  .section-icon{font-size:15px;line-height:1;}
+  .section-title{
+    font-size:11px;font-weight:700;letter-spacing:0.14em;color:var(--muted);
+  }
+  .section-body{padding:14px 18px;}
 
-  .time-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
-  .time-row:last-child{border-bottom:none;}
-  .time-label{font-size:14px;font-weight:400;color:var(--text);flex:1;}
-  .time-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-  .time-input{font-family:var(--mono);font-size:18px;color:var(--text);border:none;background:transparent;text-align:right;width:100px;outline:none;cursor:pointer;}
-  .time-input::-webkit-calendar-picker-indicator{display:none;}
-  .time-input:focus{color:var(--accent);}
+  .row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:11px 0;border-bottom:1px solid var(--border);
+  }
+  .row:last-child{border-bottom:none;}
+  .row-label{font-size:14px;}
+  .row-sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
+  .time-input{
+    font-family:var(--mono);font-size:19px;color:var(--text);
+    border:none;background:transparent;text-align:right;width:104px;outline:none;
+    color-scheme:dark;
+  }
+  .time-input:focus{color:var(--gold);}
 
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
-  .toggle-row:last-child{border-bottom:none;}
-  .toggle-label{font-size:14px;}
-  .toggle-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-  .toggle{width:44px;height:26px;background:var(--border);border-radius:99px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
-  .toggle.on{background:var(--accent);}
-  .toggle::after{content:'';position:absolute;width:20px;height:20px;background:white;border-radius:50%;top:3px;left:3px;transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 1px 4px rgba(0,0,0,0.15);}
-  .toggle.on::after{transform:translateX(18px);}
+  .toggle{
+    width:46px;height:27px;background:var(--surface2);border:1px solid var(--border);
+    border-radius:99px;position:relative;cursor:pointer;transition:all 0.2s;flex-shrink:0;
+  }
+  .toggle.on{background:var(--gold);border-color:var(--gold);}
+  .toggle::after{
+    content:'';position:absolute;width:19px;height:19px;background:#d8d5ca;
+    border-radius:50%;top:3px;left:3px;
+    transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
+  }
+  .toggle.on::after{transform:translateX(19px);background:#1a1505;}
 
-  .coffee-row{padding:12px 0;border-bottom:1px solid var(--border);}
-  .coffee-row:last-child{border-bottom:none;}
-  .coffee-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-  .coffee-label{font-size:14px;}
-  .coffee-count{font-family:var(--mono);font-size:18px;color:var(--accent);min-width:40px;text-align:right;}
-  .cup-selector{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
-  .cup-btn{font-size:22px;cursor:pointer;opacity:0.25;transition:all 0.15s;user-select:none;}
-  .cup-btn.active{opacity:1;transform:scale(1.15);}
-  .half-cup-btn{font-size:13px;padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;user-select:none;transition:all 0.15s;}
-  .half-cup-btn.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500;}
+  /* coffee */
+  .cup-selector{display:flex;gap:8px;align-items:center;}
+  .cup-btn{font-size:23px;cursor:pointer;opacity:0.22;transition:all 0.18s;user-select:none;filter:grayscale(0.6);}
+  .cup-btn.active{opacity:1;transform:scale(1.12);filter:none;}
+  .half-cup{
+    font-family:var(--mono);font-size:13px;padding:4px 11px;border-radius:99px;
+    border:1px solid var(--border);color:var(--muted);cursor:pointer;user-select:none;transition:all 0.18s;
+  }
+  .half-cup.active{border-color:var(--gold);background:var(--gold-bg);color:var(--gold);}
+  .coffee-count{font-family:var(--mono);font-size:17px;color:var(--gold);}
 
-  /* NUMBER SCALE */
-  .num-scale{display:flex;gap:4px;flex-wrap:nowrap;padding:4px 0 0;}
-  .num-btn{flex:1;min-width:0;padding:7px 2px;border-radius:8px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s;user-select:none;background:var(--bg);}
-  .num-btn.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:600;}
-  .num-scale-row{padding:10px 0;border-bottom:1px solid var(--border);}
-  .num-scale-row:last-child{border-bottom:none;}
-  .num-scale-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-  .num-scale-label{font-size:14px;}
-  .num-scale-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-  .num-scale-val{font-family:var(--mono);font-size:18px;color:var(--accent);min-width:24px;text-align:right;}
+  /* chips */
+  .chip-grid{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0;}
+  .chip{
+    padding:7px 14px;border-radius:99px;border:1px solid var(--border);
+    font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.16s;
+    user-select:none;display:flex;align-items:center;gap:5px;background:var(--surface2);
+  }
+  .chip.selected{border-color:var(--good);background:var(--good-bg);color:var(--good);font-weight:500;}
+  .chip.bad.selected{border-color:var(--warn);background:var(--warn-bg);color:var(--warn);}
+  .chip-x{font-size:10px;opacity:0.55;}
+  .add-row{display:flex;gap:8px;margin-top:13px;padding-top:13px;border-top:1px solid var(--border);align-items:center;}
+  .add-input{
+    flex:1;font-family:var(--gothic);font-size:13px;color:var(--text);
+    border:1px solid var(--border);background:var(--surface2);border-radius:99px;
+    padding:8px 14px;outline:none;
+  }
+  .add-input:focus{border-color:var(--gold-dim);}
+  .add-input::placeholder{color:var(--muted);}
+  .add-type{
+    font-size:11px;padding:7px 11px;border-radius:99px;border:1px solid var(--border);
+    color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;background:var(--surface2);
+  }
+  .add-type.bad{border-color:var(--warn);background:var(--warn-bg);color:var(--warn);}
+  .add-btn{
+    width:34px;height:34px;border-radius:50%;background:var(--gold);color:#1a1505;
+    border:none;font-size:19px;font-weight:700;cursor:pointer;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
 
-  .select-grid{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
-  .select-chip{padding:6px 14px;border-radius:99px;border:1.5px solid var(--border);font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.15s;user-select:none;display:flex;align-items:center;gap:4px;}
-  .select-chip.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500;}
-  .select-chip.warn-chip.selected{border-color:var(--warn);background:var(--warn-light);color:var(--warn);}
-  .add-activity-row{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);align-items:center;}
-  .add-activity-input{flex:1;font-family:var(--sans);font-size:13px;color:var(--text);border:1.5px solid var(--border);background:var(--bg);border-radius:99px;padding:6px 14px;outline:none;}
-  .add-activity-input:focus{border-color:var(--accent);}
-  .add-activity-input::placeholder{color:var(--muted);}
-  .add-activity-type{font-size:11px;padding:6px 10px;border-radius:99px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap;}
-  .add-activity-type.bad-type{border-color:var(--warn);background:var(--warn-light);color:var(--warn);}
-  .add-activity-btn{width:32px;height:32px;border-radius:50%;background:var(--accent);color:white;border:none;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
-  .chip-delete{font-size:10px;color:var(--muted);margin-left:2px;opacity:0.6;}
+  /* sliders + scales */
+  input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--surface2);border-radius:99px;outline:none;}
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:21px;height:21px;background:var(--gold);
+    border-radius:50%;cursor:pointer;box-shadow:0 2px 8px rgba(227,185,106,0.35);
+  }
+  .slider-block{padding:10px 0;border-bottom:1px solid var(--border);}
+  .slider-block:last-child{border-bottom:none;}
+  .slider-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+  .slider-val{font-family:var(--mono);font-size:17px;color:var(--gold);}
 
-  .slider-row{padding:8px 0;border-bottom:1px solid var(--border);}
-  .slider-row:last-child{border-bottom:none;}
-  .slider-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-  .slider-label{font-size:14px;}
-  .slider-value{font-family:var(--mono);font-size:18px;color:var(--accent);min-width:24px;text-align:right;}
-  input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:99px;outline:none;}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(45,106,79,0.3);}
+  .scale{display:flex;justify-content:space-between;padding:3px 0 0;}
+  .scale-btn{font-size:25px;cursor:pointer;opacity:0.26;transition:all 0.16s;user-select:none;filter:grayscale(0.5);}
+  .scale-btn.selected{opacity:1;transform:scale(1.28);filter:none;}
 
-  .next-day-badge{display:inline-block;font-family:var(--mono);font-size:11px;background:var(--accent-light);color:var(--accent);padding:3px 10px;border-radius:99px;margin-bottom:12px;}
+  .nd-badge{
+    display:inline-block;font-family:var(--mono);font-size:11px;
+    background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-dim);
+    padding:4px 12px;border-radius:99px;margin-bottom:13px;
+  }
 
-  .note-input{width:100%;border:none;background:transparent;font-family:var(--sans);font-size:14px;color:var(--text);resize:none;outline:none;min-height:60px;line-height:1.6;}
-  .note-input::placeholder{color:var(--muted);}
+  textarea.note{
+    width:100%;border:none;background:transparent;font-family:var(--gothic);
+    font-size:14px;color:var(--text);resize:none;outline:none;min-height:58px;line-height:1.7;
+  }
+  textarea.note::placeholder{color:var(--muted);}
 
-  /* SAVE BTN — above bottom nav */
-  .save-btn{position:fixed;bottom:calc(var(--bottom-nav-h) + 8px);left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:398px;padding:16px;background:var(--text);color:white;border:none;border-radius:var(--radius);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 24px rgba(0,0,0,0.15);z-index:190;}
-  .save-btn:active{transform:translateX(-50%) scale(0.98);}
-  .save-btn.saved{background:var(--accent);}
+  /* breakdown */
+  .ded{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .ded:last-child{border-bottom:none;}
+  .ded-pts{font-family:var(--mono);font-size:12px;color:var(--warn);}
+  .ded-ok{font-family:var(--mono);font-size:12px;color:var(--good);}
 
-  /* HISTORY */
-  .history-empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;line-height:1.8;}
-  .history-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:10px;cursor:pointer;}
-  .history-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
-  .history-date{font-family:var(--mono);font-size:13px;color:var(--text);font-weight:500;letter-spacing:0.05em;}
-  .history-score{font-family:var(--mono);font-size:36px;font-weight:300;line-height:1;}
-  .history-score.good{color:var(--accent);}
-  .history-score.ok{color:#f4a261;}
-  .history-score.bad{color:var(--warn);}
-  .history-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
-  .history-meta-item{display:flex;flex-direction:column;gap:2px;}
-  .history-meta-key{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;}
-  .history-meta-val{font-family:var(--mono);font-size:13px;color:var(--text);}
-  .history-tags{display:flex;flex-wrap:wrap;gap:5px;}
-  .history-tag{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--bg);color:var(--muted);font-family:var(--mono);}
-  .history-tag.red{background:var(--warn-light);color:var(--warn);}
-  .history-tag.green{background:var(--accent-light);color:var(--accent);}
-  .history-ratings{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
-  .history-rating-item{flex:1;text-align:center;}
-  .history-rating-key{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;}
-  .history-rating-val{font-family:var(--mono);font-size:16px;color:var(--accent);display:block;margin-top:2px;}
+  /* save */
+  .save-btn{
+    position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 22px);left:50%;transform:translateX(-50%);
+    width:calc(100% - 32px);max-width:398px;padding:17px;
+    background:var(--gold);color:#1a1505;border:none;border-radius:var(--radius);
+    font-family:var(--gothic);font-size:14px;font-weight:700;letter-spacing:0.12em;
+    cursor:pointer;transition:all 0.2s;
+    box-shadow:0 6px 28px rgba(227,185,106,0.28);
+  }
+  .save-btn:active{transform:translateX(-50%) scale(0.97);}
+  .save-btn.saved{background:var(--good);box-shadow:0 6px 28px rgba(127,200,169,0.3);}
 
-  /* STATS */
-  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
-  .stat-value{font-family:var(--mono);font-size:32px;font-weight:300;line-height:1;margin-bottom:4px;}
-  .stat-label{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.05em;text-transform:uppercase;}
-  .deduction-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
-  .deduction-item:last-child{border-bottom:none;}
-  .deduction-pts{font-family:var(--mono);font-size:12px;color:var(--warn);font-weight:500;}
-  .deduction-ok{font-family:var(--mono);font-size:12px;color:var(--accent);}
+  /* ============ HISTORY ============ */
+  .week-strip{
+    display:flex;gap:5px;margin-bottom:16px;
+  }
+  .ws-day{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;
+    padding:9px 0 8px;background:var(--surface);border:1px solid var(--border);
+    border-radius:13px;cursor:pointer;transition:border-color 0.2s;
+  }
+  .ws-day.today{border-color:var(--gold-dim);}
+  .ws-wd{font-size:9px;color:var(--muted);letter-spacing:0.05em;}
+  .ws-moon{font-size:15px;line-height:1;}
+  .ws-score{font-family:var(--mono);font-size:10px;color:var(--muted);}
+  .ws-score.good{color:var(--good);}
+  .ws-score.ok{color:var(--gold);}
+  .ws-score.bad{color:var(--warn);}
 
-  /* CHART */
-  .chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
-  .chart-title{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
-  canvas.stat-chart{width:100%;display:block;}
+  .h-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:15px 18px 14px;margin-bottom:10px;cursor:pointer;transition:border-color 0.2s;
+  }
+  .h-card:active{border-color:var(--gold-dim);}
+  .h-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+  .h-date{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.06em;}
+  .h-dur{font-family:var(--mono);font-size:13px;color:var(--text);}
+  .h-score{
+    font-family:var(--mincho);font-size:26px;font-weight:600;line-height:1;
+  }
+  .h-score.good{color:var(--good);}
+  .h-score.ok{color:var(--gold);}
+  .h-score.bad{color:var(--warn);}
 
-  @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
-  .pulse{animation:pulse 0.4s ease;}
-  .toast{position:fixed;bottom:calc(var(--bottom-nav-h) + 80px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:white;padding:12px 24px;border-radius:99px;font-size:13px;font-family:var(--mono);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:nowrap;z-index:300;}
+  /* sleep bar: 18:00 -> 12:00 next day (18h window) */
+  .sleep-track{
+    position:relative;height:22px;background:var(--surface2);
+    border-radius:99px;overflow:hidden;margin-bottom:9px;
+  }
+  .sleep-seg{
+    position:absolute;top:3px;bottom:3px;border-radius:99px;
+    background:linear-gradient(90deg, #5b71c4, #8a6fd1);
+    min-width:8px;
+  }
+  .sleep-mark{
+    position:absolute;top:0;bottom:0;width:1px;background:var(--border);
+  }
+  .sleep-times{
+    display:flex;justify-content:space-between;margin-bottom:10px;
+  }
+  .st-item{font-family:var(--mono);font-size:10px;color:var(--muted);}
+  .st-item b{color:var(--text);font-weight:400;}
+
+  .h-tags{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
+  .h-tag{
+    font-size:10.5px;padding:3px 9px;border-radius:99px;
+    background:var(--surface2);color:var(--muted);font-family:var(--gothic);
+  }
+  .h-tag.red{background:var(--warn-bg);color:var(--warn);}
+  .h-tag.green{background:var(--good-bg);color:var(--good);}
+  .h-perf{font-size:15px;letter-spacing:1px;margin-left:auto;}
+
+  .empty{
+    text-align:center;padding:64px 20px;color:var(--muted);font-size:14px;line-height:2;
+  }
+  .empty .big{font-size:34px;display:block;margin-bottom:10px;}
+
+  /* filter pills */
+  .filter-row{display:flex;gap:7px;margin-bottom:14px;}
+  .f-pill{
+    font-size:11px;padding:6px 13px;border-radius:99px;border:1px solid var(--border);
+    color:var(--muted);cursor:pointer;user-select:none;background:var(--surface);
+  }
+  .f-pill.active{border-color:var(--gold);color:var(--gold);background:var(--gold-bg);}
+
+  /* ============ STATS ============ */
+  .stat-hero{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;
+  }
+  .stat-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:15px 16px 13px;
+  }
+  .stat-num{
+    font-family:var(--mincho);font-size:30px;font-weight:600;line-height:1.05;
+  }
+  .stat-num .small{font-size:15px;color:var(--muted);font-family:var(--mono);font-weight:400;}
+  .stat-lbl{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-top:5px;}
+  .gold{color:var(--gold);}
+  .greenc{color:var(--good);}
+
+  .chart-box{padding:14px 18px 10px;}
+  .chart-box svg{width:100%;height:auto;display:block;}
+  .chart-cap{font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:0.08em;margin-top:7px;display:flex;justify-content:space-between;}
+
+  .wk-rows{padding:4px 0;}
+  .wk-row{display:flex;align-items:center;gap:10px;padding:6px 0;}
+  .wk-name{font-family:var(--mono);font-size:11px;color:var(--muted);width:22px;}
+  .wk-bar-track{flex:1;height:9px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+  .wk-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-dim),var(--gold));}
+  .wk-val{font-family:var(--mono);font-size:11px;color:var(--text);width:30px;text-align:right;}
+
+  .toast{
+    position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 104px);left:50%;
+    transform:translateX(-50%) translateY(16px);
+    background:var(--surface2);color:var(--text);border:1px solid var(--gold-dim);
+    padding:11px 22px;border-radius:99px;font-size:13px;font-family:var(--gothic);
+    opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;
+    white-space:nowrap;z-index:200;
+  }
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  .login-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px;}
-  .login-title{font-family:var(--mono);font-size:13px;letter-spacing:0.2em;color:var(--muted);}
-  .login-btn{padding:16px 32px;background:var(--text);color:white;border:none;border-radius:var(--radius);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.1em;cursor:pointer;}
-  .login-sub{font-size:12px;color:var(--muted);}
-
-  /* nap duration input */
-  .nap-dur-input{font-family:var(--mono);font-size:18px;color:var(--text);border:none;background:transparent;text-align:right;width:70px;outline:none;}
-  .nap-dur-input:focus{color:var(--accent);}
-  .nap-dur-unit{font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:2px;}
+  /* login */
+  .login{
+    position:fixed;inset:0;background:
+      radial-gradient(ellipse 130% 60% at 50% -10%, #1c2038 0%, var(--bg) 65%),
+      var(--bg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:999;gap:22px;padding:0 36px;text-align:center;
+  }
+  .login-moon{font-size:52px;animation:floaty 4.5s ease-in-out infinite;}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .login-title{font-family:var(--mincho);font-size:19px;font-weight:600;letter-spacing:0.42em;color:var(--gold);}
+  .login-sub{font-size:12.5px;color:var(--muted);line-height:1.9;}
+  .login-btn{
+    padding:15px 38px;background:var(--gold);color:#1a1505;border:none;
+    border-radius:var(--radius);font-family:var(--gothic);font-size:14px;font-weight:700;
+    letter-spacing:0.08em;cursor:pointer;box-shadow:0 6px 28px rgba(227,185,106,0.3);
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+  }
 </style>
 </head>
 <body>
 
-<div class="login-screen" id="loginScreen">
+<div class="login" id="loginScreen">
+  <div class="login-moon">🌙</div>
   <div class="login-title">SLEEP LOG</div>
   <button class="login-btn" onclick="signIn()">Googleでログイン</button>
-  <div class="login-sub">データはクラウドに保存されます</div>
+  <div class="login-sub">記録はクラウドに保存され<br>機種変更しても引き継がれます</div>
 </div>
 
 <div class="header">
   <div class="header-top">
     <span class="app-name">SLEEP LOG</span>
-    <div class="date-picker-wrap">
-      <span style="font-size:13px">📅</span>
+    <div class="date-chip">
+      <span style="font-size:12px">📅</span>
       <input type="date" id="logDate" onchange="onDateChange()">
     </div>
   </div>
-  <div class="score-display">
-    <div class="score-number" id="scoreNum">—</div>
-    <div class="score-label">/ 100</div>
-  </div>
-  <div class="score-bar-wrap">
-    <div class="score-bar" id="scoreBar" style="width:0%"></div>
-  </div>
-  <div class="sync-status">
-    <div class="sync-dot" id="syncDot"></div>
-    <span id="syncLabel">—</span>
+  <div class="ring-wrap">
+    <div class="ring-box">
+      <svg viewBox="0 0 118 118">
+        <circle class="ring-track" cx="59" cy="59" r="52"/>
+        <circle class="ring-fill" id="ringFill" cx="59" cy="59" r="52"
+          stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-score" id="scoreNum">—</div>
+        <div class="ring-unit">SCORE</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-row">
+        <span class="meta-label">睡眠時間</span>
+        <span class="meta-value" id="metaSleep">—</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">連続記録</span>
+        <span class="meta-value" id="metaStreak">—</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">今週平均</span>
+        <span class="meta-value" id="metaWeekAvg">—</span>
+      </div>
+      <div class="sync-row">
+        <div class="sync-dot" id="syncDot"></div>
+        <span class="sync-label" id="syncLabel">—</span>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <div class="nav-tab-bar" id="navBar" style="left:0%"></div>
-  <div class="nav-tab active" id="navTab-log" onclick="switchTab('log')">
-    <div class="nav-tab-icon">🌙</div>
-    <div class="nav-tab-label">LOG</div>
-  </div>
-  <div class="nav-tab" id="navTab-history" onclick="switchTab('history')">
-    <div class="nav-tab-icon">📋</div>
-    <div class="nav-tab-label">HISTORY</div>
-  </div>
-  <div class="nav-tab" id="navTab-stats" onclick="switchTab('stats')">
-    <div class="nav-tab-icon">📊</div>
-    <div class="nav-tab-label">STATS</div>
-  </div>
-</nav>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('log')">記録</div>
+  <div class="tab" onclick="switchTab('history')">履歴</div>
+  <div class="tab" onclick="switchTab('stats')">分析</div>
+</div>
 
 <div class="content">
-  <!-- LOG TAB -->
+
+  <!-- ============ LOG ============ -->
   <div class="tab-panel active" id="tab-log">
-    <div class="section-tabs">
-      <div class="section-tab active" onclick="switchLogPanel('night')">🌙 夜の記録</div>
-      <div class="section-tab" onclick="switchLogPanel('nextday')">☀️ 翌日の状態</div>
+    <div class="subtabs">
+      <div class="subtab active" onclick="switchLogPanel('night')">🌙 夜の記録</div>
+      <div class="subtab" onclick="switchLogPanel('nextday')">☀️ 翌日の状態</div>
     </div>
 
     <div class="log-panel active" id="panel-night">
 
-      <!-- SLEEP -->
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">🌙</span><span class="section-title">SLEEP</span></div></div>
+        <div class="section-header"><span class="section-icon">🌙</span><span class="section-title">SLEEP</span></div>
         <div class="section-body">
-          <div class="time-row">
-            <div><div class="time-label">就寝</div><div class="time-sub">ベッドに入った時間</div></div>
+          <div class="row">
+            <div><div class="row-label">就寝</div><div class="row-sub">ベッドに入った時間</div></div>
             <input type="time" class="time-input" id="bedtime" onchange="recalc()">
           </div>
-          <div class="time-row">
-            <div><div class="time-label">起床</div><div class="time-sub">目が覚めた時間</div></div>
+          <div class="row">
+            <div><div class="row-label">起床</div><div class="row-sub">目が覚めた時間</div></div>
             <input type="time" class="time-input" id="waketime" onchange="recalc()">
           </div>
-          <div class="num-scale-row">
-            <div class="num-scale-top">
-              <div><div class="num-scale-label">目覚め感</div><div class="time-sub">起きた瞬間の感覚</div></div>
-              <div class="num-scale-val" id="wakeupVal">—</div>
+          <div class="row">
+            <div><div class="row-label">目覚め感</div></div>
+            <div class="scale">
+              <span class="scale-btn" data-group="wakeup" data-val="1" onclick="selectScale(this)">😴</span>
+              <span class="scale-btn" data-group="wakeup" data-val="2" onclick="selectScale(this)">😪</span>
+              <span class="scale-btn" data-group="wakeup" data-val="3" onclick="selectScale(this)">😐</span>
+              <span class="scale-btn" data-group="wakeup" data-val="4" onclick="selectScale(this)">🙂</span>
+              <span class="scale-btn" data-group="wakeup" data-val="5" onclick="selectScale(this)">😁</span>
             </div>
-            <div class="num-scale" id="scale-wakeup"></div>
           </div>
         </div>
       </div>
 
-      <!-- FOOD -->
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">🍽</span><span class="section-title">FOOD</span></div></div>
+        <div class="section-header"><span class="section-icon">🍽</span><span class="section-title">FOOD</span></div>
         <div class="section-body">
-          <div class="time-row">
-            <div><div class="time-label">最後の食事</div><div class="time-sub">就寝3時間前までが理想</div></div>
+          <div class="row">
+            <div><div class="row-label">最後の食事</div><div class="row-sub">就寝3時間前までが理想</div></div>
             <input type="time" class="time-input" id="mealtime" onchange="recalc()">
           </div>
-          <div class="toggle-row">
-            <div><div class="toggle-label">アルコール</div><div class="toggle-sub">REM睡眠を妨げる</div></div>
-            <div class="toggle" id="alcohol" onclick="toggleSwitch(this); recalc()"></div>
+          <div class="row">
+            <div><div class="row-label">アルコール</div><div class="row-sub">REM睡眠を妨げる</div></div>
+            <div class="toggle" id="alcohol" onclick="toggleSwitch(this);recalc()"></div>
           </div>
         </div>
       </div>
 
-      <!-- BATH -->
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">🛁</span><span class="section-title">BATH</span></div></div>
+        <div class="section-header"><span class="section-icon">🛁</span><span class="section-title">BATH</span></div>
         <div class="section-body">
-          <div class="time-row">
-            <div><div class="time-label">入浴時間</div><div class="time-sub">就寝90分前が理想</div></div>
+          <div class="row">
+            <div><div class="row-label">入浴時間</div><div class="row-sub">就寝90分前が理想</div></div>
             <input type="time" class="time-input" id="bathtime" onchange="recalc()">
           </div>
-          <div class="toggle-row">
-            <div><div class="toggle-label">シャワーのみ</div></div>
+          <div class="row">
+            <div><div class="row-label">シャワーのみ</div></div>
             <div class="toggle" id="showerOnly" onclick="toggleSwitch(this)"></div>
           </div>
         </div>
       </div>
 
-      <!-- COFFEE -->
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">☕️</span><span class="section-title">COFFEE</span></div></div>
+        <div class="section-header"><span class="section-icon">☕️</span><span class="section-title">COFFEE</span></div>
         <div class="section-body">
-          <div class="coffee-row">
-            <div class="coffee-top">
-              <div class="coffee-label">本日の杯数</div>
-              <div class="coffee-count" id="coffeeCountLabel">—</div>
-            </div>
-            <div class="cup-selector">
-              <span class="half-cup-btn" id="halfCupBtn" onclick="toggleHalfCup()">½</span>
-              <span class="cup-btn" data-cup="1" onclick="setCups(1)">☕</span>
-              <span class="cup-btn" data-cup="2" onclick="setCups(2)">☕</span>
-              <span class="cup-btn" data-cup="3" onclick="setCups(3)">☕</span>
+          <div class="row">
+            <div><div class="row-label">杯数</div></div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="cup-selector">
+                <span class="half-cup" id="halfCupBtn" onclick="toggleHalfCup()">½</span>
+                <span class="cup-btn" data-cup="1" onclick="setCups(1)">☕</span>
+                <span class="cup-btn" data-cup="2" onclick="setCups(2)">☕</span>
+                <span class="cup-btn" data-cup="3" onclick="setCups(3)">☕</span>
+              </div>
+              <span class="coffee-count" id="coffeeCountLabel">—</span>
             </div>
           </div>
-          <div class="time-row">
-            <div><div class="time-label">最後に飲んだ時間</div><div class="time-sub">14時前が理想</div></div>
+          <div class="row">
+            <div><div class="row-label">最後に飲んだ時間</div><div class="row-sub">14時前が理想</div></div>
             <input type="time" class="time-input" id="coffeeTime" onchange="recalc()">
           </div>
         </div>
       </div>
 
-      <!-- PRE-SLEEP -->
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">💻</span><span class="section-title">PRE-SLEEP</span></div></div>
+        <div class="section-header"><span class="section-icon">💻</span><span class="section-title">PRE-SLEEP</span></div>
         <div class="section-body">
-          <div style="margin-bottom:4px">
-            <div class="time-label" style="margin-bottom:10px">就寝前の行動（複数選択可）</div>
-            <div class="select-grid" id="activityGrid"></div>
-            <div class="add-activity-row">
-              <input type="text" class="add-activity-input" id="newActivityInput" placeholder="項目を追加" maxlength="12">
-              <div class="add-activity-type" id="newActivityType" onclick="toggleNewActivityType()">良い</div>
-              <button class="add-activity-btn" onclick="addCustomActivity()">+</button>
-            </div>
+          <div class="row-label" style="margin-bottom:11px">就寝前の行動（複数選択可）</div>
+          <div class="chip-grid" id="activityGrid"></div>
+          <div class="add-row">
+            <input type="text" class="add-input" id="newActivityInput" placeholder="項目を追加" maxlength="12">
+            <div class="add-type" id="newActivityType" onclick="toggleNewActivityType()">良い</div>
+            <button class="add-btn" onclick="addCustomActivity()">+</button>
           </div>
-          <div class="time-row" style="margin-top:12px">
-            <div><div class="time-label">作業終了</div><div class="time-sub">就寝1時間前が理想</div></div>
+          <div class="row" style="margin-top:10px">
+            <div><div class="row-label">作業終了</div><div class="row-sub">就寝1時間前が理想</div></div>
             <input type="time" class="time-input" id="workend" onchange="recalc()">
           </div>
         </div>
       </div>
 
-      <!-- STRESS / EXERCISE -->
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">😤</span><span class="section-title">STRESS & EXERCISE</span></div></div>
+        <div class="section-header"><span class="section-icon">😤</span><span class="section-title">CONDITION</span></div>
         <div class="section-body">
-          <div class="slider-row">
-            <div class="slider-top"><div class="slider-label">ストレスレベル</div><div class="slider-value" id="stressVal">—</div></div>
+          <div class="slider-block">
+            <div class="slider-head"><span class="row-label">ストレスレベル</span><span class="slider-val" id="stressVal">—</span></div>
             <input type="range" min="0" max="5" value="0" id="stress" oninput="document.getElementById('stressVal').textContent=this.value==0?'—':this.value;recalc()">
           </div>
-          <div class="toggle-row">
-            <div><div class="toggle-label">運動した</div><div class="toggle-sub">就寝2時間前までOK</div></div>
+          <div class="row">
+            <div><div class="row-label">運動した</div><div class="row-sub">就寝2時間前までOK</div></div>
             <div class="toggle" id="exercise" onclick="toggleSwitch(this);recalc()"></div>
-          </div>
-          <div class="time-row" id="exerciseTimeRow">
-            <div><div class="time-label">運動した時間</div><div class="time-sub">終了時刻</div></div>
-            <input type="time" class="time-input" id="exerciseTime" onchange="recalc()">
-          </div>
-          <div class="toggle-row">
-            <div><div class="toggle-label">昼寝した</div></div>
-            <div class="toggle" id="napped" onclick="toggleSwitch(this);toggleNapFields()"></div>
-          </div>
-          <div id="napFields" style="display:none">
-            <div class="time-row">
-              <div><div class="time-label">昼寝開始</div></div>
-              <input type="time" class="time-input" id="napStart">
-            </div>
-            <div class="time-row">
-              <div><div class="time-label">昼寝の長さ</div></div>
-              <div style="display:flex;align-items:center;justify-content:flex-end">
-                <input type="number" class="nap-dur-input" id="napDuration" min="1" max="240" placeholder="—">
-                <span class="nap-dur-unit">分</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- BREAKDOWN -->
       <div class="section" id="breakdownSection" style="display:none">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">📊</span><span class="section-title">BREAKDOWN</span></div></div>
+        <div class="section-header"><span class="section-icon">📊</span><span class="section-title">BREAKDOWN</span></div>
         <div class="section-body"><div id="deductionList"></div></div>
       </div>
 
-      <!-- NOTE -->
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">✏️</span><span class="section-title">NOTE</span></div></div>
+        <div class="section-header"><span class="section-icon">✏️</span><span class="section-title">NOTE</span></div>
         <div class="section-body">
-          <textarea class="note-input" id="noteInput" placeholder="メモ（夢、気になったことなど）"></textarea>
+          <textarea class="note" id="noteInput" placeholder="メモ（夢、気になったことなど）"></textarea>
         </div>
       </div>
 
-    </div><!-- /panel-night -->
+    </div>
 
-    <!-- NEXT DAY PANEL -->
     <div class="log-panel" id="panel-nextday">
-      <div class="next-day-badge" id="nextDayBadge">— の翌日</div>
+      <div class="nd-badge" id="nextDayBadge">—</div>
 
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">😪</span><span class="section-title">眠気</span></div></div>
+        <div class="section-header"><span class="section-icon">😪</span><span class="section-title">昼間の眠気</span></div>
         <div class="section-body">
-          <div class="num-scale-row">
-            <div class="num-scale-top">
-              <div><div class="num-scale-label">昼間の眠気</div><div class="time-sub">1=最悪 / 10=全く眠くない</div></div>
-              <div class="num-scale-val" id="drowsyVal">—</div>
+          <div class="row">
+            <div><div class="row-label">午後の集中が保てたか</div></div>
+            <div class="scale">
+              <span class="scale-btn" data-group="drowsy" data-val="1" onclick="selectScale(this)">😵</span>
+              <span class="scale-btn" data-group="drowsy" data-val="2" onclick="selectScale(this)">😪</span>
+              <span class="scale-btn" data-group="drowsy" data-val="3" onclick="selectScale(this)">😐</span>
+              <span class="scale-btn" data-group="drowsy" data-val="4" onclick="selectScale(this)">🙂</span>
+              <span class="scale-btn" data-group="drowsy" data-val="5" onclick="selectScale(this)">😎</span>
             </div>
-            <div class="num-scale" id="scale-drowsy"></div>
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">🎯</span><span class="section-title">集中力</span></div></div>
+        <div class="section-header"><span class="section-icon">🎯</span><span class="section-title">集中力</span></div>
         <div class="section-body">
-          <div class="num-scale-row">
-            <div class="num-scale-top">
-              <div><div class="num-scale-label">作業パフォーマンス</div><div class="time-sub">1=最悪 / 10=絶好調</div></div>
-              <div class="num-scale-val" id="focusVal">—</div>
+          <div class="row">
+            <div><div class="row-label">作業パフォーマンス</div><div class="row-sub">EA・仕事・創作など</div></div>
+            <div class="scale">
+              <span class="scale-btn" data-group="focus" data-val="1" onclick="selectScale(this)">💀</span>
+              <span class="scale-btn" data-group="focus" data-val="2" onclick="selectScale(this)">😵‍💫</span>
+              <span class="scale-btn" data-group="focus" data-val="3" onclick="selectScale(this)">😐</span>
+              <span class="scale-btn" data-group="focus" data-val="4" onclick="selectScale(this)">🎯</span>
+              <span class="scale-btn" data-group="focus" data-val="5" onclick="selectScale(this)">⚡</span>
             </div>
-            <div class="num-scale" id="scale-focus"></div>
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">🌈</span><span class="section-title">気分</span></div></div>
+        <div class="section-header"><span class="section-icon">🌈</span><span class="section-title">気分</span></div>
         <div class="section-body">
-          <div class="num-scale-row">
-            <div class="num-scale-top">
-              <div><div class="num-scale-label">一日の感情状態</div><div class="time-sub">1=最悪 / 10=最高</div></div>
-              <div class="num-scale-val" id="moodVal">—</div>
+          <div class="row">
+            <div><div class="row-label">一日の感情状態</div></div>
+            <div class="scale">
+              <span class="scale-btn" data-group="mood" data-val="1" onclick="selectScale(this)">😤</span>
+              <span class="scale-btn" data-group="mood" data-val="2" onclick="selectScale(this)">😞</span>
+              <span class="scale-btn" data-group="mood" data-val="3" onclick="selectScale(this)">😐</span>
+              <span class="scale-btn" data-group="mood" data-val="4" onclick="selectScale(this)">😊</span>
+              <span class="scale-btn" data-group="mood" data-val="5" onclick="selectScale(this)">🌟</span>
             </div>
-            <div class="num-scale" id="scale-mood"></div>
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">⚡</span><span class="section-title">エネルギー</span></div></div>
+        <div class="section-header"><span class="section-icon">⚡</span><span class="section-title">エネルギー</span></div>
         <div class="section-body">
-          <div class="slider-row">
-            <div class="slider-top"><div class="slider-label">身体的エネルギー</div><div class="slider-value" id="energyVal">—</div></div>
+          <div class="slider-block">
+            <div class="slider-head"><span class="row-label">身体的エネルギー</span><span class="slider-val" id="energyVal">—</span></div>
             <input type="range" min="0" max="5" value="0" id="energy" oninput="document.getElementById('energyVal').textContent=this.value==0?'—':this.value">
           </div>
         </div>
       </div>
 
       <div class="section">
-        <div class="section-header"><div class="section-header-left"><span class="section-icon">✏️</span><span class="section-title">翌日メモ</span></div></div>
+        <div class="section-header"><span class="section-icon">✏️</span><span class="section-title">翌日メモ</span></div>
         <div class="section-body">
-          <textarea class="note-input" id="nextDayNote" placeholder="翌日に気づいたこと"></textarea>
+          <textarea class="note" id="nextDayNote" placeholder="翌日に気づいたこと"></textarea>
         </div>
       </div>
-    </div><!-- /panel-nextday -->
+    </div>
+  </div>
 
-  </div><!-- /tab-log -->
+  <!-- ============ HISTORY ============ -->
+  <div class="tab-panel" id="tab-history">
+    <div class="week-strip" id="weekStrip"></div>
+    <div class="filter-row" id="filterRow">
+      <span class="f-pill active" data-range="14" onclick="setHistFilter(this)">2週間</span>
+      <span class="f-pill" data-range="30" onclick="setHistFilter(this)">1ヶ月</span>
+      <span class="f-pill" data-range="0" onclick="setHistFilter(this)">すべて</span>
+    </div>
+    <div id="historyList"></div>
+  </div>
 
-  <div class="tab-panel" id="tab-history"><div id="historyList"></div></div>
-  <div class="tab-panel" id="tab-stats"><div id="statsContent"></div></div>
+  <!-- ============ STATS ============ -->
+  <div class="tab-panel" id="tab-stats">
+    <div id="statsContent"></div>
+  </div>
+
 </div>
 
-<button class="save-btn" id="saveBtn" onclick="saveLog()">SAVE</button>
+<button class="save-btn" id="saveBtn" onclick="saveLog()">記録する</button>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -487,21 +685,22 @@ const provider = new GoogleAuthProvider();
 
 let currentUser = null;
 let logsCache = [];
+let histRange = 14;
 
 window.signIn = async () => {
-  try { await signInWithPopup(auth, provider); } catch(e) { showToast('ログイン失敗'); }
+  try { await signInWithPopup(auth, provider); }
+  catch(e) { showToast('ログイン失敗'); }
 };
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
     document.getElementById('loginScreen').style.display = 'none';
-    setSyncStatus('loading', '読み込み中...');
+    setSync('loading','読み込み中');
     await loadAllLogs();
-    setSyncStatus('ok', user.displayName || 'ログイン済み');
+    setSync('ok', user.displayName || 'ログイン済み');
     loadLogForDate(getSelectedDate());
-    updateSaveBtnLabel();
-    updateNextDayBadge();
+    updateSaveBtnLabel(); updateNextDayBadge(); updateHeaderMeta();
   } else {
     currentUser = null;
     document.getElementById('loginScreen').style.display = 'flex';
@@ -510,266 +709,248 @@ onAuthStateChanged(auth, async (user) => {
 
 async function saveLogToCloud(log) {
   if (!currentUser) return;
-  setSyncStatus('loading', '保存中...');
+  setSync('loading','保存中');
   try {
-    await setDoc(doc(db, 'users', currentUser.uid, 'logs', log.date), log);
-    const idx = logsCache.findIndex(l => l.date === log.date);
-    if (idx >= 0) logsCache[idx] = log; else logsCache.unshift(log);
-    logsCache.sort((a,b) => b.date.localeCompare(a.date));
-    setSyncStatus('ok', '保存済み');
+    await setDoc(doc(db,'users',currentUser.uid,'logs',log.date), log);
+    const i = logsCache.findIndex(l=>l.date===log.date);
+    if (i>=0) logsCache[i]=log; else logsCache.unshift(log);
+    logsCache.sort((a,b)=>b.date.localeCompare(a.date));
+    setSync('ok','保存済み');
   } catch(e) {
-    setSyncStatus('err', '保存失敗');
-    showToast('保存に失敗しました');
+    setSync('err','保存失敗'); showToast('保存に失敗しました');
   }
 }
 
 async function loadAllLogs() {
   if (!currentUser) return;
   try {
-    const q = query(collection(db, 'users', currentUser.uid, 'logs'), orderBy('date', 'desc'));
+    const q = query(collection(db,'users',currentUser.uid,'logs'), orderBy('date','desc'));
     const snap = await getDocs(q);
-    logsCache = snap.docs.map(d => d.data());
+    logsCache = snap.docs.map(d=>d.data());
   } catch(e) { logsCache = []; }
 }
 
-function getLogs() { return logsCache; }
-function setSyncStatus(state, label) {
-  document.getElementById('syncDot').className = 'sync-dot ' + state;
-  document.getElementById('syncLabel').textContent = label;
+function getLogs(){ return logsCache; }
+function setSync(s,l){
+  document.getElementById('syncDot').className='sync-dot '+s;
+  document.getElementById('syncLabel').textContent=l;
 }
 
-// ==================== ACTIVITIES ====================
-const DEFAULT_ACTIVITIES = [
-  {val:'ea',label:'EA作業',bad:true},{val:'screen',label:'スマホ',bad:true},
-  {val:'work',label:'PC作業',bad:true},{val:'game',label:'ゲーム',bad:true},
-  {val:'read',label:'読書',bad:false},{val:'stretch',label:'ストレッチ',bad:false},
-  {val:'meditate',label:'瞑想',bad:false},{val:'nothing',label:'なにもしない',bad:false},
+// ===== activities =====
+const DEFAULT_ACTIVITIES=[
+  {val:'ea',label:'EA作業',bad:true},
+  {val:'screen',label:'スマホ',bad:true},
+  {val:'work',label:'PC作業',bad:true},
+  {val:'game',label:'ゲーム',bad:true},
+  {val:'read',label:'読書',bad:false},
+  {val:'stretch',label:'ストレッチ',bad:false},
+  {val:'meditate',label:'瞑想',bad:false},
+  {val:'nothing',label:'なにもしない',bad:false},
 ];
-
-const state = {
-  wakeupRating:0, drowsyRating:0, focusRating:0, moodRating:0,
-  newActivityIsBad:false, coffeeHalf:false, coffeeCups:0
-};
+const state={wakeupRating:0,drowsyRating:0,focusRating:0,moodRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0};
 
 function getCustomActivities(){try{return JSON.parse(localStorage.getItem('custom_activities')||'[]');}catch{return[];}}
-function saveCustomActivities(arr){localStorage.setItem('custom_activities',JSON.stringify(arr));}
+function saveCustomActivities(a){localStorage.setItem('custom_activities',JSON.stringify(a));}
 function getAllActivities(){return[...DEFAULT_ACTIVITIES,...getCustomActivities()];}
 
-window.renderActivityGrid = function(selectedVals=[]) {
-  const grid = document.getElementById('activityGrid');
-  grid.innerHTML = getAllActivities().map(a => {
-    const isDefault = DEFAULT_ACTIVITIES.some(d => d.val === a.val);
-    const del = !isDefault ? `<span class="chip-delete" onclick="deleteActivity(event,'${a.val}')">✕</span>` : '';
-    return `<div class="select-chip ${a.bad?'warn-chip':''} ${selectedVals.includes(a.val)?'selected':''}" data-val="${a.val}" data-bad="${a.bad}" onclick="toggleChip(this);recalc()">${a.label}${del}</div>`;
+window.renderActivityGrid = function(sel=[]){
+  document.getElementById('activityGrid').innerHTML = getAllActivities().map(a=>{
+    const isDef = DEFAULT_ACTIVITIES.some(d=>d.val===a.val);
+    const del = !isDef ? `<span class="chip-x" onclick="deleteActivity(event,'${a.val}')">✕</span>` : '';
+    return `<div class="chip ${a.bad?'bad':''} ${sel.includes(a.val)?'selected':''}" data-val="${a.val}" data-bad="${a.bad}" onclick="toggleChip(this);recalc()">${a.label}${del}</div>`;
   }).join('');
 };
-
-window.deleteActivity = function(e, val) {
+window.deleteActivity = function(e,val){
   e.stopPropagation();
-  saveCustomActivities(getCustomActivities().filter(a => a.val !== val));
-  const sel = [...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val).filter(v=>v!==val);
+  saveCustomActivities(getCustomActivities().filter(a=>a.val!==val));
+  const sel=[...document.querySelectorAll('#activityGrid .chip.selected')].map(c=>c.dataset.val).filter(v=>v!==val);
   renderActivityGrid(sel); recalc();
 };
-
-window.toggleNewActivityType = function() {
-  state.newActivityIsBad = !state.newActivityIsBad;
-  const btn = document.getElementById('newActivityType');
-  btn.textContent = state.newActivityIsBad ? '悪い' : '良い';
-  btn.classList.toggle('bad-type', state.newActivityIsBad);
+window.toggleNewActivityType = function(){
+  state.newActivityIsBad=!state.newActivityIsBad;
+  const b=document.getElementById('newActivityType');
+  b.textContent=state.newActivityIsBad?'悪い':'良い';
+  b.classList.toggle('bad',state.newActivityIsBad);
+};
+window.addCustomActivity = function(){
+  const i=document.getElementById('newActivityInput');
+  const label=i.value.trim(); if(!label)return;
+  const c=getCustomActivities();
+  c.push({val:'custom_'+Date.now(),label,bad:state.newActivityIsBad});
+  saveCustomActivities(c);
+  const sel=[...document.querySelectorAll('#activityGrid .chip.selected')].map(x=>x.dataset.val);
+  renderActivityGrid(sel); i.value=''; recalc();
 };
 
-window.addCustomActivity = function() {
-  const input = document.getElementById('newActivityInput');
-  const label = input.value.trim(); if(!label) return;
-  const customs = getCustomActivities();
-  customs.push({val:'custom_'+Date.now(), label, bad:state.newActivityIsBad});
-  saveCustomActivities(customs);
-  const sel = [...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val);
-  renderActivityGrid(sel); input.value=''; recalc();
-};
-
-// ==================== NUMBER SCALES ====================
-const SCALE_GROUPS = [
-  {id:'wakeup', containerId:'scale-wakeup', valId:'wakeupVal', stateKey:'wakeupRating'},
-  {id:'drowsy',  containerId:'scale-drowsy',  valId:'drowsyVal',  stateKey:'drowsyRating'},
-  {id:'focus',   containerId:'scale-focus',   valId:'focusVal',   stateKey:'focusRating'},
-  {id:'mood',    containerId:'scale-mood',    valId:'moodVal',    stateKey:'moodRating'},
-];
-
-function buildScales() {
-  SCALE_GROUPS.forEach(g => {
-    const wrap = document.getElementById(g.containerId);
-    if (!wrap) return;
-    wrap.innerHTML = '';
-    for (let i = 1; i <= 10; i++) {
-      const btn = document.createElement('div');
-      btn.className = 'num-btn';
-      btn.textContent = i;
-      btn.dataset.group = g.id;
-      btn.dataset.val = i;
-      btn.onclick = () => selectNum(g, i);
-      wrap.appendChild(btn);
-    }
-  });
-}
-
-function selectNum(g, val) {
-  const wrap = document.getElementById(g.containerId);
-  wrap.querySelectorAll('.num-btn').forEach(b => b.classList.toggle('selected', parseInt(b.dataset.val) === val));
-  document.getElementById(g.valId).textContent = val;
-  state[g.stateKey] = val;
-}
-
-function setScaleVal(groupId, val) {
-  const g = SCALE_GROUPS.find(x => x.id === groupId);
-  if (!g || !val) return;
-  const wrap = document.getElementById(g.containerId);
-  if (!wrap) return;
-  wrap.querySelectorAll('.num-btn').forEach(b => b.classList.toggle('selected', parseInt(b.dataset.val) === val));
-  document.getElementById(g.valId).textContent = val;
-  state[g.stateKey] = val;
-}
-
-function clearScaleVal(groupId) {
-  const g = SCALE_GROUPS.find(x => x.id === groupId);
-  if (!g) return;
-  const wrap = document.getElementById(g.containerId);
-  if (wrap) wrap.querySelectorAll('.num-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById(g.valId).textContent = '—';
-  state[g.stateKey] = 0;
-}
-
-// ==================== COFFEE ====================
-window.setCups = function(n) {
-  state.coffeeCups = state.coffeeCups === n && !state.coffeeHalf ? 0 : n;
-  state.coffeeHalf = false;
+// ===== coffee =====
+window.setCups = function(n){
+  state.coffeeCups = (state.coffeeCups===n && !state.coffeeHalf) ? 0 : n;
+  state.coffeeHalf=false;
   document.getElementById('halfCupBtn').classList.remove('active');
   updateCupUI(); recalc();
 };
-window.toggleHalfCup = function() {
-  state.coffeeHalf = !state.coffeeHalf;
-  if (state.coffeeHalf) state.coffeeCups = 0;
-  document.getElementById('halfCupBtn').classList.toggle('active', state.coffeeHalf);
+window.toggleHalfCup = function(){
+  state.coffeeHalf=!state.coffeeHalf;
+  if(state.coffeeHalf) state.coffeeCups=0;
+  document.getElementById('halfCupBtn').classList.toggle('active',state.coffeeHalf);
   updateCupUI(); recalc();
 };
-function updateCupUI() {
-  document.querySelectorAll('.cup-btn').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.cup) <= state.coffeeCups));
-  const total = state.coffeeCups + (state.coffeeHalf ? 0.5 : 0);
-  document.getElementById('coffeeCountLabel').textContent = total === 0 ? '—' : total + '杯';
+function updateCupUI(){
+  document.querySelectorAll('.cup-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.cup)<=state.coffeeCups));
+  const t=state.coffeeCups+(state.coffeeHalf?0.5:0);
+  document.getElementById('coffeeCountLabel').textContent = t===0?'—':t+'杯';
 }
 
-// ==================== NAP TOGGLE ====================
-window.toggleNapFields = function() {
-  const on = document.getElementById('napped').classList.contains('on');
-  document.getElementById('napFields').style.display = on ? 'block' : 'none';
-};
-
-// ==================== UTILS ====================
-function toMinutes(t){if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+m;}
-function minDiff(t1,t2){let d=t2-t1;if(d<0)d+=1440;return d;}
-function formatMins(m){const h=Math.floor(m/60),mm=m%60;return mm===0?`${h}h`:`${h}h${mm}m`;}
-function getTodayISO(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function getSelectedDate(){return document.getElementById('logDate').value||getTodayISO();}
-
-function getNextDateLabel(dateKey){
-  const[y,m,d]=dateKey.split('-');
-  const date=new Date(+y,+m-1,+d);date.setDate(date.getDate()+1);
-  return`${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')}`;
-}
-function getSelectedDateLabel(){
-  const val=getSelectedDate();const[y,m,d]=val.split('-');
-  const date=new Date(+y,+m-1,+d);
-  const today=new Date();today.setHours(0,0,0,0);
-  const yesterday=new Date(today);yesterday.setDate(today.getDate()-1);
-  if(date.toDateString()===today.toDateString())return'今日';
-  if(date.toDateString()===yesterday.toDateString())return'昨日';
+// ===== utils =====
+function toMin(t){if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+m;}
+function minDiff(a,b){let d=b-a;if(d<0)d+=1440;return d;}
+function fmtMin(m){const h=Math.floor(m/60),mm=m%60;return mm===0?`${h}h`:`${h}h${mm}m`;}
+function todayISO(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function getSelectedDate(){return document.getElementById('logDate').value||todayISO();}
+function dateLabel(){
+  const v=getSelectedDate();const[y,m,d]=v.split('-');
+  const dt=new Date(+y,+m-1,+d);const t=new Date();t.setHours(0,0,0,0);
+  const yd=new Date(t);yd.setDate(t.getDate()-1);
+  if(dt.toDateString()===t.toDateString())return'今日';
+  if(dt.toDateString()===yd.toDateString())return'昨日';
   return`${m}/${d}`;
 }
-
+function nextDateLabel(k){
+  const[y,m,d]=k.split('-');const dt=new Date(+y,+m-1,+d);dt.setDate(dt.getDate()+1);
+  return`${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}`;
+}
 window.onDateChange = function(){loadLogForDate(getSelectedDate());updateSaveBtnLabel();updateNextDayBadge();};
-function updateSaveBtnLabel(){document.getElementById('saveBtn').textContent=`SAVE — ${getSelectedDateLabel()}`;}
+function updateSaveBtnLabel(){document.getElementById('saveBtn').textContent=`記録する — ${dateLabel()}`;}
 function updateNextDayBadge(){
-  const dateKey=getSelectedDate();
-  document.getElementById('nextDayBadge').textContent=`${dateKey.replace(/-/g,'/')} の翌日（${getNextDateLabel(dateKey)}）`;
+  const k=getSelectedDate();
+  document.getElementById('nextDayBadge').textContent=`${k.replace(/-/g,'/')} の翌日（${nextDateLabel(k)}）の状態`;
 }
 
-window.switchLogPanel = function(panel){
-  document.querySelectorAll('.section-tab').forEach((t,i)=>t.classList.toggle('active',['night','nextday'][i]===panel));
-  document.querySelectorAll('.log-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+panel).classList.add('active');
+window.switchLogPanel = function(p){
+  document.querySelectorAll('.subtab').forEach((t,i)=>t.classList.toggle('active',['night','nextday'][i]===p));
+  document.querySelectorAll('.log-panel').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+p).classList.add('active');
 };
 
-// ==================== RECALC ====================
+// ===== header meta =====
+function calcStreak(){
+  const logs=getLogs(); if(!logs.length)return 0;
+  const dates=new Set(logs.map(l=>l.date));
+  let streak=0;
+  const d=new Date();
+  // allow today missing (might log tomorrow)
+  const tISO=todayISO();
+  if(!dates.has(tISO)) d.setDate(d.getDate()-1);
+  for(;;){
+    const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if(dates.has(k)){streak++;d.setDate(d.getDate()-1);}
+    else break;
+  }
+  return streak;
+}
+function updateHeaderMeta(){
+  const logs=getLogs();
+  const cur=logs.find(l=>l.date===getSelectedDate());
+  // sleep duration for selected date
+  const ms=document.getElementById('metaSleep');
+  if(cur&&cur.bedtime&&cur.waketime) ms.innerHTML=fmtMin(minDiff(toMin(cur.bedtime),toMin(cur.waketime)));
+  else {
+    const bed=toMin(document.getElementById('bedtime').value), wake=toMin(document.getElementById('waketime').value);
+    ms.innerHTML=(bed!==null&&wake!==null)?fmtMin(minDiff(bed,wake)):'—';
+  }
+  // streak
+  const st=calcStreak();
+  document.getElementById('metaStreak').innerHTML = st>0 ? `${st}<span class="dim">日</span> ${'🌙'.repeat(Math.min(st,7))}` : '—';
+  // week avg
+  const now=new Date();
+  const weekLogs=logs.filter(l=>{
+    const[y,m,d]=l.date.split('-');const dt=new Date(+y,+m-1,+d);
+    return (now-dt)/(1000*3600*24)<7;
+  });
+  document.getElementById('metaWeekAvg').innerHTML = weekLogs.length
+    ? `${Math.round(weekLogs.reduce((s,l)=>s+l.score,0)/weekLogs.length)}<span class="dim">点</span>`
+    : '—';
+}
+
+// ===== recalc =====
+const RING_C = 2*Math.PI*52;
 window.recalc = function(){
-  let score=100;const deductions=[];
-  const bed=toMinutes(document.getElementById('bedtime').value);
-  const wake=toMinutes(document.getElementById('waketime').value);
-  const meal=toMinutes(document.getElementById('mealtime').value);
-  const bath=toMinutes(document.getElementById('bathtime').value);
-  const coffeeTime=toMinutes(document.getElementById('coffeeTime').value);
-  const workend=toMinutes(document.getElementById('workend').value);
-  const alcohol=document.getElementById('alcohol').classList.contains('on');
-  const hasBadActivity=[...document.querySelectorAll('#activityGrid .select-chip.selected')].some(c=>c.dataset.bad==='true');
+  let score=100;const ded=[];
+  const bed=toMin(document.getElementById('bedtime').value);
+  const wake=toMin(document.getElementById('waketime').value);
+  const meal=toMin(document.getElementById('mealtime').value);
+  const bath=toMin(document.getElementById('bathtime').value);
+  const cof=toMin(document.getElementById('coffeeTime').value);
+  const wend=toMin(document.getElementById('workend').value);
+  const alc=document.getElementById('alcohol').classList.contains('on');
+  const badAct=[...document.querySelectorAll('#activityGrid .chip.selected')].some(c=>c.dataset.bad==='true');
 
   if(bed!==null&&wake!==null){
     const s=minDiff(bed,wake);
-    if(s<420){const pts=Math.min(25,Math.round((420-s)/12));score-=pts;deductions.push({name:`睡眠時間 ${formatMins(s)}`,pts,bad:true});}
-    else deductions.push({name:`睡眠時間 ${formatMins(s)}`,pts:0,bad:false});
+    if(s<420){const p=Math.min(25,Math.round((420-s)/12));score-=p;ded.push({n:`睡眠時間 ${fmtMin(s)}`,p,bad:true});}
+    else ded.push({n:`睡眠時間 ${fmtMin(s)}`,p:0,bad:false});
   }
   if(meal!==null&&bed!==null){
-    const gap=minDiff(meal,bed);
-    if(gap<120){score-=15;deductions.push({name:`食事→就寝 ${formatMins(gap)}`,pts:15,bad:true});}
-    else if(gap<180){score-=8;deductions.push({name:`食事→就寝 ${formatMins(gap)}`,pts:8,bad:true});}
-    else deductions.push({name:`食事→就寝 ${formatMins(gap)}`,pts:0,bad:false});
+    const g=minDiff(meal,bed);
+    if(g<120){score-=15;ded.push({n:`食事→就寝 ${fmtMin(g)}`,p:15,bad:true});}
+    else if(g<180){score-=8;ded.push({n:`食事→就寝 ${fmtMin(g)}`,p:8,bad:true});}
+    else ded.push({n:`食事→就寝 ${fmtMin(g)}`,p:0,bad:false});
   }
-  if(alcohol){score-=15;deductions.push({name:'アルコールあり',pts:15,bad:true});}
+  if(alc){score-=15;ded.push({n:'アルコールあり',p:15,bad:true});}
   if(bath!==null&&bed!==null){
-    const gap=minDiff(bath,bed);
-    if(gap<30){score-=10;deductions.push({name:`入浴→就寝 ${formatMins(gap)}(近すぎ)`,pts:10,bad:true});}
-    else if(gap>=60&&gap<=120)deductions.push({name:'入浴タイミング 最適',pts:0,bad:false});
-    else deductions.push({name:`入浴→就寝 ${formatMins(gap)}`,pts:0,bad:false});
+    const g=minDiff(bath,bed);
+    if(g<30){score-=10;ded.push({n:`入浴→就寝 ${fmtMin(g)}（近すぎ）`,p:10,bad:true});}
+    else if(g>=60&&g<=120)ded.push({n:'入浴タイミング 最適',p:0,bad:false});
+    else ded.push({n:`入浴→就寝 ${fmtMin(g)}`,p:0,bad:false});
   }
-  if(coffeeTime!==null){
-    const h=Math.floor(coffeeTime/60);
-    const str=`${h}:${String(coffeeTime%60).padStart(2,'0')}`;
-    if(h>=16){score-=15;deductions.push({name:`コーヒー最終 ${str}`,pts:15,bad:true});}
-    else if(h>=14){score-=8;deductions.push({name:`コーヒー最終 ${str}`,pts:8,bad:true});}
-    else deductions.push({name:`コーヒー最終 ${str}`,pts:0,bad:false});
+  if(cof!==null){
+    const h=Math.floor(cof/60);
+    const s=`${h}:${String(cof%60).padStart(2,'0')}`;
+    if(h>=16){score-=15;ded.push({n:`コーヒー最終 ${s}`,p:15,bad:true});}
+    else if(h>=14){score-=8;ded.push({n:`コーヒー最終 ${s}`,p:8,bad:true});}
+    else ded.push({n:`コーヒー最終 ${s}`,p:0,bad:false});
   }
-  if(hasBadActivity&&workend!==null&&bed!==null){
-    const gap=minDiff(workend,bed);
-    if(gap<60){score-=20;deductions.push({name:`作業→就寝 ${formatMins(gap)}(近すぎ)`,pts:20,bad:true});}
-    else if(gap<90){score-=10;deductions.push({name:`作業→就寝 ${formatMins(gap)}`,pts:10,bad:true});}
-    else deductions.push({name:`作業→就寝 ${formatMins(gap)}`,pts:0,bad:false});
-  }else if(hasBadActivity&&workend===null){score-=15;deductions.push({name:'作業終了時間 未入力',pts:15,bad:true});}
+  if(badAct&&wend!==null&&bed!==null){
+    const g=minDiff(wend,bed);
+    if(g<60){score-=20;ded.push({n:`作業→就寝 ${fmtMin(g)}（近すぎ）`,p:20,bad:true});}
+    else if(g<90){score-=10;ded.push({n:`作業→就寝 ${fmtMin(g)}`,p:10,bad:true});}
+    else ded.push({n:`作業→就寝 ${fmtMin(g)}`,p:0,bad:false});
+  }else if(badAct&&wend===null){score-=15;ded.push({n:'作業終了時間 未入力',p:15,bad:true});}
 
   score=Math.max(0,score);
-  const scoreEl=document.getElementById('scoreNum');
-  scoreEl.textContent=score;scoreEl.classList.add('pulse');
-  setTimeout(()=>scoreEl.classList.remove('pulse'),400);
-  const barEl=document.getElementById('scoreBar');
-  barEl.style.width=score+'%';barEl.className='score-bar';
-  if(score<50)barEl.classList.add('bad');else if(score<75)barEl.classList.add('warn');
 
-  const breakEl=document.getElementById('breakdownSection');
-  const listEl=document.getElementById('deductionList');
-  if(deductions.length>0){
-    breakEl.style.display='block';
-    listEl.innerHTML=deductions.map(d=>`<div class="deduction-item"><span>${d.name}</span>${d.bad?`<span class="deduction-pts">-${d.pts}pt</span>`:`<span class="deduction-ok">✓</span>`}</div>`).join('');
-  }else breakEl.style.display='none';
+  document.getElementById('scoreNum').textContent=score;
+  const ring=document.getElementById('ringFill');
+  ring.style.strokeDashoffset = RING_C*(1-score/100);
+  ring.style.stroke = score>=75?'var(--good)':score>=50?'var(--gold)':'var(--warn)';
+
+  const bEl=document.getElementById('breakdownSection');
+  const lEl=document.getElementById('deductionList');
+  if(ded.length){
+    bEl.style.display='block';
+    lEl.innerHTML=ded.map(d=>`<div class="ded"><span>${d.n}</span>${d.bad?`<span class="ded-pts">-${d.p}pt</span>`:`<span class="ded-ok">✓</span>`}</div>`).join('');
+  }else bEl.style.display='none';
+
+  updateHeaderMeta();
   return score;
 };
 
-window.toggleSwitch = function(el){el.classList.toggle('on');};
-window.toggleChip = function(el){el.classList.toggle('selected');};
+window.toggleSwitch = el=>el.classList.toggle('on');
+window.toggleChip = el=>el.classList.toggle('selected');
+window.selectScale = function(el){
+  const g=el.dataset.group;
+  document.querySelectorAll(`.scale-btn[data-group="${g}"]`).forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  state[g+'Rating']=parseInt(el.dataset.val);
+};
 
-// ==================== SAVE ====================
+// ===== save/load =====
 window.saveLog = async function(){
   if(!currentUser){showToast('ログインが必要です');return;}
   const score=recalc();
   const dateKey=getSelectedDate();
   const log={
-    date:dateKey, score,
+    date:dateKey,score,
     bedtime:document.getElementById('bedtime').value,
     waketime:document.getElementById('waketime').value,
     meal:document.getElementById('mealtime').value,
@@ -778,11 +959,7 @@ window.saveLog = async function(){
     coffeeCups:state.coffeeCups+(state.coffeeHalf?0.5:0),
     alcohol:document.getElementById('alcohol').classList.contains('on'),
     exercise:document.getElementById('exercise').classList.contains('on'),
-    exerciseTime:document.getElementById('exerciseTime').value,
-    napped:document.getElementById('napped').classList.contains('on'),
-    napStart:document.getElementById('napStart').value,
-    napDuration:document.getElementById('napDuration').value,
-    activities:[...document.querySelectorAll('#activityGrid .select-chip.selected')].map(c=>c.dataset.val),
+    activities:[...document.querySelectorAll('#activityGrid .chip.selected')].map(c=>c.dataset.val),
     workend:document.getElementById('workend').value,
     wakeupRating:state.wakeupRating,
     drowsyRating:state.drowsyRating,
@@ -795,32 +972,32 @@ window.saveLog = async function(){
     ts:Date.now(),
   };
   await saveLogToCloud(log);
+  updateHeaderMeta();
   const btn=document.getElementById('saveBtn');
-  const orig=btn.textContent;
-  btn.textContent='SAVED ✓';btn.classList.add('saved');
-  setTimeout(()=>{btn.textContent=orig;btn.classList.remove('saved');},2000);
-  showToast('保存しました');
+  const o=btn.textContent;
+  btn.textContent='保存しました ✓';btn.classList.add('saved');
+  setTimeout(()=>{btn.textContent=o;btn.classList.remove('saved');},2000);
+  showToast('🌙 おつかれさま');
 };
 
-// ==================== LOAD ====================
-function loadLogForDate(dateKey){
-  const log=getLogs().find(l=>l.date===dateKey);
-  ['bedtime','waketime','mealtime','bathtime','coffeeTime','workend','noteInput','nextDayNote','exerciseTime','napStart','napDuration'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.value='';
+function loadLogForDate(k){
+  const log=getLogs().find(l=>l.date===k);
+  ['bedtime','waketime','mealtime','bathtime','coffeeTime','workend','noteInput','nextDayNote'].forEach(id=>{
+    const e=document.getElementById(id);if(e)e.value='';
   });
-  ['alcohol','showerOnly','exercise','napped'].forEach(id=>document.getElementById(id).classList.remove('on'));
-  document.getElementById('napFields').style.display='none';
+  ['alcohol','showerOnly','exercise'].forEach(id=>document.getElementById(id).classList.remove('on'));
   document.getElementById('stress').value=0;document.getElementById('stressVal').textContent='—';
   document.getElementById('energy').value=0;document.getElementById('energyVal').textContent='—';
+  document.querySelectorAll('.scale-btn').forEach(e=>e.classList.remove('selected'));
   document.getElementById('scoreNum').textContent='—';
-  document.getElementById('scoreBar').style.width='0%';
+  document.getElementById('ringFill').style.strokeDashoffset=RING_C;
   document.getElementById('breakdownSection').style.display='none';
   state.coffeeCups=0;state.coffeeHalf=false;
   document.getElementById('halfCupBtn').classList.remove('active');
   updateCupUI();
-  SCALE_GROUPS.forEach(g=>clearScaleVal(g.id));
+  ['wakeupRating','drowsyRating','focusRating','moodRating'].forEach(x=>state[x]=0);
 
-  if(!log){renderActivityGrid([]);return;}
+  if(!log){renderActivityGrid([]);updateHeaderMeta();return;}
 
   document.getElementById('bedtime').value=log.bedtime||'';
   document.getElementById('waketime').value=log.waketime||'';
@@ -830,271 +1007,288 @@ function loadLogForDate(dateKey){
   document.getElementById('workend').value=log.workend||'';
   document.getElementById('noteInput').value=log.note||'';
   document.getElementById('nextDayNote').value=log.nextDayNote||'';
-  document.getElementById('exerciseTime').value=log.exerciseTime||'';
-  document.getElementById('napStart').value=log.napStart||'';
-  document.getElementById('napDuration').value=log.napDuration||'';
   if(log.alcohol)document.getElementById('alcohol').classList.add('on');
   if(log.exercise)document.getElementById('exercise').classList.add('on');
-  if(log.napped){
-    document.getElementById('napped').classList.add('on');
-    document.getElementById('napFields').style.display='block';
-  }
-  if(log.stress){document.getElementById('stress').value=log.stress;document.getElementById('stressVal').textContent=log.stress;}
-  if(log.energy){document.getElementById('energy').value=log.energy;document.getElementById('energyVal').textContent=log.energy;}
+  if(log.stress&&log.stress!=0){document.getElementById('stress').value=log.stress;document.getElementById('stressVal').textContent=log.stress;}
+  if(log.energy&&log.energy!=0){document.getElementById('energy').value=log.energy;document.getElementById('energyVal').textContent=log.energy;}
   if(log.coffeeCups){
     state.coffeeHalf=log.coffeeCups%1!==0;
     state.coffeeCups=Math.floor(log.coffeeCups);
     if(state.coffeeHalf)document.getElementById('halfCupBtn').classList.add('active');
     updateCupUI();
   }
-  SCALE_GROUPS.forEach(g=>{
-    const val=log[g.stateKey];
-    if(val)setScaleVal(g.id,val);
+  ['wakeup','drowsy','focus','mood'].forEach(g=>{
+    const v=log[g+'Rating'];
+    if(v){
+      const b=document.querySelector(`.scale-btn[data-group="${g}"][data-val="${v}"]`);
+      if(b)b.classList.add('selected');
+      state[g+'Rating']=v;
+    }
   });
   renderActivityGrid(log.activities||[]);
   recalc();
 }
 
-function showToast(msg){
+function showToast(m){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
+  t.textContent=m;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// ==================== TABS ====================
+// ===== tabs =====
 window.switchTab = function(tab){
-  ['log','history','stats'].forEach((t,i)=>{
-    document.getElementById('navTab-'+t).classList.toggle('active',t===tab);
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
-  });
-  document.getElementById('navBar').style.left = tab==='log'?'0%':tab==='history'?'33.33%':'66.66%';
-  document.getElementById('saveBtn').style.display = tab==='log'?'block':'none';
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['log','history','stats'][i]===tab));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('saveBtn').style.display=tab==='log'?'block':'none';
   if(tab==='history')renderHistory();
   if(tab==='stats')renderStats();
 };
 
-// ==================== HISTORY ====================
-function renderHistory(){
+// ===== HISTORY =====
+window.setHistFilter = function(el){
+  document.querySelectorAll('.f-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  histRange=parseInt(el.dataset.range);
+  renderHistory();
+};
+
+function scoreMoon(score){
+  if(score==null)return'·';
+  if(score>=85)return'🌕';
+  if(score>=70)return'🌔';
+  if(score>=55)return'🌓';
+  if(score>=40)return'🌒';
+  return'🌑';
+}
+
+function renderWeekStrip(){
   const logs=getLogs();
-  const el=document.getElementById('historyList');
-  if(logs.length===0){el.innerHTML=`<div class="history-empty">まだ記録がありません</div>`;return;}
-  const allActs=getAllActivities();
-  el.innerHTML=logs.map(log=>{
-    const scoreClass=log.score>=75?'good':log.score>=50?'ok':'bad';
-    const[y,m,d]=log.date.split('-');
-    const sleepDur=log.bedtime&&log.waketime?formatMins(minDiff(toMinutes(log.bedtime),toMinutes(log.waketime))):'—';
-    const bedLabel=log.bedtime||'—';
-    const wakeLabel=log.waketime||'—';
+  const byDate=Object.fromEntries(logs.map(l=>[l.date,l]));
+  const wd=['日','月','火','水','木','金','土'];
+  let html='';
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const log=byDate[k];
+    const sc=log?log.score:null;
+    const cls=sc==null?'':sc>=75?'good':sc>=50?'ok':'bad';
+    html+=`<div class="ws-day ${i===0?'today':''}" onclick="jumpToDate('${k}')">
+      <span class="ws-wd">${wd[d.getDay()]}</span>
+      <span class="ws-moon">${scoreMoon(sc)}</span>
+      <span class="ws-score ${cls}">${sc==null?'—':sc}</span>
+    </div>`;
+  }
+  document.getElementById('weekStrip').innerHTML=html;
+}
 
-    let tags=[];
-    if(log.coffeeCups)tags.push(`<span class="history-tag">☕ ${log.coffeeCups}杯</span>`);
-    if(log.alcohol)tags.push(`<span class="history-tag red">アルコール</span>`);
-    if(log.napped)tags.push(`<span class="history-tag">昼寝 ${log.napDuration?log.napDuration+'分':''}</span>`);
-    if(log.activities)log.activities.forEach(v=>{
-      const act=allActs.find(a=>a.val===v);if(!act)return;
-      tags.push(`<span class="history-tag ${act.bad?'red':'green'}">${act.label}</span>`);
+// sleep bar: window 19:00 → 12:00 (17h)
+function sleepBarHTML(bed,wake){
+  if(bed==null||wake==null)return'';
+  const WSTART=19*60, WLEN=17*60;
+  let b=bed, w=wake;
+  // normalize into window: times after midnight get +1440
+  let bPos=b>=WSTART? b-WSTART : b+1440-WSTART;
+  let wPos=w>=WSTART? w-WSTART : w+1440-WSTART;
+  if(wPos<=bPos)wPos=bPos+30;
+  bPos=Math.max(0,Math.min(WLEN,bPos));
+  wPos=Math.max(0,Math.min(WLEN,wPos));
+  const l=(bPos/WLEN*100).toFixed(1), wdt=((wPos-bPos)/WLEN*100).toFixed(1);
+  // marks at 21,0,3,6,9
+  const marks=[2*60,5*60,8*60,11*60,14*60].map(m=>`<div class="sleep-mark" style="left:${(m/WLEN*100).toFixed(1)}%"></div>`).join('');
+  return`<div class="sleep-track">${marks}<div class="sleep-seg" style="left:${l}%;width:${wdt}%"></div></div>`;
+}
+
+function renderHistory(){
+  renderWeekStrip();
+  let logs=getLogs();
+  if(histRange>0){
+    const cut=new Date();cut.setDate(cut.getDate()-histRange);
+    logs=logs.filter(l=>{
+      const[y,m,d]=l.date.split('-');return new Date(+y,+m-1,+d)>=cut;
     });
+  }
+  const el=document.getElementById('historyList');
+  if(!logs.length){
+    el.innerHTML=`<div class="empty"><span class="big">🌙</span>まだ記録がありません<br>今夜から始めよう</div>`;
+    return;
+  }
+  const allActs=getAllActivities();
+  const emojiMap={wakeup:['','😴','😪','😐','🙂','😁'],drowsy:['','😵','😪','😐','🙂','😎'],focus:['','💀','😵‍💫','😐','🎯','⚡'],mood:['','😤','😞','😐','😊','🌟']};
+  const wdJ=['日','月','火','水','木','金','土'];
 
-    const ratingItems=[
-      {key:'wakeupRating',label:'目覚め'},
-      {key:'drowsyRating',label:'眠気'},
-      {key:'focusRating',label:'集中'},
-      {key:'moodRating',label:'気分'},
-    ];
-    const ratingsHtml=ratingItems.filter(r=>log[r.key]).map(r=>`<div class="history-rating-item"><div class="history-rating-key">${r.label}</div><span class="history-rating-val">${log[r.key]}</span></div>`).join('');
-
-    return`<div class="history-card" onclick="jumpToDate('${log.date}')">
-      <div class="history-top">
+  el.innerHTML=logs.map(log=>{
+    const cls=log.score>=75?'good':log.score>=50?'ok':'bad';
+    const bed=toMin(log.bedtime), wake=toMin(log.waketime);
+    const dur=(bed!=null&&wake!=null)?fmtMin(minDiff(bed,wake)):'—';
+    let tags=[];
+    if(log.coffeeCups)tags.push(`<span class="h-tag">☕️ ${log.coffeeCups}杯</span>`);
+    if(log.alcohol)tags.push(`<span class="h-tag red">🍺 酒</span>`);
+    if(log.exercise)tags.push(`<span class="h-tag green">🏃 運動</span>`);
+    if(log.activities)log.activities.slice(0,3).forEach(v=>{
+      const a=allActs.find(x=>x.val===v);if(!a)return;
+      tags.push(`<span class="h-tag ${a.bad?'red':'green'}">${a.label}</span>`);
+    });
+    let perf='';
+    ['drowsy','focus','mood'].forEach(g=>{if(log[g+'Rating'])perf+=emojiMap[g][log[g+'Rating']]||'';});
+    const[y,m,d]=log.date.split('-');
+    const dow=wdJ[new Date(+y,+m-1,+d).getDay()];
+    return`<div class="h-card" onclick="jumpToDate('${log.date}')">
+      <div class="h-top">
         <div>
-          <div class="history-date">${y}/${m}/${d}</div>
-          ${log.note?`<div style="font-size:12px;color:var(--muted);margin-top:4px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${log.note}</div>`:''}
+          <div class="h-date">${m}/${d} <span style="opacity:0.65">${dow}</span></div>
         </div>
-        <div class="history-score ${scoreClass}">${log.score}</div>
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <span class="h-dur">${dur}</span>
+          <span class="h-score ${cls}">${log.score}</span>
+        </div>
       </div>
-      <div class="history-meta">
-        <div class="history-meta-item"><div class="history-meta-key">就寝</div><div class="history-meta-val">${bedLabel}</div></div>
-        <div class="history-meta-item"><div class="history-meta-key">起床</div><div class="history-meta-val">${wakeLabel}</div></div>
-        <div class="history-meta-item"><div class="history-meta-key">睡眠時間</div><div class="history-meta-val">${sleepDur}</div></div>
-        <div class="history-meta-item"><div class="history-meta-key">ストレス</div><div class="history-meta-val">${log.stress||'—'}</div></div>
-      </div>
-      ${tags.length?`<div class="history-tags">${tags.join('')}</div>`:''}
-      ${ratingsHtml?`<div class="history-ratings">${ratingsHtml}</div>`:''}
+      ${sleepBarHTML(bed,wake)}
+      ${(bed!=null&&wake!=null)?`<div class="sleep-times"><span class="st-item">就寝 <b>${log.bedtime}</b></span><span class="st-item">起床 <b>${log.waketime}</b></span></div>`:''}
+      <div class="h-tags">${tags.join('')}${perf?`<span class="h-perf">${perf}</span>`:''}</div>
     </div>`;
   }).join('');
 }
 
-window.jumpToDate = function(dateKey){
-  document.getElementById('logDate').value=dateKey;
-  loadLogForDate(dateKey);updateSaveBtnLabel();updateNextDayBadge();
+window.jumpToDate = function(k){
+  document.getElementById('logDate').value=k;
+  loadLogForDate(k);updateSaveBtnLabel();updateNextDayBadge();
   switchTab('log');
 };
 
-// ==================== STATS ====================
-function drawLineChart(canvasId, labels, datasets, yMin, yMax) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.offsetWidth;
-  const H = 160;
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-
-  const pad = {top:16, right:16, bottom:28, left:36};
-  const cw = W - pad.left - pad.right;
-  const ch = H - pad.top - pad.bottom;
-  const range = yMax - yMin || 1;
-
-  // grid
-  ctx.strokeStyle = '#e8e8e4';
-  ctx.lineWidth = 1;
-  const gridLines = 4;
-  for(let i=0;i<=gridLines;i++){
-    const y = pad.top + (ch/gridLines)*i;
-    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
-    const val = yMax - ((yMax-yMin)/gridLines)*i;
-    ctx.fillStyle='#9a9a96';ctx.font=`${10*dpr}px DM Mono,monospace`;ctx.textAlign='right';
-    ctx.fillText(Math.round(val), pad.left-6, y+4);
-  }
-
-  if (labels.length < 2) {
-    ctx.fillStyle='#9a9a96';ctx.font=`${11*dpr}px DM Sans,sans-serif`;ctx.textAlign='center';
-    ctx.fillText('データが2件以上で表示されます', W/2, H/2);
-    return;
-  }
-
-  // x labels
-  ctx.fillStyle='#9a9a96';ctx.font=`${9*dpr}px DM Mono,monospace`;ctx.textAlign='center';
-  const step = Math.max(1, Math.ceil(labels.length/5));
-  labels.forEach((l,i)=>{
-    if(i%step===0||i===labels.length-1){
-      const x=pad.left+(i/(labels.length-1))*cw;
-      ctx.fillText(l,x,H-6);
-    }
+// ===== STATS =====
+function svgLineChart(data, w=340, h=110){
+  // data: [{x:label, y:score}] oldest->newest
+  if(data.length<2)return'<div class="empty" style="padding:24px">記録が2件以上で表示されます</div>';
+  const pad=6;
+  const min=Math.max(0,Math.min(...data.map(d=>d.y))-10);
+  const max=Math.min(100,Math.max(...data.map(d=>d.y))+5);
+  const px=i=>pad+(w-2*pad)*i/(data.length-1);
+  const py=v=>h-pad-(h-2*pad)*(v-min)/(max-min||1);
+  let path='',area='';
+  data.forEach((d,i)=>{
+    const x=px(i).toFixed(1),y=py(d.y).toFixed(1);
+    path+=(i===0?`M${x},${y}`:` L${x},${y}`);
   });
+  area=path+` L${px(data.length-1).toFixed(1)},${h-pad} L${px(0).toFixed(1)},${h-pad} Z`;
+  const dots=data.map((d,i)=>{
+    const c=d.y>=75?'#7fc8a9':d.y>=50?'#e3b96a':'#e0876f';
+    return`<circle cx="${px(i).toFixed(1)}" cy="${py(d.y).toFixed(1)}" r="3" fill="${c}"/>`;
+  }).join('');
+  return`<svg viewBox="0 0 ${w} ${h}">
+    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e3b96a" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#e3b96a" stop-opacity="0"/>
+    </linearGradient></defs>
+    <path d="${area}" fill="url(#ag)"/>
+    <path d="${path}" fill="none" stroke="#e3b96a" stroke-width="2" stroke-linecap="round"/>
+    ${dots}
+  </svg>`;
+}
 
-  const colors=['#2d6a4f','#e07a5f','#52b788','#f4a261'];
-  datasets.forEach((ds,di)=>{
-    const color=colors[di%colors.length];
-    ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.lineCap='round';
-    ctx.beginPath();
-    ds.data.forEach((v,i)=>{
-      const x=pad.left+(i/(labels.length-1))*cw;
-      const y=pad.top+ch-(((v-yMin)/range)*ch);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.stroke();
-    // dots
-    ds.data.forEach((v,i)=>{
-      const x=pad.left+(i/(labels.length-1))*cw;
-      const y=pad.top+ch-(((v-yMin)/range)*ch);
-      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
-      ctx.fillStyle=color;ctx.fill();
-    });
-  });
+function svgBarChart(data, w=340, h=110){
+  // data: [{label, y(minutes)}]
+  if(data.length<2)return'<div class="empty" style="padding:24px">記録が2件以上で表示されます</div>';
+  const pad=4;
+  const max=Math.max(...data.map(d=>d.y),540);
+  const bw=Math.min(22,(w-2*pad)/data.length-4);
+  const bars=data.map((d,i)=>{
+    const x=pad+(w-2*pad)*(i+0.5)/data.length-bw/2;
+    const bh=(h-2*pad)*d.y/max;
+    const ok=d.y>=420&&d.y<=540;
+    return`<rect x="${x.toFixed(1)}" y="${(h-pad-bh).toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="4"
+      fill="${ok?'#7fc8a9':'#5b71c4'}" opacity="${ok?1:0.85}"/>`;
+  }).join('');
+  // 7h line
+  const y7=h-pad-(h-2*pad)*420/max;
+  return`<svg viewBox="0 0 ${w} ${h}">
+    <line x1="0" y1="${y7.toFixed(1)}" x2="${w}" y2="${y7.toFixed(1)}" stroke="#e3b96a" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+    ${bars}
+  </svg>`;
 }
 
 function renderStats(){
-  const logs=[...getLogs()].reverse(); // oldest first for charts
+  const logs=[...getLogs()].sort((a,b)=>a.date.localeCompare(b.date));
   const el=document.getElementById('statsContent');
-  if(logs.length===0){el.innerHTML=`<div class="history-empty">記録が増えると<br>統計が表示されます</div>`;return;}
+  if(!logs.length){
+    el.innerHTML=`<div class="empty"><span class="big">📈</span>記録が増えると<br>分析が表示されます</div>`;
+    return;
+  }
+  const avg=Math.round(logs.reduce((s,l)=>s+l.score,0)/logs.length);
+  const best=Math.max(...logs.map(l=>l.score));
+  const durs=logs.filter(l=>l.bedtime&&l.waketime).map(l=>({date:l.date,m:minDiff(toMin(l.bedtime),toMin(l.waketime))}));
+  const avgSleep=durs.length?Math.round(durs.reduce((s,d)=>s+d.m,0)/durs.length):null;
+  const streak=calcStreak();
 
-  const all=[...getLogs()]; // newest first for agg
-  const avgScore=Math.round(all.reduce((s,l)=>s+l.score,0)/all.length);
-  const maxScore=Math.max(...all.map(l=>l.score));
-  const sleepDurs=all.filter(l=>l.bedtime&&l.waketime).map(l=>minDiff(toMinutes(l.bedtime),toMinutes(l.waketime)));
-  const avgSleep=sleepDurs.length?Math.round(sleepDurs.reduce((s,v)=>s+v,0)/sleepDurs.length):null;
-  const alcoholDays=all.filter(l=>l.alcohol).length;
-  const eaDays=all.filter(l=>l.activities&&l.activities.includes('ea')).length;
-  const coffeeLogs=all.filter(l=>l.coffeeCups);
-  const avgCoffee=coffeeLogs.length?(coffeeLogs.reduce((s,l)=>s+l.coffeeCups,0)/coffeeLogs.length).toFixed(1):null;
+  // last 14 for charts
+  const recent=logs.slice(-14);
+  const lineData=recent.map(l=>({x:l.date.slice(5),y:l.score}));
+  const barData=recent.filter(l=>l.bedtime&&l.waketime).map(l=>({label:l.date.slice(8),y:minDiff(toMin(l.bedtime),toMin(l.waketime))}));
+
+  // weekday averages
+  const wdJ=['日','月','火','水','木','金','土'];
+  const wdSum=Array(7).fill(0),wdCnt=Array(7).fill(0);
+  logs.forEach(l=>{
+    const[y,m,d]=l.date.split('-');const dow=new Date(+y,+m-1,+d).getDay();
+    wdSum[dow]+=l.score;wdCnt[dow]++;
+  });
+  const wkRows=[1,2,3,4,5,6,0].map(i=>{
+    const v=wdCnt[i]?Math.round(wdSum[i]/wdCnt[i]):0;
+    return`<div class="wk-row">
+      <span class="wk-name">${wdJ[i]}</span>
+      <div class="wk-bar-track"><div class="wk-bar" style="width:${v}%"></div></div>
+      <span class="wk-val">${wdCnt[i]?v:'—'}</span>
+    </div>`;
+  }).join('');
+
+  // habit insights
+  const alcLogs=logs.filter(l=>l.alcohol), noAlcLogs=logs.filter(l=>!l.alcohol);
+  const alcAvg=alcLogs.length?Math.round(alcLogs.reduce((s,l)=>s+l.score,0)/alcLogs.length):null;
+  const noAlcAvg=noAlcLogs.length?Math.round(noAlcLogs.reduce((s,l)=>s+l.score,0)/noAlcLogs.length):null;
+  const eaLogs=logs.filter(l=>l.activities&&l.activities.includes('ea'));
+  const coffees=logs.filter(l=>l.coffeeCups);
+  const avgCof=coffees.length?(coffees.reduce((s,l)=>s+l.coffeeCups,0)/coffees.length).toFixed(1):null;
 
   el.innerHTML=`
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-value" style="color:var(--accent)">${avgScore}</div><div class="stat-label">平均スコア</div></div>
-      <div class="stat-card"><div class="stat-value">${maxScore}</div><div class="stat-label">最高スコア</div></div>
-      <div class="stat-card"><div class="stat-value">${avgSleep?formatMins(avgSleep):'—'}</div><div class="stat-label">平均睡眠</div></div>
-      <div class="stat-card"><div class="stat-value">${all.length}</div><div class="stat-label">記録日数</div></div>
-    </div>
-
-    <div class="chart-wrap">
-      <div class="chart-title">スコア推移</div>
-      <canvas id="chartScore" class="stat-chart"></canvas>
-    </div>
-
-    <div class="chart-wrap">
-      <div class="chart-title">睡眠時間推移</div>
-      <canvas id="chartSleep" class="stat-chart"></canvas>
-    </div>
-
-    <div class="chart-wrap">
-      <div class="chart-title">昼間の眠気（1〜10）</div>
-      <canvas id="chartDrowsy" class="stat-chart"></canvas>
-    </div>
-
-    <div class="chart-wrap">
-      <div class="chart-title">集中力（1〜10）</div>
-      <canvas id="chartFocus" class="stat-chart"></canvas>
+    <div class="stat-hero">
+      <div class="stat-card"><div class="stat-num gold">${avg}<span class="small"> /100</span></div><div class="stat-lbl">平均スコア</div></div>
+      <div class="stat-card"><div class="stat-num greenc">${best}</div><div class="stat-lbl">ベストスコア</div></div>
+      <div class="stat-card"><div class="stat-num">${avgSleep?fmtMin(avgSleep):'—'}</div><div class="stat-lbl">平均睡眠時間</div></div>
+      <div class="stat-card"><div class="stat-num">${streak}<span class="small"> 日</span></div><div class="stat-lbl">連続記録</div></div>
     </div>
 
     <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">☕️</span><span class="section-title">COFFEE</span></div></div>
-      <div class="section-body"><div class="deduction-item"><span>平均杯数</span><span style="font-family:var(--mono);font-size:14px">${avgCoffee?avgCoffee+'杯':'—'}</span></div></div>
+      <div class="section-header"><span class="section-icon">📈</span><span class="section-title">スコア推移（直近14件）</span></div>
+      <div class="chart-box">${svgLineChart(lineData)}
+        <div class="chart-cap"><span>${lineData[0]?.x||''}</span><span>${lineData[lineData.length-1]?.x||''}</span></div>
+      </div>
     </div>
+
     <div class="section">
-      <div class="section-header"><div class="section-header-left"><span class="section-icon">⚠️</span><span class="section-title">HABITS</span></div></div>
+      <div class="section-header"><span class="section-icon">🛏</span><span class="section-title">睡眠時間（点線=7h）</span></div>
+      <div class="chart-box">${svgBarChart(barData)}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-header"><span class="section-icon">📅</span><span class="section-title">曜日別 平均スコア</span></div>
+      <div class="section-body"><div class="wk-rows">${wkRows}</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-header"><span class="section-icon">🔍</span><span class="section-title">習慣の影響</span></div>
       <div class="section-body">
-        <div class="deduction-item"><span>アルコールの日</span><span class="deduction-pts">${alcoholDays}日 / ${all.length}日</span></div>
-        <div class="deduction-item"><span>就寝前EA作業</span><span class="deduction-pts">${eaDays}日 / ${all.length}日</span></div>
+        <div class="ded"><span>🍺 酒あり vs なし</span><span style="font-family:var(--mono);font-size:13px">${alcAvg!=null?alcAvg:'—'} vs ${noAlcAvg!=null?noAlcAvg:'—'}<span style="color:var(--muted);font-size:11px">点</span></span></div>
+        <div class="ded"><span>💻 就寝前EA作業</span><span class="ded-pts">${eaLogs.length}日 / ${logs.length}日</span></div>
+        <div class="ded"><span>☕️ 平均コーヒー</span><span style="font-family:var(--mono);font-size:13px">${avgCof?avgCof+'杯':'—'}</span></div>
       </div>
     </div>`;
-
-  // Draw charts after DOM renders
-  requestAnimationFrame(()=>{
-    const labels=logs.map(l=>{const[,m,d]=l.date.split('-');return`${m}/${d}`;});
-
-    // Score chart
-    drawLineChart('chartScore', labels,
-      [{data:logs.map(l=>l.score)}], 0, 100);
-
-    // Sleep duration chart
-    const sleepData=logs.map(l=>(l.bedtime&&l.waketime)?minDiff(toMinutes(l.bedtime),toMinutes(l.waketime))/60:null);
-    const validSleep=sleepData.filter(v=>v!==null);
-    if(validSleep.length>=1){
-      const sMin=Math.max(0,Math.floor(Math.min(...validSleep))-1);
-      const sMax=Math.ceil(Math.max(...validSleep))+1;
-      drawLineChart('chartSleep', labels,
-        [{data:sleepData.map(v=>v??0)}], sMin, sMax);
-    }
-
-    // Drowsy chart
-    const drowsyData=logs.map(l=>l.drowsyRating||null);
-    const validDrowsy=drowsyData.filter(v=>v!==null);
-    if(validDrowsy.length>=1){
-      drawLineChart('chartDrowsy', labels,
-        [{data:drowsyData.map(v=>v??0),color:'#e07a5f'}], 0, 10);
-    }
-
-    // Focus chart
-    const focusData=logs.map(l=>l.focusRating||null);
-    const validFocus=focusData.filter(v=>v!==null);
-    if(validFocus.length>=1){
-      drawLineChart('chartFocus', labels,
-        [{data:focusData.map(v=>v??0),color:'#52b788'}], 0, 10);
-    }
-  });
 }
 
-// ==================== INIT ====================
-document.getElementById('logDate').value=getTodayISO();
+// ===== init =====
+document.getElementById('logDate').value=todayISO();
 document.getElementById('newActivityInput').addEventListener('keydown',e=>{if(e.key==='Enter')addCustomActivity();});
-buildScales();
 renderActivityGrid([]);
-updateSaveBtnLabel();
-updateNextDayBadge();
-
+updateSaveBtnLabel();updateNextDayBadge();
 </script>
 </body>
 </html>
