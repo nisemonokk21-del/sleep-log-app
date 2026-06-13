@@ -47,21 +47,44 @@
     padding:calc(env(safe-area-inset-top, 20px) + 36px) 22px 18px;
     position:relative;
   }
-  .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
   .app-name{
     font-family:var(--mincho);
     font-size:15px;font-weight:600;letter-spacing:0.42em;
     color:var(--gold);
   }
-  .date-chip{
-    display:flex;align-items:center;gap:6px;
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:99px;padding:5px 12px;
+  /* big date banner */
+  .date-banner{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;padding:11px 16px;
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    position:relative;overflow:hidden;
   }
-  .date-chip input[type=date]{
-    font-family:var(--mono);font-size:12px;color:var(--text);
-    border:none;background:transparent;outline:none;width:108px;
-    color-scheme:dark;
+  .date-banner.past{border-color:var(--gold-dim);background:linear-gradient(180deg,var(--gold-bg),var(--surface));}
+  .date-main{display:flex;flex-direction:column;gap:2px;}
+  .date-rel{font-family:var(--mincho);font-size:19px;font-weight:600;color:var(--text);line-height:1;}
+  .date-rel .past-tag{font-family:var(--gothic);font-size:10px;color:var(--gold);letter-spacing:0.1em;margin-left:8px;font-weight:500;}
+  .date-full{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.05em;}
+  .date-nav{display:flex;align-items:center;gap:4px;}
+  .date-arrow{
+    width:32px;height:32px;border-radius:9px;background:var(--surface2);
+    border:1px solid var(--border);color:var(--muted);font-size:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:all 0.15s;
+  }
+  .date-arrow:active{background:var(--border);color:var(--text);}
+  .date-today-btn{
+    font-size:11px;padding:0 11px;height:32px;border-radius:9px;
+    background:var(--gold);color:#1a1505;border:none;font-weight:700;cursor:pointer;
+    font-family:var(--gothic);white-space:nowrap;
+  }
+  .date-cal{position:relative;width:32px;height:32px;}
+  .date-cal input[type=date]{
+    position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;color-scheme:dark;
+  }
+  .date-cal .cal-ico{
+    width:32px;height:32px;border-radius:9px;background:var(--surface2);
+    border:1px solid var(--border);font-size:14px;
+    display:flex;align-items:center;justify-content:center;pointer-events:none;
   }
 
   /* moon ring */
@@ -243,16 +266,22 @@
   .ded-pts{font-family:var(--mono);font-size:12px;color:var(--warn);}
   .ded-ok{font-family:var(--mono);font-size:12px;color:var(--good);}
 
-  /* save */
+  /* save bar (pinned) */
+  .save-bar{
+    position:fixed;left:0;right:0;bottom:0;z-index:150;
+    max-width:430px;margin:0 auto;
+    padding:12px 16px calc(env(safe-area-inset-bottom, 0px) + 12px);
+    background:linear-gradient(180deg, rgba(17,19,31,0) 0%, var(--bg) 26%);
+    pointer-events:none;
+  }
   .save-btn{
-    position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 22px);left:50%;transform:translateX(-50%);
-    width:calc(100% - 32px);max-width:398px;padding:17px;
+    width:100%;padding:17px;pointer-events:auto;
     background:var(--gold);color:#1a1505;border:none;border-radius:var(--radius);
     font-family:var(--gothic);font-size:14px;font-weight:700;letter-spacing:0.12em;
-    cursor:pointer;transition:all 0.2s;
+    cursor:pointer;transition:transform 0.15s, background 0.2s, box-shadow 0.2s;
     box-shadow:0 6px 28px rgba(227,185,106,0.28);
   }
-  .save-btn:active{transform:translateX(-50%) scale(0.97);}
+  .save-btn:active{transform:scale(0.97);}
   .save-btn.saved{background:var(--good);box-shadow:0 6px 28px rgba(127,200,169,0.3);}
 
   /* ============ HISTORY ============ */
@@ -355,6 +384,21 @@
   .wk-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-dim),var(--gold));}
   .wk-val{font-family:var(--mono);font-size:11px;color:var(--text);width:30px;text-align:right;}
 
+  /* export */
+  .export-btn{
+    width:100%;padding:15px;
+    background:var(--surface2);color:var(--gold);border:1px solid var(--gold-dim);
+    border-radius:var(--radius);font-family:var(--gothic);font-size:13px;font-weight:700;
+    letter-spacing:0.06em;cursor:pointer;transition:background 0.18s;
+  }
+  .export-btn:active{background:var(--gold-bg);}
+  .export-hint{font-size:11px;color:var(--muted);line-height:1.85;margin-top:11px;}
+  .export-out{
+    margin-top:12px;width:100%;min-height:150px;background:var(--bg);
+    border:1px solid var(--border);border-radius:12px;color:var(--text);
+    font-family:var(--mono);font-size:11px;line-height:1.6;padding:12px;resize:vertical;display:none;
+  }
+
   .toast{
     position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 104px);left:50%;
     transform:translateX(-50%) translateY(16px);
@@ -399,9 +443,20 @@
 <div class="header">
   <div class="header-top">
     <span class="app-name">SLEEP LOG</span>
-    <div class="date-chip">
-      <span style="font-size:12px">📅</span>
-      <input type="date" id="logDate" onchange="onDateChange()">
+    <button class="date-today-btn" onclick="goToday()">今日へ</button>
+  </div>
+  <div class="date-banner" id="dateBanner">
+    <div class="date-main">
+      <div class="date-rel" id="dateRel">今日</div>
+      <div class="date-full" id="dateFull">—</div>
+    </div>
+    <div class="date-nav">
+      <div class="date-arrow" onclick="stepDate(-1)">‹</div>
+      <div class="date-cal">
+        <div class="cal-ico">📅</div>
+        <input type="date" id="logDate" onchange="onDateChange()">
+      </div>
+      <div class="date-arrow" onclick="stepDate(1)">›</div>
     </div>
   </div>
   <div class="ring-wrap">
@@ -661,7 +716,7 @@
 
 </div>
 
-<button class="save-btn" id="saveBtn" onclick="saveLog()">記録する</button>
+<div class="save-bar" id="saveBar"><button class="save-btn" id="saveBtn" onclick="saveLog()">記録する</button></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -700,7 +755,7 @@ onAuthStateChanged(auth, async (user) => {
     await loadAllLogs();
     setSync('ok', user.displayName || 'ログイン済み');
     loadLogForDate(getSelectedDate());
-    updateSaveBtnLabel(); updateNextDayBadge(); updateHeaderMeta();
+    updateSaveBtnLabel(); updateNextDayBadge(); updateHeaderMeta(); updateDateBanner();
   } else {
     currentUser = null;
     document.getElementById('loginScreen').style.display = 'flex';
@@ -819,7 +874,36 @@ function nextDateLabel(k){
   const[y,m,d]=k.split('-');const dt=new Date(+y,+m-1,+d);dt.setDate(dt.getDate()+1);
   return`${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}`;
 }
-window.onDateChange = function(){loadLogForDate(getSelectedDate());updateSaveBtnLabel();updateNextDayBadge();};
+window.onDateChange = function(){loadLogForDate(getSelectedDate());updateSaveBtnLabel();updateNextDayBadge();updateDateBanner();};
+window.stepDate = function(delta){
+  const v=getSelectedDate();const[y,m,d]=v.split('-');
+  const dt=new Date(+y,+m-1,+d);dt.setDate(dt.getDate()+delta);
+  // don't allow future
+  const t=new Date();t.setHours(0,0,0,0);
+  if(dt>t)return;
+  document.getElementById('logDate').value=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  onDateChange();
+};
+window.goToday = function(){
+  document.getElementById('logDate').value=todayISO();
+  onDateChange();
+};
+function updateDateBanner(){
+  const v=getSelectedDate();const[y,m,d]=v.split('-');
+  const dt=new Date(+y,+m-1,+d);
+  const t=new Date();t.setHours(0,0,0,0);
+  const yd=new Date(t);yd.setDate(t.getDate()-1);
+  const wd=['日','月','火','水','木','金','土'][dt.getDay()];
+  const banner=document.getElementById('dateBanner');
+  const rel=document.getElementById('dateRel');
+  let relTxt, isPast=false;
+  if(dt.toDateString()===t.toDateString()) relTxt='今日';
+  else if(dt.toDateString()===yd.toDateString()){relTxt='昨日';isPast=true;}
+  else {relTxt=`${+m}月${+d}日`;isPast=true;}
+  rel.innerHTML = relTxt + (isPast?`<span class="past-tag">過去の記録</span>`:'');
+  document.getElementById('dateFull').textContent=`${y}.${m}.${d}（${wd}）`;
+  banner.classList.toggle('past',isPast);
+}
 function updateSaveBtnLabel(){document.getElementById('saveBtn').textContent=`記録する — ${dateLabel()}`;}
 function updateNextDayBadge(){
   const k=getSelectedDate();
@@ -1040,7 +1124,7 @@ window.switchTab = function(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['log','history','stats'][i]===tab));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('saveBtn').style.display=tab==='log'?'block':'none';
+  document.getElementById('saveBar').style.display=tab==='log'?'block':'none';
   if(tab==='history')renderHistory();
   if(tab==='stats')renderStats();
 };
@@ -1281,14 +1365,82 @@ function renderStats(){
         <div class="ded"><span>💻 就寝前EA作業</span><span class="ded-pts">${eaLogs.length}日 / ${logs.length}日</span></div>
         <div class="ded"><span>☕️ 平均コーヒー</span><span style="font-family:var(--mono);font-size:13px">${avgCof?avgCof+'杯':'—'}</span></div>
       </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header"><span class="section-icon">🤖</span><span class="section-title">AI分析用に書き出す</span></div>
+      <div class="section-body">
+        <button class="export-btn" onclick="exportData()">記録をコピーする</button>
+        <div class="export-hint">コピーした内容をAIチャットに貼り付けると、傾向の分析や改善アドバイスがもらえます。「この睡眠記録を分析して」と一緒に送ってください。</div>
+        <textarea class="export-out" id="exportOut" readonly></textarea>
+      </div>
     </div>`;
 }
+
+// ===== EXPORT =====
+window.exportData = function(){
+  const logs=[...getLogs()].sort((a,b)=>a.date.localeCompare(b.date));
+  if(!logs.length){showToast('記録がありません');return;}
+  const allActs=getAllActivities();
+  const actLabel=v=>{const a=allActs.find(x=>x.val===v);return a?a.label:v;};
+  const scaleTxt=['','×非常に悪い','悪い','普通','良い','◎非常に良い'];
+
+  let out='【睡眠記録データ】\n';
+  out+=`期間: ${logs[0].date} 〜 ${logs[logs.length-1].date} / ${logs.length}件\n`;
+  const avg=Math.round(logs.reduce((s,l)=>s+l.score,0)/logs.length);
+  const durs=logs.filter(l=>l.bedtime&&l.waketime).map(l=>minDiff(toMin(l.bedtime),toMin(l.waketime)));
+  const avgSleep=durs.length?Math.round(durs.reduce((s,d)=>s+d,0)/durs.length):null;
+  out+=`平均スコア: ${avg}/100 / 平均睡眠: ${avgSleep?fmtMin(avgSleep):'—'}\n`;
+  out+='\nスコアの算出ルール: 100点から減点方式。睡眠7時間未満/食事就寝3h以内/アルコール/入浴就寝直前/コーヒー14時以降/就寝前の刺激的作業 などで減点。\n';
+  out+='\n--- 各日の記録 ---\n';
+
+  logs.forEach(l=>{
+    const dur=(l.bedtime&&l.waketime)?fmtMin(minDiff(toMin(l.bedtime),toMin(l.waketime))):'—';
+    out+=`\n■ ${l.date}（スコア${l.score}）\n`;
+    out+=`  就寝${l.bedtime||'—'} 起床${l.waketime||'—'}（${dur}）`;
+    if(l.wakeupRating)out+=` 目覚め:${scaleTxt[l.wakeupRating]}`;
+    out+='\n';
+    let nightItems=[];
+    if(l.meal)nightItems.push(`食事${l.meal}`);
+    if(l.alcohol)nightItems.push('飲酒あり');
+    if(l.bath)nightItems.push(`入浴${l.bath}`);
+    if(l.coffeeCups)nightItems.push(`コーヒー${l.coffeeCups}杯(最終${l.coffeeTime||'?'})`);
+    if(l.exercise)nightItems.push('運動あり');
+    if(l.stress&&l.stress!=0)nightItems.push(`ストレス${l.stress}/5`);
+    if(nightItems.length)out+=`  ${nightItems.join(' / ')}\n`;
+    if(l.activities&&l.activities.length)out+=`  就寝前: ${l.activities.map(actLabel).join('、')}${l.workend?`（作業終了${l.workend}）`:''}\n`;
+    // next day
+    let nd=[];
+    if(l.drowsyRating)nd.push(`昼の眠気:${scaleTxt[l.drowsyRating]}`);
+    if(l.focusRating)nd.push(`集中:${scaleTxt[l.focusRating]}`);
+    if(l.moodRating)nd.push(`気分:${scaleTxt[l.moodRating]}`);
+    if(l.energy&&l.energy!=0)nd.push(`活力${l.energy}/5`);
+    if(nd.length)out+=`  翌日: ${nd.join(' / ')}\n`;
+    if(l.note)out+=`  メモ: ${l.note}\n`;
+    if(l.nextDayNote)out+=`  翌日メモ: ${l.nextDayNote}\n`;
+  });
+
+  out+='\n--- お願い ---\nこの記録から、睡眠スコアと翌日のパフォーマンス（眠気・集中・気分）の関係、悪化要因、改善すべき習慣を分析してアドバイスをください。';
+
+  const ta=document.getElementById('exportOut');
+  ta.value=out;
+  ta.style.display='block';
+
+  // copy
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(out).then(()=>showToast('📋 コピーしました')).catch(()=>{
+      ta.select();showToast('下のテキストを長押しでコピー');
+    });
+  }else{
+    ta.select();showToast('下のテキストを長押しでコピー');
+  }
+};
 
 // ===== init =====
 document.getElementById('logDate').value=todayISO();
 document.getElementById('newActivityInput').addEventListener('keydown',e=>{if(e.key==='Enter')addCustomActivity();});
 renderActivityGrid([]);
-updateSaveBtnLabel();updateNextDayBadge();
+updateSaveBtnLabel();updateNextDayBadge();updateDateBanner();
 </script>
 </body>
 </html>
