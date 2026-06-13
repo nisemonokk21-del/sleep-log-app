@@ -263,6 +263,12 @@
   .fs-clear{margin-top:7px;font-size:10px;color:var(--muted);cursor:pointer;display:inline-block;}
 
   .nd-badge{
+    font-size:12px;color:var(--muted);background:var(--surface2);
+    border:1px solid var(--border);border-radius:12px;
+    padding:11px 14px;margin-bottom:12px;line-height:1.65;
+  }
+  .nd-badge b{color:var(--gold);font-weight:600;font-family:var(--mincho);font-size:13px;}
+  .nd-badge .arrow{color:var(--gold-dim);margin:0 4px;}
 
   textarea.note{
     width:100%;border:none;background:transparent;font-family:var(--gothic);
@@ -294,7 +300,36 @@
   .save-btn:active{transform:scale(0.97);}
   .save-btn.saved{background:var(--good);box-shadow:0 6px 28px rgba(127,200,169,0.3);}
 
+  /* ============ DATE RAIL (log page) ============ */
+  .date-rail{
+    display:flex;gap:7px;overflow-x:auto;padding:1px 1px 10px;margin-bottom:8px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;
+  }
+  .date-rail::-webkit-scrollbar{display:none;}
+  .dr-day{
+    flex:0 0 auto;width:58px;display:flex;flex-direction:column;align-items:center;gap:5px;
+    padding:9px 0 8px;background:var(--surface);border:1px solid var(--border);
+    border-radius:14px;cursor:pointer;transition:border-color .2s,background .2s;
+  }
+  .dr-day.selected{border-color:var(--gold);background:linear-gradient(180deg,var(--gold-bg),var(--surface));}
+  .dr-wd{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.04em;}
+  .dr-rel{font-family:var(--mincho);font-size:16px;font-weight:600;color:var(--text);line-height:1;}
+  .dr-rel.date{font-family:var(--mono);font-size:13px;font-weight:400;}
+  .dr-day.today .dr-rel{color:var(--gold);}
+  .dr-mark{width:6px;height:6px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);}
+  .dr-mark.has{background:var(--gold);border-color:var(--gold);}
+
   /* ============ HISTORY ============ */
+  .range-summary{
+    display:flex;justify-content:space-around;align-items:center;
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:12px 10px;margin-bottom:14px;
+  }
+  .rs-item{display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .rs-num{font-family:var(--mincho);font-size:21px;font-weight:600;line-height:1;}
+  .rs-num .u{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400;}
+  .rs-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;}
+  .rs-div{width:1px;height:30px;background:var(--border);}
   .week-strip{
     display:flex;gap:5px;margin-bottom:16px;
   }
@@ -313,18 +348,22 @@
 
   .h-card{
     background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-    padding:15px 18px 14px;margin-bottom:10px;cursor:pointer;transition:border-color 0.2s;
+    padding:15px 17px 14px;margin-bottom:10px;cursor:pointer;transition:border-color 0.2s;
   }
   .h-card:active{border-color:var(--gold-dim);}
-  .h-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
-  .h-date{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.06em;}
-  .h-dur{font-family:var(--mono);font-size:13px;color:var(--text);}
-  .h-score{
-    font-family:var(--mincho);font-size:26px;font-weight:600;line-height:1;
-  }
+  .h-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .h-date{font-family:var(--mincho);font-size:18px;font-weight:600;color:var(--text);line-height:1.1;}
+  .h-date .dow{font-family:var(--gothic);font-size:11px;color:var(--muted);margin-left:6px;font-weight:400;}
+  .h-date .reltag{font-family:var(--gothic);font-size:10px;color:var(--gold);margin-left:7px;letter-spacing:.06em;}
+  .h-feelwrap{text-align:right;}
+  .h-feellbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.14em;margin-bottom:1px;}
+  .h-score{font-family:var(--mincho);font-size:30px;font-weight:600;line-height:1;}
+  .h-score .u{font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:1px;}
   .h-score.good{color:var(--good);}
   .h-score.ok{color:var(--gold);}
   .h-score.bad{color:var(--warn);}
+  .h-score.none{color:var(--muted);font-family:var(--mono);font-size:17px;}
+  .h-dur{font-family:var(--mono);font-size:13px;color:var(--text);}
 
   /* sleep bar: 18:00 -> 12:00 next day (18h window) */
   .sleep-track{
@@ -345,22 +384,28 @@
   .st-item{font-family:var(--mono);font-size:10px;color:var(--muted);}
   .st-item b{color:var(--text);font-weight:400;}
 
+  .h-sleepline{display:flex;align-items:baseline;gap:12px;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px;}
+  .h-sleepline b{color:var(--text);font-weight:400;}
+
+  .h-feelchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
+  .h-fchip{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:baseline;gap:4px;}
+  .h-fchip b{font-weight:500;}
+
+  .h-bottom{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
   .h-tags{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
   .h-tag{
-    font-size:10.5px;padding:3px 9px;border-radius:99px;
+    font-size:11px;padding:3px 9px;border-radius:99px;
     background:var(--surface2);color:var(--muted);font-family:var(--gothic);
   }
   .h-tag.red{background:var(--warn-bg);color:var(--warn);}
   .h-tag.green{background:var(--good-bg);color:var(--good);}
-  .h-perf{font-size:15px;letter-spacing:1px;margin-left:auto;}
-  .h-actionscore{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px;}
-  .h-actionscore.good{color:var(--good);}
-  .h-actionscore.ok{color:var(--gold);}
-  .h-actionscore.bad{color:var(--warn);}
-  .h-feel{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:9px;}
-  .fb{display:flex;align-items:baseline;gap:3px;}
-  .fb-l{font-size:10px;color:var(--muted);}
-  .fb-v{font-family:var(--mono);font-size:13px;}
+  .h-action-pill{
+    margin-left:auto;font-family:var(--mono);font-size:10px;
+    color:var(--muted);background:var(--surface2);border:1px solid var(--border);
+    border-radius:99px;padding:3px 10px;white-space:nowrap;
+  }
+  .h-action-pill.good{color:var(--good);border-color:var(--good-bg);}
+  .h-action-pill.bad{color:var(--warn);border-color:var(--warn-bg);}
 
   .empty{
     text-align:center;padding:64px 20px;color:var(--muted);font-size:14px;line-height:2;
@@ -415,6 +460,22 @@
   .impact-bar-track{height:7px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-bottom:6px;}
   .impact-bar{height:100%;border-radius:99px;transition:width 0.5s;}
   .impact-detail{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.02em;}
+
+  /* insight card */
+  .insight{
+    background:linear-gradient(180deg,var(--gold-bg),var(--surface));
+    border:1px solid var(--gold-dim);border-radius:var(--radius);
+    padding:15px 17px;margin-bottom:12px;
+  }
+  .insight-head{font-family:var(--mincho);font-size:13px;font-weight:600;color:var(--gold);letter-spacing:.06em;margin-bottom:11px;}
+  .insight-line{display:flex;align-items:flex-start;gap:9px;padding:7px 0;font-size:13px;line-height:1.5;}
+  .insight-line:not(:last-child){border-bottom:1px solid var(--border);}
+  .insight-diff{font-family:var(--mono);font-size:14px;font-weight:500;flex-shrink:0;min-width:48px;}
+  .insight-diff.up{color:var(--good);}
+  .insight-diff.down{color:var(--warn);}
+  .insight-text{color:var(--text);flex:1;}
+  .insight-text .lite{color:var(--muted);font-size:11px;}
+  .insight-none{font-size:12px;color:var(--muted);line-height:1.8;}
 
   /* export */
   .export-btn{
@@ -477,20 +538,7 @@
     <span class="app-name">SLEEP LOG</span>
     <button class="date-today-btn" onclick="goToday()">今日へ</button>
   </div>
-  <div class="date-banner" id="dateBanner">
-    <div class="date-main">
-      <div class="date-rel" id="dateRel">今日</div>
-      <div class="date-full" id="dateFull">—</div>
-    </div>
-    <div class="date-nav">
-      <div class="date-arrow" onclick="stepDate(-1)">‹</div>
-      <div class="date-cal">
-        <div class="cal-ico">📅</div>
-        <input type="date" id="logDate" onchange="onDateChange()">
-      </div>
-      <div class="date-arrow" onclick="stepDate(1)">›</div>
-    </div>
-  </div>
+  <input type="date" id="logDate" onchange="onDateChange()" style="display:none">
   <div class="ring-wrap">
     <div class="ring-box">
       <svg viewBox="0 0 118 118">
@@ -534,12 +582,14 @@
 
   <!-- ============ LOG ============ -->
   <div class="tab-panel active" id="tab-log">
+    <div class="date-rail" id="dateRail"></div>
     <div class="subtabs">
-      <div class="subtab active" onclick="switchLogPanel('night')">🌙 夜の記録</div>
-      <div class="subtab" onclick="switchLogPanel('nextday')">☀️ 翌日の状態</div>
+      <div class="subtab active" onclick="switchLogPanel('night')">🌙 前夜の睡眠</div>
+      <div class="subtab" onclick="switchLogPanel('nextday')">☀️ 日中の調子</div>
     </div>
 
     <div class="log-panel active" id="panel-night">
+      <div class="nd-badge" id="nightBadge">—</div>
 
       <div class="section">
         <div class="section-header"><span class="section-icon">🌙</span><span class="section-title">SLEEP</span></div>
@@ -705,9 +755,9 @@
       </div>
 
       <div class="section">
-        <div class="section-header"><span class="section-icon">✏️</span><span class="section-title">翌日メモ</span></div>
+        <div class="section-header"><span class="section-icon">✏️</span><span class="section-title">日中メモ</span></div>
         <div class="section-body">
-          <textarea class="note" id="nextDayNote" placeholder="翌日に気づいたこと"></textarea>
+          <textarea class="note" id="nextDayNote" placeholder="日中に気づいたこと（眠気・集中・気分など）"></textarea>
         </div>
       </div>
     </div>
@@ -715,7 +765,7 @@
 
   <!-- ============ HISTORY ============ -->
   <div class="tab-panel" id="tab-history">
-    <div class="week-strip" id="weekStrip"></div>
+    <div class="range-summary" id="rangeSummary"></div>
     <div class="filter-row" id="filterRow">
       <span class="f-pill active" data-range="14" onclick="setHistFilter(this)">2週間</span>
       <span class="f-pill" data-range="30" onclick="setHistFilter(this)">1ヶ月</span>
@@ -737,7 +787,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, collection, getDocs, writeBatch, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClH0QgBhAyTjn4FeCAQpX7nkiJr_BpY3E",
@@ -767,15 +817,50 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     document.getElementById('loginScreen').style.display = 'none';
     setSync('loading','読み込み中');
+    let migrated=false;
+    try { migrated = await migrateToDayAnchored(); } catch(e){ console.error('migration',e); }
     await loadAllLogs();
     setSync('ok', user.displayName || 'ログイン済み');
     loadLogForDate(getSelectedDate());
-    updateSaveBtnLabel(); updateNextDayBadge(); updateHeaderMeta(); updateDateBanner();
+    updateSaveBtnLabel(); updateNextDayBadge(); updateHeaderMeta(); updateDateBanner(); renderDateRail();
+    if(migrated) showToast('🗓 過去の記録を日中基準に移行しました');
   } else {
     currentUser = null;
     document.getElementById('loginScreen').style.display = 'flex';
   }
 });
+
+// One-time migration: legacy logs were keyed by the night you went to bed.
+// New model keys by the daytime (the morning you woke up) → shift every key +1 day.
+// Guarded by a meta flag so it runs exactly once and never double-shifts.
+async function migrateToDayAnchored(){
+  if(!currentUser) return false;
+  const flagKey='dayAnchored_'+currentUser.uid;
+  try{ if(localStorage.getItem(flagKey)==='1') return false; }catch(e){}
+  try{
+    const snap = await getDocs(collection(db,'users',currentUser.uid,'logs'));
+    const olds = snap.docs.map(d=>({id:d.id,data:d.data()}));
+    // already migrated? every doc stamped v>=2 (a batch is atomic, never half-done)
+    if(olds.length && olds.every(o=>(o.data.v||0)>=2)){ try{localStorage.setItem(flagKey,'1');}catch(e){} return false; }
+    const shift=(k)=>{const[y,m,dd]=k.split('-').map(Number);const dt=new Date(y,m-1,dd);dt.setDate(dt.getDate()+1);return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;};
+    if(olds.length){
+      const newDocs=olds.map(o=>{const nk=shift(o.id||o.data.date);return {id:nk,data:{...o.data,date:nk,v:2}};});
+      const newIds=new Set(newDocs.map(n=>n.id));
+      const toDelete=olds.map(o=>o.id).filter(id=>!newIds.has(id)); // overlapping consecutive days kept
+      const ops=[...newDocs.map(n=>({t:'s',ref:doc(db,'users',currentUser.uid,'logs',n.id),data:n.data})),
+                 ...toDelete.map(id=>({t:'d',ref:doc(db,'users',currentUser.uid,'logs',id)}))];
+      for(let i=0;i<ops.length;i+=400){
+        const batch=writeBatch(db);
+        ops.slice(i,i+400).forEach(op=>{ op.t==='s'?batch.set(op.ref,op.data):batch.delete(op.ref); });
+        await batch.commit();
+      }
+      try{localStorage.setItem(flagKey,'1');}catch(e){}
+      return true;
+    }
+    try{localStorage.setItem(flagKey,'1');}catch(e){}
+    return false;
+  }catch(e){ console.error('migration skipped:',e); return false; }
+}
 
 async function saveLogToCloud(log) {
   if (!currentUser) return;
@@ -819,6 +904,7 @@ const DEFAULT_ACTIVITIES=[
 ];
 const FEEL_KEYS=['morning','postmeal','afternoon','evening','working'];
 const FEEL_LABELS={morning:'朝',postmeal:'食後の眠気',afternoon:'午後',evening:'夜',working:'作業中'};
+const FEEL_SHORT={morning:'朝',postmeal:'食後',afternoon:'午後',evening:'夜',working:'作業'};
 const state={wakeupRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0,feel:{morning:null,postmeal:null,afternoon:null,evening:null,working:null}};
 
 function getCustomActivities(){try{return JSON.parse(localStorage.getItem('custom_activities')||'[]');}catch{return[];}}
@@ -891,7 +977,7 @@ function nextDateLabel(k){
   const[y,m,d]=k.split('-');const dt=new Date(+y,+m-1,+d);dt.setDate(dt.getDate()+1);
   return`${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}`;
 }
-window.onDateChange = function(){loadLogForDate(getSelectedDate());updateSaveBtnLabel();updateNextDayBadge();updateDateBanner();};
+window.onDateChange = function(){loadLogForDate(getSelectedDate());updateSaveBtnLabel();updateNextDayBadge();updateDateBanner();renderDateRail();};
 window.stepDate = function(delta){
   const v=getSelectedDate();const[y,m,d]=v.split('-');
   const dt=new Date(+y,+m-1,+d);dt.setDate(dt.getDate()+delta);
@@ -906,12 +992,13 @@ window.goToday = function(){
   onDateChange();
 };
 function updateDateBanner(){
+  const banner=document.getElementById('dateBanner');
+  if(!banner) return; // header date banner removed
   const v=getSelectedDate();const[y,m,d]=v.split('-');
   const dt=new Date(+y,+m-1,+d);
   const t=new Date();t.setHours(0,0,0,0);
   const yd=new Date(t);yd.setDate(t.getDate()-1);
   const wd=['日','月','火','水','木','金','土'][dt.getDay()];
-  const banner=document.getElementById('dateBanner');
   const rel=document.getElementById('dateRel');
   let relTxt, isPast=false;
   if(dt.toDateString()===t.toDateString()) relTxt='今日';
@@ -922,10 +1009,61 @@ function updateDateBanner(){
   banner.classList.toggle('past',isPast);
 }
 function updateSaveBtnLabel(){document.getElementById('saveBtn').textContent=`記録する — ${dateLabel()}`;}
+
+// "M/D（曜）" for the night BEFORE the selected daytime date
+function prevNightLabel(k){
+  const[y,m,d]=k.split('-').map(Number);const dt=new Date(y,m-1,d);dt.setDate(dt.getDate()-1);
+  const wd=['日','月','火','水','木','金','土'][dt.getDay()];
+  return `${dt.getMonth()+1}/${dt.getDate()}（${wd}）`;
+}
+function selDayLabel(k){
+  const[y,m,d]=k.split('-').map(Number);const dt=new Date(y,m-1,d);
+  const wd=['日','月','火','水','木','金','土'][dt.getDay()];
+  return `${m}/${d}（${wd}）`;
+}
+// both badges now describe the SAME day-anchored record:
+//   日中 = the selected date / 睡眠 = the night before it
 function updateNextDayBadge(){
   const k=getSelectedDate();
-  document.getElementById('nextDayBadge').textContent=`${k.replace(/-/g,'/')} の翌日（${nextDateLabel(k)}）の状態`;
+  const nb=document.getElementById('nightBadge');
+  if(nb) nb.innerHTML=`<b>${selDayLabel(k)}</b> の調子をつくった睡眠<span class="arrow">←</span>前夜 <b>${prevNightLabel(k)}</b> の記録`;
+  const db2=document.getElementById('nextDayBadge');
+  if(db2) db2.innerHTML=`☀️ <b>${selDayLabel(k)}</b> 日中のパフォーマンス`;
 }
+
+function isoOf(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+const RAIL_DAYS=60;
+function renderDateRail(){
+  const rail=document.getElementById('dateRail'); if(!rail)return;
+  const byDate=new Set(getLogs().map(l=>l.date));
+  const sel=getSelectedDate(), today=todayISO();
+  const wd=['日','月','火','水','木','金','土'];
+  let html='';
+  for(let off=RAIL_DAYS; off>=0; off--){
+    const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-off);
+    const k=isoOf(d);
+    const isToday=k===today, isSel=k===sel, has=byDate.has(k);
+    let rel,relCls='';
+    if(isToday) rel='今日';
+    else if(off===1) rel='昨日';
+    else {rel=`${d.getMonth()+1}/${d.getDate()}`;relCls='date';}
+    html+=`<div class="dr-day ${isToday?'today':''} ${isSel?'selected':''}" onclick="jumpToDateRail('${k}')">
+      <span class="dr-wd">${wd[d.getDay()]}</span>
+      <span class="dr-rel ${relCls}">${rel}</span>
+      <span class="dr-mark ${has?'has':''}"></span>
+    </div>`;
+  }
+  rail.innerHTML=html;
+  requestAnimationFrame(()=>{
+    const s=rail.querySelector('.dr-day.selected');
+    if(s) rail.scrollLeft = s.offsetLeft - rail.clientWidth/2 + s.clientWidth/2;
+    else rail.scrollLeft = rail.scrollWidth;
+  });
+}
+window.jumpToDateRail=function(k){
+  document.getElementById('logDate').value=k;
+  loadLogForDate(k);updateSaveBtnLabel();updateNextDayBadge();updateDateBanner();renderDateRail();
+};
 
 window.switchLogPanel = function(p){
   document.querySelectorAll('.subtab').forEach((t,i)=>t.classList.toggle('active',['night','nextday'][i]===p));
@@ -1102,6 +1240,7 @@ window.saveLog = async function(){
     feelPercent:feelPercent(state.feel),
     note:document.getElementById('noteInput').value,
     nextDayNote:document.getElementById('nextDayNote').value,
+    v:2,
     ts:Date.now(),
   };
   await saveLogToCloud(log);
@@ -1193,26 +1332,6 @@ function scoreMoon(score){
   return'🌑';
 }
 
-function renderWeekStrip(){
-  const logs=getLogs();
-  const byDate=Object.fromEntries(logs.map(l=>[l.date,l]));
-  const wd=['日','月','火','水','木','金','土'];
-  let html='';
-  for(let i=6;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);
-    const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const log=byDate[k];
-    const fp=log?(log.feelPercent!=null?log.feelPercent:feelPercent(log.feel)):null;
-    const cls=fp==null?'':fp>=75?'good':fp>=50?'ok':'bad';
-    html+=`<div class="ws-day ${i===0?'today':''}" onclick="jumpToDate('${k}')">
-      <span class="ws-wd">${wd[d.getDay()]}</span>
-      <span class="ws-moon">${scoreMoon(fp)}</span>
-      <span class="ws-score ${cls}">${fp==null?(log?'·':'—'):fp}</span>
-    </div>`;
-  }
-  document.getElementById('weekStrip').innerHTML=html;
-}
-
 // sleep bar: window 19:00 → 12:00 (17h)
 function sleepBarHTML(bed,wake){
   if(bed==null||wake==null)return'';
@@ -1231,7 +1350,6 @@ function sleepBarHTML(bed,wake){
 }
 
 function renderHistory(){
-  renderWeekStrip();
   let logs=getLogs();
   if(histRange>0){
     const cut=new Date();cut.setDate(cut.getDate()-histRange);
@@ -1240,61 +1358,90 @@ function renderHistory(){
     });
   }
   const el=document.getElementById('historyList');
+  const sumEl=document.getElementById('rangeSummary');
+
   if(!logs.length){
-    el.innerHTML=`<div class="empty"><span class="big">🌙</span>まだ記録がありません<br>今夜から始めよう</div>`;
+    if(sumEl)sumEl.style.display='none';
+    el.innerHTML=`<div class="empty"><span class="big">🌙</span>この期間の記録はありません</div>`;
     return;
   }
+
+  // range summary
+  if(sumEl){
+    sumEl.style.display='flex';
+    const fps=logs.map(l=>l.feelPercent!=null?l.feelPercent:feelPercent(l.feel)).filter(x=>x!=null);
+    const avgF=fps.length?Math.round(fps.reduce((s,v)=>s+v,0)/fps.length):null;
+    const durs=logs.filter(l=>l.bedtime&&l.waketime).map(l=>minDiff(toMin(l.bedtime),toMin(l.waketime)));
+    const avgS=durs.length?Math.round(durs.reduce((s,d)=>s+d,0)/durs.length):null;
+    const fcol=avgF==null?'var(--muted)':avgF>=75?'var(--good)':avgF>=50?'var(--gold)':'var(--warn)';
+    sumEl.innerHTML=`
+      <div class="rs-item"><div class="rs-num">${logs.length}<span class="u"> 件</span></div><div class="rs-lbl">記録数</div></div>
+      <div class="rs-div"></div>
+      <div class="rs-item"><div class="rs-num" style="color:${fcol}">${avgF!=null?avgF:'—'}<span class="u"> %</span></div><div class="rs-lbl">平均 体感</div></div>
+      <div class="rs-div"></div>
+      <div class="rs-item"><div class="rs-num">${avgS?fmtMin(avgS):'—'}</div><div class="rs-lbl">平均 睡眠</div></div>`;
+  }
+
   const allActs=getAllActivities();
   const wdJ=['日','月','火','水','木','金','土'];
+  const today=todayISO();
+  const yISO=(()=>{const d=new Date();d.setDate(d.getDate()-1);return isoOf(d);})();
 
   el.innerHTML=logs.map(log=>{
     const fp=log.feelPercent!=null?log.feelPercent:feelPercent(log.feel);
-    const fcls=fp==null?'':fp>=75?'good':fp>=50?'ok':'bad';
-    const acls=log.score>=75?'good':log.score>=50?'ok':'bad';
+    const fcls=fp==null?'none':fp>=75?'good':fp>=50?'ok':'bad';
+    const aclsPill=log.score>=75?'good':log.score>=50?'':'bad';
     const bed=toMin(log.bedtime), wake=toMin(log.waketime);
     const dur=(bed!=null&&wake!=null)?fmtMin(minDiff(bed,wake)):'—';
+
     let tags=[];
-    if(log.coffeeCups)tags.push(`<span class="h-tag">☕️ ${log.coffeeCups}杯</span>`);
+    if(log.coffeeCups)tags.push(`<span class="h-tag">☕️ ${log.coffeeCups}</span>`);
     if(log.alcohol)tags.push(`<span class="h-tag red">🍺 酒</span>`);
     if(log.exercise)tags.push(`<span class="h-tag green">🏃 運動</span>`);
     if(log.activities)log.activities.slice(0,3).forEach(v=>{
       const a=allActs.find(x=>x.val===v);if(!a)return;
       tags.push(`<span class="h-tag ${a.bad?'red':'green'}">${a.label}</span>`);
     });
-    // feel mini-bars
-    let feelBars='';
+
+    let feelChips='';
     if(log.feel){
       const fb=FEEL_KEYS.filter(f=>log.feel[f]!=null).map(f=>{
         const v=log.feel[f];
         const c=v>=8?'var(--good)':v>=5?'var(--gold)':'var(--warn)';
-        return `<span class="fb" title="${FEEL_LABELS[f]}"><span class="fb-l">${FEEL_LABELS[f][0]}</span><span class="fb-v" style="color:${c}">${v}</span></span>`;
+        return `<span class="h-fchip">${FEEL_SHORT[f]} <b style="color:${c}">${v}</b></span>`;
       }).join('');
-      if(fb)feelBars=`<div class="h-feel">${fb}</div>`;
+      if(fb)feelChips=`<div class="h-feelchips">${fb}</div>`;
     }
-    const[y,m,d]=log.date.split('-');
-    const dow=wdJ[new Date(+y,+m-1,+d).getDay()];
+
+    const[hy,hm,hd]=log.date.split('-');
+    const dow=wdJ[new Date(+hy,+hm-1,+hd).getDay()];
+    const m=hm, d=hd;
+    let reltag='';
+    if(log.date===today)reltag='<span class="reltag">今日</span>';
+    else if(log.date===yISO)reltag='<span class="reltag">昨日</span>';
+
     return`<div class="h-card" onclick="jumpToDate('${log.date}')">
       <div class="h-top">
-        <div>
-          <div class="h-date">${m}/${d} <span style="opacity:0.65">${dow}</span></div>
-          <div class="h-actionscore ${acls}">行動 ${log.score}</div>
-        </div>
-        <div style="text-align:right">
-          <div class="h-score ${fcls}">${fp==null?'—':fp+'<span style=\"font-size:13px;color:var(--muted)\">%</span>'}</div>
-          <div class="h-dur">${dur}</div>
+        <div class="h-date">${+m}/${+d}<span class="dow">${dow}</span>${reltag}</div>
+        <div class="h-feelwrap">
+          <div class="h-feellbl">日中の体感</div>
+          <div class="h-score ${fcls}">${fp==null?'未入力':fp+'<span class="u">%</span>'}</div>
         </div>
       </div>
+      ${(bed!=null&&wake!=null)?`<div class="h-sleepline"><span>前夜の睡眠</span><span class="dur"><b>${dur}</b></span><span>就寝 <b>${log.bedtime}</b> / 起床 <b>${log.waketime}</b></span></div>`:''}
       ${sleepBarHTML(bed,wake)}
-      ${(bed!=null&&wake!=null)?`<div class="sleep-times"><span class="st-item">就寝 <b>${log.bedtime}</b></span><span class="st-item">起床 <b>${log.waketime}</b></span></div>`:''}
-      ${feelBars}
-      <div class="h-tags">${tags.join('')}</div>
+      ${feelChips}
+      <div class="h-bottom">
+        <div class="h-tags">${tags.join('')}</div>
+        <span class="h-action-pill ${aclsPill}">行動評価 ${log.score}</span>
+      </div>
     </div>`;
   }).join('');
 }
 
 window.jumpToDate = function(k){
   document.getElementById('logDate').value=k;
-  loadLogForDate(k);updateSaveBtnLabel();updateNextDayBadge();
+  loadLogForDate(k);updateSaveBtnLabel();updateNextDayBadge();updateDateBanner();renderDateRail();
   switchTab('log');
 };
 
@@ -1427,7 +1574,31 @@ function renderStats(){
     }).join('');
   }
 
+  // ===== INSIGHT (plain-language takeaways) =====
+  let insightHTML;
+  if(!ranked.length){
+    insightHTML=`<div class="insight-none">体感スコアと夜の習慣が2日分以上たまると、<br>「何が一番効いているか」をここに言葉でまとめます。<br>まずは日中の体感を入力し続けてみて。</div>`;
+  }else{
+    insightHTML=ranked.slice(0,3).map(x=>{
+      const aBetter=x.av>=x.bv;
+      const better=aBetter?{lbl:x.a,v:x.av}:{lbl:x.b,v:x.bv};
+      const worse =aBetter?{lbl:x.b,v:x.bv}:{lbl:x.a,v:x.av};
+      const gap=Math.abs(x.diff);
+      return`<div class="insight-line">
+        <span class="insight-diff up">+${gap}%</span>
+        <span class="insight-text">「${better.lbl}」の日は体感が高い<br>
+          <span class="lite">${x.label}：${better.lbl} ${better.v}% ・ ${worse.lbl} ${worse.v}%</span>
+        </span>
+      </div>`;
+    }).join('');
+  }
+
   el.innerHTML=`
+    <div class="insight">
+      <div class="insight-head">◇ いまデータが示していること</div>
+      ${insightHTML}
+    </div>
+
     <div class="stat-hero">
       <div class="stat-card"><div class="stat-num gold">${avgFeel!=null?avgFeel:'—'}<span class="small"> %</span></div><div class="stat-lbl">平均 体感スコア</div></div>
       <div class="stat-card"><div class="stat-num greenc">${bestFeel!=null?bestFeel+'%':'—'}</div><div class="stat-lbl">ベスト体感</div></div>
@@ -1436,7 +1607,7 @@ function renderStats(){
     </div>
 
     <div class="section">
-      <div class="section-header"><span class="section-icon">🎯</span><span class="section-title">体感に一番効く習慣ランキング</span></div>
+      <div class="section-header"><span class="section-icon">🎯</span><span class="section-title">体感に効く習慣ランキング</span></div>
       <div class="section-body"><div class="impact-list">${impactHTML}</div></div>
     </div>
 
@@ -1448,7 +1619,7 @@ function renderStats(){
     </div>
 
     <div class="section">
-      <div class="section-header"><span class="section-icon">🛏</span><span class="section-title">睡眠時間（点線=7h）</span></div>
+      <div class="section-header"><span class="section-icon">🛏</span><span class="section-title">前夜の睡眠時間（点線=7h）</span></div>
       <div class="chart-box">${svgBarChart(barData)}</div>
     </div>
 
@@ -1478,6 +1649,8 @@ window.exportData = function(){
   const durs=logs.filter(l=>l.bedtime&&l.waketime).map(l=>minDiff(toMin(l.bedtime),toMin(l.waketime)));
   const avgSleep=durs.length?Math.round(durs.reduce((s,d)=>s+d,0)/durs.length):null;
   out+=`平均 体感スコア: ${avgFeel!=null?avgFeel+'%':'—'} / 平均 行動評価: ${avgAction}/100 / 平均睡眠: ${avgSleep?fmtMin(avgSleep):'—'}\n`;
+  out+='\n【日付の意味】\n';
+  out+='・各記録の日付は「日中（その日の調子）」基準。睡眠は前夜の記録（前日夜〜その日の朝）。\n';
   out+='\n【スコアの意味】\n';
   out+='・体感スコア(%) = 自己採点。朝/食後の眠気/午後/夜/作業中 を各10点で評価し、入力した項目だけで平均。実際の調子。\n';
   out+='・行動評価(/100) = 夜の習慣から機械的に算出。睡眠7h未満/食事就寝3h以内/飲酒/入浴就寝直前/コーヒー14時以降/就寝前の刺激作業 で減点。\n';
@@ -1530,7 +1703,7 @@ document.getElementById('newActivityInput').addEventListener('keydown',e=>{if(e.
 renderActivityGrid([]);
 renderFeelScales();
 FEEL_KEYS.forEach(k=>paintFeel(k));
-updateSaveBtnLabel();updateNextDayBadge();updateDateBanner();updateHeaderMeta();
+updateSaveBtnLabel();updateNextDayBadge();updateDateBanner();updateHeaderMeta();renderDateRail();
 </script>
 </body>
 </html>
