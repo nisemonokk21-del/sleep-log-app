@@ -744,12 +744,19 @@
             </div>
             <div class="feel-scale" id="feelScale-evening"></div>
           </div>
-          <div class="feel-block" data-feel="working" style="border-bottom:none">
+          <div class="feel-block" data-feel="working">
             <div class="feel-head">
               <div><div class="row-label">作業中</div><div class="row-sub">作業した時のみ</div></div>
               <div class="feel-val" id="feelVal-working">—</div>
             </div>
             <div class="feel-scale" id="feelScale-working"></div>
+          </div>
+          <div class="feel-block" data-feel="concentration" style="border-bottom:none">
+            <div class="feel-head">
+              <div><div class="row-label">集中力</div><div class="row-sub">日中の集中のしやすさ</div></div>
+              <div class="feel-val" id="feelVal-concentration">—</div>
+            </div>
+            <div class="feel-scale" id="feelScale-concentration"></div>
           </div>
         </div>
       </div>
@@ -902,10 +909,10 @@ const DEFAULT_ACTIVITIES=[
   {val:'meditate',label:'瞑想',bad:false},
   {val:'nothing',label:'なにもしない',bad:false},
 ];
-const FEEL_KEYS=['morning','postmeal','afternoon','evening','working'];
-const FEEL_LABELS={morning:'朝',postmeal:'食後の眠気',afternoon:'午後',evening:'夜',working:'作業中'};
+const FEEL_KEYS=['morning','postmeal','afternoon','evening','working','concentration'];
+const FEEL_LABELS={morning:'朝',postmeal:'食後の眠気',afternoon:'午後',evening:'夜',working:'作業中',concentration:'集中力'};
 const FEEL_SHORT={morning:'朝',postmeal:'食後',afternoon:'午後',evening:'夜',working:'作業'};
-const state={wakeupRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0,feel:{morning:null,postmeal:null,afternoon:null,evening:null,working:null}};
+const state={wakeupRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0,feel:{morning:null,postmeal:null,afternoon:null,evening:null,working:null,concentration:null}};
 
 function getCustomActivities(){try{return JSON.parse(localStorage.getItem('custom_activities')||'[]');}catch{return[];}}
 function saveCustomActivities(a){localStorage.setItem('custom_activities',JSON.stringify(a));}
@@ -1652,7 +1659,7 @@ window.exportData = function(){
   out+='\n【日付の意味】\n';
   out+='・各記録の日付は「日中（その日の調子）」基準。睡眠は前夜の記録（前日夜〜その日の朝）。\n';
   out+='\n【スコアの意味】\n';
-  out+='・体感スコア(%) = 自己採点。朝/食後の眠気/午後/夜/作業中 を各10点で評価し、入力した項目だけで平均。実際の調子。\n';
+  out+='・体感スコア(%) = 自己採点。朝/食後の眠気/午後/夜/作業中/集中力 を各10点で評価し、入力した項目だけで平均。実際の調子。\n';
   out+='・行動評価(/100) = 夜の習慣から機械的に算出。睡眠7h未満/食事就寝3h以内/飲酒/入浴就寝直前/コーヒー14時以降/就寝前の刺激作業 で減点。\n';
   out+='\n--- 各日の記録 ---\n';
 
