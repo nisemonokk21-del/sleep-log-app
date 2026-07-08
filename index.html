@@ -824,12 +824,12 @@
       </div>
 
       <div class="section">
-        <div class="section-header"><span class="section-icon">🕐</span><span class="section-title">眠気タイムライン</span></div>
+        <div class="section-header"><span class="section-icon">🕐</span><span class="section-title">調子タイムライン</span></div>
         <div class="section-body">
-          <div class="sl-hint">眠気レベルを選んで、時間をタップ／なぞって塗る（まとめ塗りOK・同じ値をもう一度タップで消える）</div>
+          <div class="sl-hint">1日の調子（眠気の波）を記録。<b style="color:var(--good)">10=パッチリ</b> 〜 <b style="color:var(--warn)">1=強い眠気</b>。レベルを選んで時間をタップ／なぞって塗る（まとめ塗りOK・同じ値をもう一度で消える）</div>
           <div class="sl-brushes" id="slBrushes"></div>
           <div class="sl-grid" id="slGrid"></div>
-          <div class="sl-legend"><span>上段 0〜11時 / 下段 12〜23時</span><span>緑=快調 金=普通 赤=強い眠気</span></div>
+          <div class="sl-legend"><span>上段 0〜11時 / 下段 12〜23時</span><span>緑=快調 金=普通 赤=眠い</span></div>
         </div>
       </div>
 
@@ -1064,13 +1064,15 @@ function sleepEff(bedM,wakeM,lat,wakes){
   return Math.max(0,Math.min(100,Math.round((dur-lost)/dur*100)));
 }
 
-// ===== sleepiness timeline (hourly, KSS-style self report) =====
+// ===== condition/alertness timeline (hourly, KSS-style self report) =====
+// scale is aligned with the rest of the app: HIGH = good (パッチリ), LOW = sleepy.
 function slColor(v){
-  const t=v<=3?[127,200,169]:v<=6?[227,185,106]:[224,135,111];
-  const a=0.16+0.07*v;
-  return{bg:`rgba(${t[0]},${t[1]},${t[2]},${a.toFixed(2)})`,
+  const t=v>=7?[127,200,169]:v>=4?[227,185,106]:[224,135,111]; // green / gold / red
+  const a=0.2+0.05*Math.abs(v-5.5); // stronger states (very alert OR very sleepy) pop more
+  return{rgb:`rgb(${t[0]},${t[1]},${t[2]})`,
+         bg:`rgba(${t[0]},${t[1]},${t[2]},${a.toFixed(2)})`,
          bd:`rgba(${t[0]},${t[1]},${t[2]},0.55)`,
-         tx:a>0.6?'#11131f':`rgb(${t[0]},${t[1]},${t[2]})`};
+         tx:`rgb(${t[0]},${t[1]},${t[2]})`};
 }
 function renderSlBrushes(){
   const el=document.getElementById('slBrushes'); if(!el)return;
@@ -1571,19 +1573,25 @@ function scoreMoon(score){
   return'🌑';
 }
 
-// mini sleepiness strip for history cards (24 hourly cells)
+// mini condition-wave sparkline for history cards (one day, 0-23h)
 function slStripHTML(sl){
   if(!sl)return'';
-  let any=false;
-  const cells=[];
+  const pts=[];
   for(let h=0;h<24;h++){
     const v=sl[h]!=null?sl[h]:sl[String(h)];
-    if(v==null){cells.push('<span style="flex:1"></span>');continue;}
-    any=true;
-    cells.push(`<span style="flex:1;background:${slColor(v).bg}"></span>`);
+    if(v!=null)pts.push({h,v});
   }
-  if(!any)return'';
-  return`<div style="display:flex;height:6px;border-radius:99px;overflow:hidden;background:var(--surface2);margin-bottom:9px">${cells.join('')}</div>`;
+  if(!pts.length)return'';
+  const w=300,ht=26,padX=2,padY=3,plotH=ht-2*padY;
+  const px=h=>padX+(w-2*padX)*h/23;
+  const py=v=>padY+plotH*(1-v/10);
+  const segs=[];let cur=[];
+  pts.forEach(p=>{ if(cur.length&&p.h!==cur[cur.length-1].h+1){segs.push(cur);cur=[];} cur.push(p); });
+  if(cur.length)segs.push(cur);
+  const lines=segs.map(seg=>seg.length<2?'':`<path d="${seg.map((p,i)=>`${i?'L':'M'}${px(p.h).toFixed(1)},${py(p.v).toFixed(1)}`).join(' ')}" fill="none" stroke="#e3b96a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  const dots=pts.map(p=>`<circle cx="${px(p.h).toFixed(1)}" cy="${py(p.v).toFixed(1)}" r="1.8" fill="${slColor(p.v).rgb}"/>`).join('');
+  const mid=`<line x1="${padX}" y1="${py(5).toFixed(1)}" x2="${w-padX}" y2="${py(5).toFixed(1)}" stroke="#2a2e46" stroke-width="0.8" stroke-dasharray="2 2"/>`;
+  return`<div style="margin-bottom:9px"><svg viewBox="0 0 ${w} ${ht}" style="width:100%;height:26px;display:block">${mid}${lines}${dots}</svg></div>`;
 }
 
 // sleep bar: window 19:00 → 12:00 (17h)
@@ -1756,7 +1764,8 @@ function svgBarChart(data, w=340, h=110){
   </svg>`;
 }
 
-// hourly average sleepiness across logs → {bars svg, peak:{h,avg}} or null
+// hourly average condition across logs → {sums,cnts,low:{h,avg}} or null
+// low = the sleepiest hour (lowest avg condition), where the daily dip is
 function sleepinessByHour(logs){
   const sums=Array(24).fill(0),cnts=Array(24).fill(0);
   logs.forEach(l=>{
@@ -1767,27 +1776,35 @@ function sleepinessByHour(logs){
     });
   });
   if(!cnts.some(c=>c>0))return null;
-  let peak=null;
+  let low=null;
   for(let h=0;h<24;h++){
     if(cnts[h]<2)continue;
     const avg=sums[h]/cnts[h];
-    if(!peak||avg>peak.avg)peak={h,avg};
+    if(!low||avg<low.avg)low={h,avg};
   }
-  return{sums,cnts,peak};
+  return{sums,cnts,low};
 }
-function svgSleepinessChart(hb,w=340,h=120){
-  const pad=4,axisH=14,bw=(w-2*pad)/24-2;
-  let bars='';
-  for(let hr=0;hr<24;hr++){
-    if(!hb.cnts[hr])continue;
-    const avg=hb.sums[hr]/hb.cnts[hr];
-    const col=avg<=3?'#7fc8a9':avg<=6?'#e3b96a':'#e0876f';
-    const bh=Math.max(3,(h-axisH-2*pad)*avg/10);
-    const x=pad+(w-2*pad)*hr/24+1;
-    bars+=`<rect x="${x.toFixed(1)}" y="${(h-axisH-pad-bh).toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="2.5" fill="${col}" opacity="0.9"/>`;
-  }
-  const lbls=[0,6,12,18,23].map(hr=>`<text x="${(pad+(w-2*pad)*(hr+0.5)/24).toFixed(1)}" y="${h-3}" font-size="8.5" fill="#8b8ea6" text-anchor="middle" font-family="monospace">${hr}時</text>`).join('');
-  return`<svg viewBox="0 0 ${w} ${h}">${bars}${lbls}</svg>`;
+// line chart of the daily condition wave (broken across hours with no data)
+function svgSleepinessChart(hb,w=340,h=130){
+  const padX=6,padTop=8,axisH=16,plotH=h-axisH-padTop;
+  const px=hr=>padX+(w-2*padX)*hr/23;
+  const py=v=>padTop+plotH*(1-v/10);
+  const pts=[];
+  for(let hr=0;hr<24;hr++)if(hb.cnts[hr])pts.push({hr,avg:hb.sums[hr]/hb.cnts[hr]});
+  // neutral reference line at 5
+  const grid=`<line x1="${padX}" y1="${py(5).toFixed(1)}" x2="${(w-padX).toFixed(1)}" y2="${py(5).toFixed(1)}" stroke="#2a2e46" stroke-width="1" stroke-dasharray="3 3"/>`;
+  // split into runs of consecutive hours so overnight gaps break the line
+  const segs=[];let cur=[];
+  pts.forEach(p=>{ if(cur.length&&p.hr!==cur[cur.length-1].hr+1){segs.push(cur);cur=[];} cur.push(p); });
+  if(cur.length)segs.push(cur);
+  const lines=segs.map(seg=>{
+    if(seg.length<2)return'';
+    const d=seg.map((p,i)=>`${i?'L':'M'}${px(p.hr).toFixed(1)},${py(p.avg).toFixed(1)}`).join(' ');
+    return`<path d="${d}" fill="none" stroke="#e3b96a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }).join('');
+  const dots=pts.map(p=>`<circle cx="${px(p.hr).toFixed(1)}" cy="${py(p.avg).toFixed(1)}" r="3.2" fill="${slColor(Math.round(p.avg)).rgb}"/>`).join('');
+  const lbls=[0,6,12,18,23].map(hr=>`<text x="${px(hr).toFixed(1)}" y="${h-4}" font-size="8.5" fill="#8b8ea6" text-anchor="middle" font-family="monospace">${hr}時</text>`).join('');
+  return`<svg viewBox="0 0 ${w} ${h}">${grid}${lines}${dots}${lbls}</svg>`;
 }
 
 function renderStats(){
@@ -1945,11 +1962,11 @@ function renderStats(){
     ${(()=>{
       const hb=sleepinessByHour(logs);
       if(!hb)return'';
-      const peak=hb.peak?`眠気ピーク <b style="color:var(--warn)">${hb.peak.h}時ごろ</b>（平均 ${hb.peak.avg.toFixed(1)}）`:'2日以上でピークが出ます';
+      const low=hb.low?`眠気が強い時間帯 <b style="color:var(--warn)">${hb.low.h}時ごろ</b>（調子 ${hb.low.avg.toFixed(1)}）`:'2日以上で傾向が出ます';
       return`<div class="section">
-        <div class="section-header"><span class="section-icon">🕐</span><span class="section-title">時間帯別の平均眠気</span></div>
+        <div class="section-header"><span class="section-icon">🕐</span><span class="section-title">時間帯別の調子（1日の波）</span></div>
         <div class="chart-box">${svgSleepinessChart(hb)}
-          <div class="chart-cap"><span>${peak}</span><span>棒=眠気 0〜10</span></div>
+          <div class="chart-cap"><span>${low}</span><span>折れ線=調子 0〜10（下=眠い）</span></div>
         </div>
       </div>`;
     })()}
@@ -1985,7 +2002,7 @@ window.exportData = function(){
   out+='\n【スコアの意味】\n';
   out+='・体感スコア(%) = 自己採点。朝/食後の眠気/午後/夜/作業中/集中力 を各10点で評価し、入力した項目だけで平均。実際の調子。\n';
   out+='・行動評価(/100) = 夜の習慣から機械的に算出。睡眠7h未満/食事就寝3h以内/飲酒/入浴就寝直前/コーヒー14時以降/就寝前の刺激作業 で減点。\n';
-  out+='・眠気 = 時間帯ごとの眠気の自己評価(1〜10、高いほど眠い)。「13〜15時=8」は13,14,15時が眠気8の意味。\n';
+  out+='・調子 = 時間帯ごとの調子の自己評価(1〜10、高いほどパッチリ、低いほど眠い)。「13〜15時=3」は13,14,15時の調子が3（眠い）の意味。\n';
   out+='・推定睡眠効率 = (就床時間−寝つき時間−中途覚醒×15分)÷就床時間。\n';
   out+='\n--- 各日の記録 ---\n';
 
@@ -2018,7 +2035,7 @@ window.exportData = function(){
         if(run){runs.push(run.s===h-1?`${run.s}時=${run.v}`:`${run.s}〜${h-1}時=${run.v}`);run=null;}
         if(v!=null)run={s:h,v};
       }
-      if(runs.length)out+=`  眠気: ${runs.join(' / ')}\n`;
+      if(runs.length)out+=`  調子: ${runs.join(' / ')}\n`;
     }
     if(l.activities&&l.activities.length)out+=`  就寝前: ${l.activities.map(actLabel).join('、')}${l.workend?`（作業終了${l.workend}）`:''}\n`;
     // feel breakdown
