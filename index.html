@@ -215,6 +215,30 @@
   }
   .nap-chip.active{border-color:var(--gold);background:var(--gold-bg);color:var(--gold);}
 
+  /* sleepiness timeline */
+  .sl-hint{font-size:10.5px;color:var(--muted);line-height:1.6;margin-bottom:10px;}
+  .sl-brushes{display:flex;gap:4px;margin-bottom:10px;}
+  .sl-brush{
+    flex:1;height:30px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer;
+    user-select:none;transition:all 0.12s;font-variant-numeric:tabular-nums;
+  }
+  .sl-brush.on{border-color:var(--gold);background:var(--gold-bg);color:var(--gold);font-weight:500;}
+  .sl-brush.eraser{flex:1.6;font-family:var(--gothic);font-size:10px;}
+  .sl-grid{
+    display:grid;grid-template-columns:repeat(12,1fr);gap:3px;
+    touch-action:none;user-select:none;-webkit-user-select:none;
+  }
+  .sl-cell{
+    height:38px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+    cursor:pointer;transition:background 0.1s;
+  }
+  .sl-h{font-family:var(--mono);font-size:9.5px;color:var(--muted);line-height:1;pointer-events:none;}
+  .sl-e{font-size:9px;line-height:1;height:10px;pointer-events:none;}
+  .sl-legend{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:8px;letter-spacing:0.03em;}
+
   /* chips */
   .chip-grid{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0;}
   .chip{
@@ -616,7 +640,29 @@
           </div>
           <div class="row">
             <div><div class="row-label">起床</div><div class="row-sub">目が覚めた時間</div></div>
-            <input type="time" class="time-input" id="waketime" onchange="recalc()">
+            <input type="time" class="time-input" id="waketime" onchange="recalc();renderSlGrid()">
+          </div>
+          <div class="row">
+            <div><div class="row-label">寝つくまで</div><div class="row-sub">布団に入ってから眠るまで</div></div>
+            <div class="nap-chips" id="latencyChips">
+              <span class="nap-chip" data-lat="5" onclick="setLatency(5)">〜10分</span>
+              <span class="nap-chip" data-lat="20" onclick="setLatency(20)">〜20分</span>
+              <span class="nap-chip" data-lat="40" onclick="setLatency(40)">〜40分</span>
+              <span class="nap-chip" data-lat="75" onclick="setLatency(75)">1時間〜</span>
+            </div>
+          </div>
+          <div class="row">
+            <div><div class="row-label">夜中に目覚めた</div><div class="row-sub">中途覚醒の回数</div></div>
+            <div class="nap-chips" id="wakesChips">
+              <span class="nap-chip" data-wakes="0" onclick="setWakes(0)">0回</span>
+              <span class="nap-chip" data-wakes="1" onclick="setWakes(1)">1回</span>
+              <span class="nap-chip" data-wakes="2" onclick="setWakes(2)">2回</span>
+              <span class="nap-chip" data-wakes="3" onclick="setWakes(3)">3回〜</span>
+            </div>
+          </div>
+          <div class="row">
+            <div><div class="row-label">朝の日光</div><div class="row-sub">起床後1時間以内に外の光を浴びた</div></div>
+            <div class="toggle" id="morningLight" onclick="toggleSwitch(this)"></div>
           </div>
           <div class="row">
             <div><div class="row-label">目覚め感</div></div>
@@ -778,11 +824,21 @@
       </div>
 
       <div class="section">
+        <div class="section-header"><span class="section-icon">🕐</span><span class="section-title">眠気タイムライン</span></div>
+        <div class="section-body">
+          <div class="sl-hint">眠気レベルを選んで、時間をタップ／なぞって塗る（まとめ塗りOK・同じ値をもう一度タップで消える）</div>
+          <div class="sl-brushes" id="slBrushes"></div>
+          <div class="sl-grid" id="slGrid"></div>
+          <div class="sl-legend"><span>上段 0〜11時 / 下段 12〜23時</span><span>緑=快調 金=普通 赤=強い眠気</span></div>
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section-header"><span class="section-icon">💤</span><span class="section-title">NAP（昼寝）</span></div>
         <div class="section-body">
           <div class="row">
             <div><div class="row-label">昼寝 開始</div><div class="row-sub">15時までの短い昼寝が理想</div></div>
-            <input type="time" class="time-input" id="napStart">
+            <input type="time" class="time-input" id="napStart" onchange="renderSlGrid()">
           </div>
           <div class="row">
             <div><div class="row-label">長さ</div><div class="row-sub">タップで選択・もう一度で解除</div></div>
@@ -948,7 +1004,7 @@ const DEFAULT_ACTIVITIES=[
 const FEEL_KEYS=['morning','postmeal','afternoon','evening','working','concentration'];
 const FEEL_LABELS={morning:'朝',postmeal:'食後の眠気',afternoon:'午後',evening:'夜',working:'作業中',concentration:'集中力'};
 const FEEL_SHORT={morning:'朝',postmeal:'食後',afternoon:'午後',evening:'夜',working:'作業'};
-const state={wakeupRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0,napMin:0,feel:{morning:null,postmeal:null,afternoon:null,evening:null,working:null,concentration:null}};
+const state={wakeupRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0,napMin:0,sleepLatency:null,nightWakes:null,slBrush:5,sleepiness:{},feel:{morning:null,postmeal:null,afternoon:null,evening:null,working:null,concentration:null}};
 
 function getCustomActivities(){try{return JSON.parse(localStorage.getItem('custom_activities')||'[]');}catch{return[];}}
 function saveCustomActivities(a){localStorage.setItem('custom_activities',JSON.stringify(a));}
@@ -982,6 +1038,116 @@ window.addCustomActivity = function(){
   const sel=[...document.querySelectorAll('#activityGrid .chip.selected')].map(x=>x.dataset.val);
   renderActivityGrid(sel); i.value=''; recalc();
 };
+
+// ===== sleep latency / night wakes (PSQI-style) =====
+const LAT_TXT={5:'〜10分',20:'〜20分',40:'〜40分',75:'1時間以上'};
+window.setLatency = function(m){
+  state.sleepLatency = state.sleepLatency===m ? null : m;
+  paintLatency(); updateHeaderMeta();
+};
+function paintLatency(){
+  document.querySelectorAll('#latencyChips .nap-chip').forEach(c=>c.classList.toggle('active',parseInt(c.dataset.lat)===state.sleepLatency));
+}
+window.setWakes = function(n){
+  state.nightWakes = state.nightWakes===n ? null : n;
+  paintWakes(); updateHeaderMeta();
+};
+function paintWakes(){
+  document.querySelectorAll('#wakesChips .nap-chip').forEach(c=>c.classList.toggle('active',parseInt(c.dataset.wakes)===state.nightWakes));
+}
+// estimated sleep efficiency: (in-bed − latency − wakes×15min) / in-bed
+function sleepEff(bedM,wakeM,lat,wakes){
+  if(bedM==null||wakeM==null)return null;
+  if(lat==null&&wakes==null)return null;
+  const dur=minDiff(bedM,wakeM); if(!dur)return null;
+  const lost=(lat||0)+(wakes||0)*15;
+  return Math.max(0,Math.min(100,Math.round((dur-lost)/dur*100)));
+}
+
+// ===== sleepiness timeline (hourly, KSS-style self report) =====
+function slColor(v){
+  const t=v<=3?[127,200,169]:v<=6?[227,185,106]:[224,135,111];
+  const a=0.16+0.07*v;
+  return{bg:`rgba(${t[0]},${t[1]},${t[2]},${a.toFixed(2)})`,
+         bd:`rgba(${t[0]},${t[1]},${t[2]},0.55)`,
+         tx:a>0.6?'#11131f':`rgb(${t[0]},${t[1]},${t[2]})`};
+}
+function renderSlBrushes(){
+  const el=document.getElementById('slBrushes'); if(!el)return;
+  let html='';
+  for(let v=1;v<=10;v++)html+=`<div class="sl-brush ${state.slBrush===v?'on':''}" onclick="setSlBrush(${v})">${v}</div>`;
+  html+=`<div class="sl-brush eraser ${state.slBrush===0?'on':''}" onclick="setSlBrush(0)">消す</div>`;
+  el.innerHTML=html;
+}
+window.setSlBrush = function(v){ state.slBrush=v; renderSlBrushes(); };
+// events for date D: morning (wake/nap) from log D or current inputs;
+// evening (meal/coffee/bath/bed) lives in D+1's 前夜 record
+function slEventsFor(dateKey){
+  const ev={};
+  const add=(t,e)=>{ if(!t)return; const h=parseInt(t.split(':')[0]); if(!isNaN(h)&&h>=0&&h<24) ev[h]=(ev[h]||'')+e; };
+  if(dateKey===getSelectedDate()){
+    add(document.getElementById('waketime').value,'☀');
+    add(document.getElementById('napStart').value,'💤');
+  }else{
+    const log=getLogs().find(l=>l.date===dateKey);
+    if(log){ add(log.waketime,'☀'); add(log.napStart,'💤'); }
+  }
+  const[y,m,d]=dateKey.split('-').map(Number);
+  const dt=new Date(y,m-1,d); dt.setDate(dt.getDate()+1);
+  const nlog=getLogs().find(l=>l.date===isoOf(dt));
+  if(nlog){ add(nlog.meal,'🍽'); add(nlog.coffeeTime,'☕'); add(nlog.bath,'🛁'); add(nlog.bedtime,'🌙'); }
+  return ev;
+}
+window.renderSlGrid = function(){
+  const grid=document.getElementById('slGrid'); if(!grid)return;
+  const ev=slEventsFor(getSelectedDate());
+  let html='';
+  for(let h=0;h<24;h++)html+=`<div class="sl-cell" data-h="${h}"><span class="sl-h">${h}</span><span class="sl-e">${ev[h]||''}</span></div>`;
+  grid.innerHTML=html;
+  for(let h=0;h<24;h++)paintSlCell(h);
+};
+function paintSlCell(h){
+  const c=document.querySelector(`.sl-cell[data-h="${h}"]`); if(!c)return;
+  const v=state.sleepiness[h];
+  const lbl=c.querySelector('.sl-h');
+  if(v==null){ c.style.background=''; c.style.borderColor=''; lbl.style.color=''; }
+  else{ const col=slColor(v); c.style.background=col.bg; c.style.borderColor=col.bd; lbl.style.color=col.tx; }
+}
+function slApply(h){
+  if(state.slBrush===0) delete state.sleepiness[h];
+  else state.sleepiness[h]=state.slBrush;
+  paintSlCell(h);
+}
+function initSlPaint(){
+  const grid=document.getElementById('slGrid'); if(!grid)return;
+  let active=false, downH=null, downHadSame=false, moved=false, lastH=null;
+  const hourAt=(x,y)=>{
+    const el=document.elementFromPoint(x,y);
+    const cell=el&&el.closest?el.closest('.sl-cell'):null;
+    return cell?parseInt(cell.dataset.h):null;
+  };
+  grid.addEventListener('pointerdown',e=>{
+    const h=hourAt(e.clientX,e.clientY); if(h==null)return;
+    active=true; moved=false; downH=h; lastH=h;
+    downHadSame=(state.slBrush!==0&&state.sleepiness[h]===state.slBrush);
+    try{grid.setPointerCapture(e.pointerId);}catch(_){}
+    slApply(h);
+  });
+  grid.addEventListener('pointermove',e=>{
+    if(!active)return;
+    const h=hourAt(e.clientX,e.clientY);
+    if(h==null||h===lastH)return;
+    lastH=h; if(h!==downH)moved=true;
+    slApply(h);
+  });
+  const finish=()=>{
+    if(!active)return;
+    if(!moved&&downHadSame){ delete state.sleepiness[downH]; paintSlCell(downH); }
+    active=false;
+  };
+  grid.addEventListener('pointerup',finish);
+  grid.addEventListener('pointercancel',finish);
+}
 
 // ===== nap =====
 window.setNapMin = function(m){
@@ -1147,7 +1313,8 @@ function updateHeaderMeta(){
   // sleep duration (live from inputs)
   const ms=document.getElementById('metaSleep');
   const bed=toMin(document.getElementById('bedtime').value), wake=toMin(document.getElementById('waketime').value);
-  ms.innerHTML=(bed!==null&&wake!==null)?fmtMin(minDiff(bed,wake)):'—';
+  const eff=sleepEff(bed,wake,state.sleepLatency,state.nightWakes);
+  ms.innerHTML=(bed!==null&&wake!==null)?fmtMin(minDiff(bed,wake))+(eff!=null?`<span class="dim"> · 推定効率${eff}%</span>`:''):'—';
   // streak
   const st=calcStreak();
   document.getElementById('metaStreak').innerHTML = st>0 ? `${st}<span class="dim">日</span> ${'🌙'.repeat(Math.min(st,7))}` : '—';
@@ -1293,6 +1460,10 @@ window.saveLog = async function(){
     stress:document.getElementById('stress').value,
     napStart:document.getElementById('napStart').value,
     napMin:state.napMin,
+    sleepLatency:state.sleepLatency,
+    nightWakes:state.nightWakes,
+    morningLight:document.getElementById('morningLight').classList.contains('on'),
+    sleepiness:{...state.sleepiness},
     feel:{...state.feel},
     feelPercent:feelPercent(state.feel),
     note:document.getElementById('noteInput').value,
@@ -1314,7 +1485,7 @@ function loadLogForDate(k){
   ['bedtime','waketime','mealtime','bathtime','coffeeTime','workend','napStart','noteInput','nextDayNote'].forEach(id=>{
     const e=document.getElementById(id);if(e)e.value='';
   });
-  ['alcohol','showerOnly','exercise'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  ['alcohol','showerOnly','exercise','morningLight'].forEach(id=>document.getElementById(id).classList.remove('on'));
   document.getElementById('stress').value=0;document.getElementById('stressVal').textContent='—';
   document.querySelectorAll('.scale-btn').forEach(e=>e.classList.remove('selected'));
   document.getElementById('breakdownSection').style.display='none';
@@ -1322,11 +1493,14 @@ function loadLogForDate(k){
   document.getElementById('halfCupBtn').classList.remove('active');
   updateCupUI();
   state.napMin=0;paintNap();
+  state.sleepLatency=null;paintLatency();
+  state.nightWakes=null;paintWakes();
+  state.sleepiness={};
   state.wakeupRating=0;
   // reset feel
   FEEL_KEYS.forEach(f=>{state.feel[f]=null;paintFeel(f);});
 
-  if(!log){renderActivityGrid([]);recalc();return;}
+  if(!log){renderActivityGrid([]);renderSlGrid();recalc();return;}
 
   document.getElementById('bedtime').value=log.bedtime||'';
   document.getElementById('waketime').value=log.waketime||'';
@@ -1336,6 +1510,10 @@ function loadLogForDate(k){
   document.getElementById('workend').value=log.workend||'';
   document.getElementById('napStart').value=log.napStart||'';
   if(log.napMin){state.napMin=log.napMin;paintNap();}
+  if(log.sleepLatency!=null){state.sleepLatency=log.sleepLatency;paintLatency();}
+  if(log.nightWakes!=null){state.nightWakes=log.nightWakes;paintWakes();}
+  if(log.morningLight)document.getElementById('morningLight').classList.add('on');
+  if(log.sleepiness)Object.entries(log.sleepiness).forEach(([h,v])=>{const hh=parseInt(h);if(v!=null&&hh>=0&&hh<24)state.sleepiness[hh]=v;});
   document.getElementById('noteInput').value=log.note||'';
   document.getElementById('nextDayNote').value=log.nextDayNote||'';
   if(log.alcohol)document.getElementById('alcohol').classList.add('on');
@@ -1356,6 +1534,7 @@ function loadLogForDate(k){
     FEEL_KEYS.forEach(f=>{state.feel[f]=(log.feel[f]!=null)?log.feel[f]:null;paintFeel(f);});
   }
   renderActivityGrid(log.activities||[]);
+  renderSlGrid();
   recalc();
 }
 
@@ -1390,6 +1569,21 @@ function scoreMoon(score){
   if(score>=55)return'🌓';
   if(score>=40)return'🌒';
   return'🌑';
+}
+
+// mini sleepiness strip for history cards (24 hourly cells)
+function slStripHTML(sl){
+  if(!sl)return'';
+  let any=false;
+  const cells=[];
+  for(let h=0;h<24;h++){
+    const v=sl[h]!=null?sl[h]:sl[String(h)];
+    if(v==null){cells.push('<span style="flex:1"></span>');continue;}
+    any=true;
+    cells.push(`<span style="flex:1;background:${slColor(v).bg}"></span>`);
+  }
+  if(!any)return'';
+  return`<div style="display:flex;height:6px;border-radius:99px;overflow:hidden;background:var(--surface2);margin-bottom:9px">${cells.join('')}</div>`;
 }
 
 // sleep bar: window 19:00 → 12:00 (17h)
@@ -1454,8 +1648,10 @@ function renderHistory(){
     const aclsPill=log.score>=75?'good':log.score>=50?'':'bad';
     const bed=toMin(log.bedtime), wake=toMin(log.waketime);
     const dur=(bed!=null&&wake!=null)?fmtMin(minDiff(bed,wake)):'—';
+    const eff=sleepEff(bed,wake,log.sleepLatency,log.nightWakes);
 
     let tags=[];
+    if(log.morningLight)tags.push(`<span class="h-tag green">☀ 朝日光</span>`);
     if(log.coffeeCups)tags.push(`<span class="h-tag">☕️ ${log.coffeeCups}</span>`);
     if(log.alcohol)tags.push(`<span class="h-tag red">🍺 酒</span>`);
     if(log.exercise)tags.push(`<span class="h-tag green">🏃 運動</span>`);
@@ -1491,8 +1687,9 @@ function renderHistory(){
           <div class="h-score ${fcls}">${fp==null?'未入力':fp+'<span class="u">%</span>'}</div>
         </div>
       </div>
-      ${(bed!=null&&wake!=null)?`<div class="h-sleepline"><span>前夜の睡眠</span><span class="dur"><b>${dur}</b></span><span>就寝 <b>${log.bedtime}</b> / 起床 <b>${log.waketime}</b></span></div>`:''}
+      ${(bed!=null&&wake!=null)?`<div class="h-sleepline"><span>前夜の睡眠</span><span class="dur"><b>${dur}</b></span><span>就寝 <b>${log.bedtime}</b> / 起床 <b>${log.waketime}</b></span>${eff!=null?`<span>効率 <b>${eff}%</b></span>`:''}</div>`:''}
       ${sleepBarHTML(bed,wake)}
+      ${slStripHTML(log.sleepiness)}
       ${feelChips}
       <div class="h-bottom">
         <div class="h-tags">${tags.join('')}</div>
@@ -1559,6 +1756,40 @@ function svgBarChart(data, w=340, h=110){
   </svg>`;
 }
 
+// hourly average sleepiness across logs → {bars svg, peak:{h,avg}} or null
+function sleepinessByHour(logs){
+  const sums=Array(24).fill(0),cnts=Array(24).fill(0);
+  logs.forEach(l=>{
+    if(!l.sleepiness)return;
+    Object.entries(l.sleepiness).forEach(([h,v])=>{
+      const hh=parseInt(h);
+      if(v!=null&&hh>=0&&hh<24){sums[hh]+=v;cnts[hh]++;}
+    });
+  });
+  if(!cnts.some(c=>c>0))return null;
+  let peak=null;
+  for(let h=0;h<24;h++){
+    if(cnts[h]<2)continue;
+    const avg=sums[h]/cnts[h];
+    if(!peak||avg>peak.avg)peak={h,avg};
+  }
+  return{sums,cnts,peak};
+}
+function svgSleepinessChart(hb,w=340,h=120){
+  const pad=4,axisH=14,bw=(w-2*pad)/24-2;
+  let bars='';
+  for(let hr=0;hr<24;hr++){
+    if(!hb.cnts[hr])continue;
+    const avg=hb.sums[hr]/hb.cnts[hr];
+    const col=avg<=3?'#7fc8a9':avg<=6?'#e3b96a':'#e0876f';
+    const bh=Math.max(3,(h-axisH-2*pad)*avg/10);
+    const x=pad+(w-2*pad)*hr/24+1;
+    bars+=`<rect x="${x.toFixed(1)}" y="${(h-axisH-pad-bh).toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="2.5" fill="${col}" opacity="0.9"/>`;
+  }
+  const lbls=[0,6,12,18,23].map(hr=>`<text x="${(pad+(w-2*pad)*(hr+0.5)/24).toFixed(1)}" y="${h-3}" font-size="8.5" fill="#8b8ea6" text-anchor="middle" font-family="monospace">${hr}時</text>`).join('');
+  return`<svg viewBox="0 0 ${w} ${h}">${bars}${lbls}</svg>`;
+}
+
 function renderStats(){
   const logs=[...getLogs()].sort((a,b)=>a.date.localeCompare(b.date));
   const el=document.getElementById('statsContent');
@@ -1574,6 +1805,19 @@ function renderStats(){
   const durs=logs.filter(l=>l.bedtime&&l.waketime).map(l=>minDiff(toMin(l.bedtime),toMin(l.waketime)));
   const avgSleep=durs.length?Math.round(durs.reduce((s,d)=>s+d,0)/durs.length):null;
   const streak=calcStreak();
+
+  // wake-time regularity (mean abs deviation, unwrapped around median) — last 14 logs
+  const wts=logs.slice(-14).map(l=>toMin(l.waketime)).filter(v=>v!=null);
+  let regTxt=null;
+  if(wts.length>=3){
+    const med=[...wts].sort((a,b)=>a-b)[Math.floor(wts.length/2)];
+    const un=wts.map(v=>{let d=v;while(d-med>720)d-=1440;while(med-d>720)d+=1440;return d;});
+    const mean=un.reduce((s,v)=>s+v,0)/un.length;
+    regTxt=Math.round(un.reduce((s,v)=>s+Math.abs(v-mean),0)/un.length);
+  }
+  // average estimated sleep efficiency
+  const effs=logs.map(l=>sleepEff(toMin(l.bedtime),toMin(l.waketime),l.sleepLatency,l.nightWakes)).filter(x=>x!=null);
+  const avgEff=effs.length?Math.round(effs.reduce((s,v)=>s+v,0)/effs.length):null;
 
   // charts (feel% trend)
   const recent=withFeel.slice(-14);
@@ -1608,6 +1852,16 @@ function renderStats(){
   // exercise
   const exY=f.filter(l=>l.exercise), exN=f.filter(l=>!l.exercise);
   factors.push({label:'運動',a:'した',b:'してない',av:avgFp(exY),bv:avgFp(exN),na:exY.length,nb:exN.length});
+  // morning light
+  const mlY=f.filter(l=>l.morningLight), mlN=f.filter(l=>!l.morningLight);
+  factors.push({label:'朝の日光',a:'浴びた',b:'浴びてない',av:avgFp(mlY),bv:avgFp(mlN),na:mlY.length,nb:mlN.length});
+  // sleep onset latency fast vs slow
+  const laF=f.filter(l=>l.sleepLatency!=null&&l.sleepLatency<=20);
+  const laS=f.filter(l=>l.sleepLatency!=null&&l.sleepLatency>=40);
+  factors.push({label:'寝つき20分以内',a:'早い',b:'遅い',av:avgFp(laF),bv:avgFp(laS),na:laF.length,nb:laS.length});
+  // night awakenings
+  const nwN=f.filter(l=>l.nightWakes===0), nwY=f.filter(l=>l.nightWakes!=null&&l.nightWakes>=1);
+  factors.push({label:'中途覚醒なし',a:'なし',b:'あり',av:avgFp(nwN),bv:avgFp(nwY),na:nwN.length,nb:nwY.length});
 
   // compute diff (good condition - bad condition), only where both sides have >=2 samples
   const ranked=factors
@@ -1667,6 +1921,8 @@ function renderStats(){
       <div class="stat-card"><div class="stat-num greenc">${bestFeel!=null?bestFeel+'%':'—'}</div><div class="stat-lbl">ベスト体感</div></div>
       <div class="stat-card"><div class="stat-num">${avgSleep?fmtMin(avgSleep):'—'}</div><div class="stat-lbl">平均睡眠時間</div></div>
       <div class="stat-card"><div class="stat-num">${avgAction}<span class="small"> /100</span></div><div class="stat-lbl">平均 行動評価</div></div>
+      <div class="stat-card"><div class="stat-num">${regTxt!=null?'±'+regTxt:'—'}<span class="small"> 分</span></div><div class="stat-lbl">起床のばらつき（直近14件）</div></div>
+      <div class="stat-card"><div class="stat-num">${avgEff!=null?avgEff:'—'}<span class="small"> %</span></div><div class="stat-lbl">推定 睡眠効率</div></div>
     </div>
 
     <div class="section">
@@ -1685,6 +1941,18 @@ function renderStats(){
       <div class="section-header"><span class="section-icon">🛏</span><span class="section-title">前夜の睡眠時間（点線=7h）</span></div>
       <div class="chart-box">${svgBarChart(barData)}</div>
     </div>
+
+    ${(()=>{
+      const hb=sleepinessByHour(logs);
+      if(!hb)return'';
+      const peak=hb.peak?`眠気ピーク <b style="color:var(--warn)">${hb.peak.h}時ごろ</b>（平均 ${hb.peak.avg.toFixed(1)}）`:'2日以上でピークが出ます';
+      return`<div class="section">
+        <div class="section-header"><span class="section-icon">🕐</span><span class="section-title">時間帯別の平均眠気</span></div>
+        <div class="chart-box">${svgSleepinessChart(hb)}
+          <div class="chart-cap"><span>${peak}</span><span>棒=眠気 0〜10</span></div>
+        </div>
+      </div>`;
+    })()}
 
     <div class="section">
       <div class="section-header"><span class="section-icon">🤖</span><span class="section-title">AI分析用に書き出す</span></div>
@@ -1717,6 +1985,8 @@ window.exportData = function(){
   out+='\n【スコアの意味】\n';
   out+='・体感スコア(%) = 自己採点。朝/食後の眠気/午後/夜/作業中/集中力 を各10点で評価し、入力した項目だけで平均。実際の調子。\n';
   out+='・行動評価(/100) = 夜の習慣から機械的に算出。睡眠7h未満/食事就寝3h以内/飲酒/入浴就寝直前/コーヒー14時以降/就寝前の刺激作業 で減点。\n';
+  out+='・眠気 = 時間帯ごとの眠気の自己評価(1〜10、高いほど眠い)。「13〜15時=8」は13,14,15時が眠気8の意味。\n';
+  out+='・推定睡眠効率 = (就床時間−寝つき時間−中途覚醒×15分)÷就床時間。\n';
   out+='\n--- 各日の記録 ---\n';
 
   logs.forEach(l=>{
@@ -1725,6 +1995,10 @@ window.exportData = function(){
     out+=`\n■ ${l.date}（体感${fp!=null?fp+'%':'—'} / 行動${l.score}）\n`;
     out+=`  就寝${l.bedtime||'—'} 起床${l.waketime||'—'}（${dur}）`;
     if(l.wakeupRating)out+=` 目覚め:${wakeTxt[l.wakeupRating]}`;
+    if(l.sleepLatency!=null)out+=` 寝つき:${LAT_TXT[l.sleepLatency]||l.sleepLatency+'分'}`;
+    if(l.nightWakes!=null)out+=` 中途覚醒:${l.nightWakes}${l.nightWakes>=3?'回以上':'回'}`;
+    const exEff=sleepEff(toMin(l.bedtime),toMin(l.waketime),l.sleepLatency,l.nightWakes);
+    if(exEff!=null)out+=` 推定効率:${exEff}%`;
     out+='\n';
     let nightItems=[];
     if(l.meal)nightItems.push(`食事${l.meal}`);
@@ -1732,9 +2006,20 @@ window.exportData = function(){
     if(l.bath)nightItems.push(`入浴${l.bath}`);
     if(l.coffeeCups)nightItems.push(`コーヒー${l.coffeeCups}杯(最終${l.coffeeTime||'?'})`);
     if(l.exercise)nightItems.push('運動あり');
+    if(l.morningLight)nightItems.push('朝の日光あり');
     if(l.stress&&l.stress!=0)nightItems.push(`ストレス${l.stress}/5`);
     if(nightItems.length)out+=`  ${nightItems.join(' / ')}\n`;
     if(l.napStart||l.napMin)out+=`  昼寝: ${l.napStart?`開始${l.napStart}`:''}${l.napStart&&l.napMin?' ':''}${l.napMin?`${l.napMin}分`:''}\n`;
+    if(l.sleepiness){
+      const runs=[];let run=null;
+      for(let h=0;h<=24;h++){
+        const v=h<24?(l.sleepiness[h]!=null?l.sleepiness[h]:l.sleepiness[String(h)]):null;
+        if(run&&v===run.v)continue;
+        if(run){runs.push(run.s===h-1?`${run.s}時=${run.v}`:`${run.s}〜${h-1}時=${run.v}`);run=null;}
+        if(v!=null)run={s:h,v};
+      }
+      if(runs.length)out+=`  眠気: ${runs.join(' / ')}\n`;
+    }
     if(l.activities&&l.activities.length)out+=`  就寝前: ${l.activities.map(actLabel).join('、')}${l.workend?`（作業終了${l.workend}）`:''}\n`;
     // feel breakdown
     if(l.feel){
@@ -1766,6 +2051,7 @@ document.getElementById('logDate').value=todayISO();
 document.getElementById('newActivityInput').addEventListener('keydown',e=>{if(e.key==='Enter')addCustomActivity();});
 renderActivityGrid([]);
 renderFeelScales();
+renderSlBrushes();renderSlGrid();initSlPaint();
 FEEL_KEYS.forEach(k=>paintFeel(k));
 updateSaveBtnLabel();updateNextDayBadge();updateDateBanner();updateHeaderMeta();renderDateRail();
 </script>
