@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#11131f">
 <title>SLEEP LOG</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=DM+Mono:wght@300;400;500&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#11131f;
@@ -27,6 +27,7 @@
     --mincho:'Shippori Mincho',serif;
     --gothic:'Zen Kaku Gothic New',sans-serif;
     --mono:'DM Mono',monospace;
+    --num:'Fraunces','Shippori Mincho',serif;
     --radius:18px;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -101,8 +102,8 @@
     align-items:center;justify-content:center;gap:0;
   }
   .ring-score{
-    font-family:var(--mincho);font-size:38px;font-weight:600;line-height:1;
-    color:var(--text);
+    font-family:var(--num);font-size:40px;font-weight:500;line-height:1;
+    color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-0.01em;
   }
   .ring-unit{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.15em;margin-top:3px;}
 
@@ -175,9 +176,9 @@
   .row-label{font-size:14px;}
   .row-sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
   .time-input{
-    font-family:var(--mono);font-size:19px;color:var(--text);
+    font-family:var(--mono);font-size:19px;font-weight:500;color:var(--text);
     border:none;background:transparent;text-align:right;width:104px;outline:none;
-    color-scheme:dark;
+    color-scheme:dark;font-variant-numeric:tabular-nums;letter-spacing:0.02em;
   }
   .time-input:focus{color:var(--gold);}
 
@@ -202,7 +203,17 @@
     border:1px solid var(--border);color:var(--muted);cursor:pointer;user-select:none;transition:all 0.18s;
   }
   .half-cup.active{border-color:var(--gold);background:var(--gold-bg);color:var(--gold);}
-  .coffee-count{font-family:var(--mono);font-size:17px;color:var(--gold);}
+  .coffee-count{font-family:var(--num);font-size:18px;font-weight:500;color:var(--gold);font-variant-numeric:tabular-nums;}
+
+  /* nap */
+  .nap-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+  .nap-chip{
+    font-family:var(--mono);font-size:12px;padding:5px 11px;border-radius:99px;
+    border:1px solid var(--border);color:var(--muted);cursor:pointer;
+    user-select:none;transition:all 0.18s;background:var(--surface2);
+    font-variant-numeric:tabular-nums;
+  }
+  .nap-chip.active{border-color:var(--gold);background:var(--gold-bg);color:var(--gold);}
 
   /* chips */
   .chip-grid{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0;}
@@ -242,7 +253,7 @@
   .slider-block{padding:10px 0;border-bottom:1px solid var(--border);}
   .slider-block:last-child{border-bottom:none;}
   .slider-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
-  .slider-val{font-family:var(--mono);font-size:17px;color:var(--gold);}
+  .slider-val{font-family:var(--num);font-size:19px;font-weight:500;color:var(--gold);font-variant-numeric:tabular-nums;}
 
   .scale{display:flex;justify-content:space-between;padding:3px 0 0;}
   .scale-btn{font-size:25px;cursor:pointer;opacity:0.26;transition:all 0.16s;user-select:none;filter:grayscale(0.5);}
@@ -251,7 +262,7 @@
   /* feel score (10pt) */
   .feel-block{padding:13px 0;border-bottom:1px solid var(--border);}
   .feel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;}
-  .feel-val{font-family:var(--mincho);font-size:20px;font-weight:600;color:var(--gold);min-width:48px;text-align:right;}
+  .feel-val{font-family:var(--num);font-size:22px;font-weight:500;color:var(--gold);min-width:48px;text-align:right;font-variant-numeric:tabular-nums;}
   .feel-val.unset{color:var(--muted);font-family:var(--mono);font-size:15px;}
   .feel-scale{display:flex;gap:3px;}
   .fs-dot{
@@ -316,6 +327,10 @@
   .dr-rel{font-family:var(--mincho);font-size:16px;font-weight:600;color:var(--text);line-height:1;}
   .dr-rel.date{font-family:var(--mono);font-size:13px;font-weight:400;}
   .dr-day.today .dr-rel{color:var(--gold);}
+  .dr-day.tomorrow{border-style:dashed;}
+  .dr-day.tomorrow .dr-rel{color:var(--muted);}
+  .dr-day.tomorrow.selected{border-style:solid;border-color:var(--gold);}
+  .dr-day.tomorrow.selected .dr-rel{color:var(--text);}
   .dr-mark{width:6px;height:6px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);}
   .dr-mark.has{background:var(--gold);border-color:var(--gold);}
 
@@ -326,7 +341,7 @@
     padding:12px 10px;margin-bottom:14px;
   }
   .rs-item{display:flex;flex-direction:column;align-items:center;gap:3px;}
-  .rs-num{font-family:var(--mincho);font-size:21px;font-weight:600;line-height:1;}
+  .rs-num{font-family:var(--num);font-size:22px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;}
   .rs-num .u{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400;}
   .rs-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;}
   .rs-div{width:1px;height:30px;background:var(--border);}
@@ -357,7 +372,7 @@
   .h-date .reltag{font-family:var(--gothic);font-size:10px;color:var(--gold);margin-left:7px;letter-spacing:.06em;}
   .h-feelwrap{text-align:right;}
   .h-feellbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.14em;margin-bottom:1px;}
-  .h-score{font-family:var(--mincho);font-size:30px;font-weight:600;line-height:1;}
+  .h-score{font-family:var(--num);font-size:31px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;}
   .h-score .u{font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:1px;}
   .h-score.good{color:var(--good);}
   .h-score.ok{color:var(--gold);}
@@ -429,7 +444,8 @@
     border-radius:var(--radius);padding:15px 16px 13px;
   }
   .stat-num{
-    font-family:var(--mincho);font-size:30px;font-weight:600;line-height:1.05;
+    font-family:var(--num);font-size:31px;font-weight:500;line-height:1.05;
+    font-variant-numeric:tabular-nums;letter-spacing:-0.01em;
   }
   .stat-num .small{font-size:15px;color:var(--muted);font-family:var(--mono);font-weight:400;}
   .stat-lbl{font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-top:5px;}
@@ -456,7 +472,7 @@
     width:18px;text-align:center;flex-shrink:0;
   }
   .impact-label{font-size:13px;flex:1;}
-  .impact-diff{font-family:var(--mono);font-size:16px;font-weight:500;}
+  .impact-diff{font-family:var(--num);font-size:17px;font-weight:500;font-variant-numeric:tabular-nums;}
   .impact-bar-track{height:7px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-bottom:6px;}
   .impact-bar{height:100%;border-radius:99px;transition:width 0.5s;}
   .impact-detail{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.02em;}
@@ -762,6 +778,26 @@
       </div>
 
       <div class="section">
+        <div class="section-header"><span class="section-icon">💤</span><span class="section-title">NAP（昼寝）</span></div>
+        <div class="section-body">
+          <div class="row">
+            <div><div class="row-label">昼寝 開始</div><div class="row-sub">15時までの短い昼寝が理想</div></div>
+            <input type="time" class="time-input" id="napStart">
+          </div>
+          <div class="row">
+            <div><div class="row-label">長さ</div><div class="row-sub">タップで選択・もう一度で解除</div></div>
+            <div class="nap-chips" id="napChips">
+              <span class="nap-chip" data-min="15" onclick="setNapMin(15)">15分</span>
+              <span class="nap-chip" data-min="30" onclick="setNapMin(30)">30分</span>
+              <span class="nap-chip" data-min="45" onclick="setNapMin(45)">45分</span>
+              <span class="nap-chip" data-min="60" onclick="setNapMin(60)">60分</span>
+              <span class="nap-chip" data-min="90" onclick="setNapMin(90)">90分</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
         <div class="section-header"><span class="section-icon">✏️</span><span class="section-title">日中メモ</span></div>
         <div class="section-body">
           <textarea class="note" id="nextDayNote" placeholder="日中に気づいたこと（眠気・集中・気分など）"></textarea>
@@ -912,7 +948,7 @@ const DEFAULT_ACTIVITIES=[
 const FEEL_KEYS=['morning','postmeal','afternoon','evening','working','concentration'];
 const FEEL_LABELS={morning:'朝',postmeal:'食後の眠気',afternoon:'午後',evening:'夜',working:'作業中',concentration:'集中力'};
 const FEEL_SHORT={morning:'朝',postmeal:'食後',afternoon:'午後',evening:'夜',working:'作業'};
-const state={wakeupRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0,feel:{morning:null,postmeal:null,afternoon:null,evening:null,working:null,concentration:null}};
+const state={wakeupRating:0,newActivityIsBad:false,coffeeHalf:false,coffeeCups:0,napMin:0,feel:{morning:null,postmeal:null,afternoon:null,evening:null,working:null,concentration:null}};
 
 function getCustomActivities(){try{return JSON.parse(localStorage.getItem('custom_activities')||'[]');}catch{return[];}}
 function saveCustomActivities(a){localStorage.setItem('custom_activities',JSON.stringify(a));}
@@ -947,6 +983,15 @@ window.addCustomActivity = function(){
   renderActivityGrid(sel); i.value=''; recalc();
 };
 
+// ===== nap =====
+window.setNapMin = function(m){
+  state.napMin = state.napMin===m ? 0 : m;
+  paintNap();
+};
+function paintNap(){
+  document.querySelectorAll('#napChips .nap-chip').forEach(c=>c.classList.toggle('active',parseInt(c.dataset.min)===state.napMin));
+}
+
 // ===== coffee =====
 window.setCups = function(n){
   state.coffeeCups = (state.coffeeCups===n && !state.coffeeHalf) ? 0 : n;
@@ -976,8 +1021,10 @@ function dateLabel(){
   const v=getSelectedDate();const[y,m,d]=v.split('-');
   const dt=new Date(+y,+m-1,+d);const t=new Date();t.setHours(0,0,0,0);
   const yd=new Date(t);yd.setDate(t.getDate()-1);
+  const tm=new Date(t);tm.setDate(t.getDate()+1);
   if(dt.toDateString()===t.toDateString())return'今日';
   if(dt.toDateString()===yd.toDateString())return'昨日';
+  if(dt.toDateString()===tm.toDateString())return'明日';
   return`${m}/${d}`;
 }
 function nextDateLabel(k){
@@ -988,9 +1035,9 @@ window.onDateChange = function(){loadLogForDate(getSelectedDate());updateSaveBtn
 window.stepDate = function(delta){
   const v=getSelectedDate();const[y,m,d]=v.split('-');
   const dt=new Date(+y,+m-1,+d);dt.setDate(dt.getDate()+delta);
-  // don't allow future
-  const t=new Date();t.setHours(0,0,0,0);
-  if(dt>t)return;
+  // allow up to tomorrow (advance entry), no further
+  const lim=new Date();lim.setHours(0,0,0,0);lim.setDate(lim.getDate()+1);
+  if(dt>lim)return;
   document.getElementById('logDate').value=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
   onDateChange();
 };
@@ -1046,15 +1093,16 @@ function renderDateRail(){
   const sel=getSelectedDate(), today=todayISO();
   const wd=['日','月','火','水','木','金','土'];
   let html='';
-  for(let off=RAIL_DAYS; off>=0; off--){
+  for(let off=RAIL_DAYS; off>=-1; off--){
     const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-off);
     const k=isoOf(d);
-    const isToday=k===today, isSel=k===sel, has=byDate.has(k);
+    const isToday=k===today, isTomorrow=off===-1, isSel=k===sel, has=byDate.has(k);
     let rel,relCls='';
     if(isToday) rel='今日';
+    else if(isTomorrow) rel='明日';
     else if(off===1) rel='昨日';
     else {rel=`${d.getMonth()+1}/${d.getDate()}`;relCls='date';}
-    html+=`<div class="dr-day ${isToday?'today':''} ${isSel?'selected':''}" onclick="jumpToDateRail('${k}')">
+    html+=`<div class="dr-day ${isToday?'today':''} ${isTomorrow?'tomorrow':''} ${isSel?'selected':''}" onclick="jumpToDateRail('${k}')">
       <span class="dr-wd">${wd[d.getDay()]}</span>
       <span class="dr-rel ${relCls}">${rel}</span>
       <span class="dr-mark ${has?'has':''}"></span>
@@ -1243,6 +1291,8 @@ window.saveLog = async function(){
     workend:document.getElementById('workend').value,
     wakeupRating:state.wakeupRating,
     stress:document.getElementById('stress').value,
+    napStart:document.getElementById('napStart').value,
+    napMin:state.napMin,
     feel:{...state.feel},
     feelPercent:feelPercent(state.feel),
     note:document.getElementById('noteInput').value,
@@ -1261,7 +1311,7 @@ window.saveLog = async function(){
 
 function loadLogForDate(k){
   const log=getLogs().find(l=>l.date===k);
-  ['bedtime','waketime','mealtime','bathtime','coffeeTime','workend','noteInput','nextDayNote'].forEach(id=>{
+  ['bedtime','waketime','mealtime','bathtime','coffeeTime','workend','napStart','noteInput','nextDayNote'].forEach(id=>{
     const e=document.getElementById(id);if(e)e.value='';
   });
   ['alcohol','showerOnly','exercise'].forEach(id=>document.getElementById(id).classList.remove('on'));
@@ -1271,6 +1321,7 @@ function loadLogForDate(k){
   state.coffeeCups=0;state.coffeeHalf=false;
   document.getElementById('halfCupBtn').classList.remove('active');
   updateCupUI();
+  state.napMin=0;paintNap();
   state.wakeupRating=0;
   // reset feel
   FEEL_KEYS.forEach(f=>{state.feel[f]=null;paintFeel(f);});
@@ -1283,6 +1334,8 @@ function loadLogForDate(k){
   document.getElementById('bathtime').value=log.bath||'';
   document.getElementById('coffeeTime').value=log.coffeeTime||'';
   document.getElementById('workend').value=log.workend||'';
+  document.getElementById('napStart').value=log.napStart||'';
+  if(log.napMin){state.napMin=log.napMin;paintNap();}
   document.getElementById('noteInput').value=log.note||'';
   document.getElementById('nextDayNote').value=log.nextDayNote||'';
   if(log.alcohol)document.getElementById('alcohol').classList.add('on');
@@ -1393,6 +1446,7 @@ function renderHistory(){
   const wdJ=['日','月','火','水','木','金','土'];
   const today=todayISO();
   const yISO=(()=>{const d=new Date();d.setDate(d.getDate()-1);return isoOf(d);})();
+  const tmISO=(()=>{const d=new Date();d.setDate(d.getDate()+1);return isoOf(d);})();
 
   el.innerHTML=logs.map(log=>{
     const fp=log.feelPercent!=null?log.feelPercent:feelPercent(log.feel);
@@ -1405,6 +1459,7 @@ function renderHistory(){
     if(log.coffeeCups)tags.push(`<span class="h-tag">☕️ ${log.coffeeCups}</span>`);
     if(log.alcohol)tags.push(`<span class="h-tag red">🍺 酒</span>`);
     if(log.exercise)tags.push(`<span class="h-tag green">🏃 運動</span>`);
+    if(log.napMin||log.napStart)tags.push(`<span class="h-tag">💤 昼寝${log.napMin?log.napMin+'分':''}</span>`);
     if(log.activities)log.activities.slice(0,3).forEach(v=>{
       const a=allActs.find(x=>x.val===v);if(!a)return;
       tags.push(`<span class="h-tag ${a.bad?'red':'green'}">${a.label}</span>`);
@@ -1426,6 +1481,7 @@ function renderHistory(){
     let reltag='';
     if(log.date===today)reltag='<span class="reltag">今日</span>';
     else if(log.date===yISO)reltag='<span class="reltag">昨日</span>';
+    else if(log.date===tmISO)reltag='<span class="reltag">明日</span>';
 
     return`<div class="h-card" onclick="jumpToDate('${log.date}')">
       <div class="h-top">
@@ -1678,6 +1734,7 @@ window.exportData = function(){
     if(l.exercise)nightItems.push('運動あり');
     if(l.stress&&l.stress!=0)nightItems.push(`ストレス${l.stress}/5`);
     if(nightItems.length)out+=`  ${nightItems.join(' / ')}\n`;
+    if(l.napStart||l.napMin)out+=`  昼寝: ${l.napStart?`開始${l.napStart}`:''}${l.napStart&&l.napMin?' ':''}${l.napMin?`${l.napMin}分`:''}\n`;
     if(l.activities&&l.activities.length)out+=`  就寝前: ${l.activities.map(actLabel).join('、')}${l.workend?`（作業終了${l.workend}）`:''}\n`;
     // feel breakdown
     if(l.feel){
